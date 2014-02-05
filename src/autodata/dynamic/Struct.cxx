@@ -93,12 +93,6 @@ std::string const& Struct::GetTypename() const
     return m_typename;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Struct::Into(
-    Poco::Data::Statement& s )
-{
-    for( auto& kv : m_struct ) s, Keywords::into( kv.second );
-}
-////////////////////////////////////////////////////////////////////////////////
 void Struct::SetID(
     Var id )
 {
@@ -109,12 +103,6 @@ void Struct::SetTypename(
     std::string name )
 {
     m_typename = std::move( name );
-}
-////////////////////////////////////////////////////////////////////////////////
-void Struct::UseRef(
-    Poco::Data::Statement& s )
-{
-    for( auto const& kv : m_struct ) s, Keywords::useRef( kv.second );
 }
 ////////////////////////////////////////////////////////////////////////////////
 

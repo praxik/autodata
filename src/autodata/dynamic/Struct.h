@@ -70,10 +70,6 @@ public:
     std::string const& GetTypename() const;
 
     ///
-    void Into(
-        Poco::Data::Statement& s );
-
-    ///
     void SetID(
         Poco::Dynamic::Var id );
 
@@ -81,9 +77,6 @@ public:
     void SetTypename(
         std::string name );
 
-    ///
-    void UseRef(
-        Poco::Data::Statement& s );
 
 private:
     ///
@@ -97,3 +90,27 @@ private:
 } //end dynamic
 } //end autodata
 
+namespace Poco
+{
+namespace Data
+{
+namespace Keywords
+{
+
+///
+inline AbstractExtraction::Ptr into(
+    autodata::dynamic::Struct& s )
+{
+    for( auto& kv : s.GetStruct() ) s, Keywords::into( kv.second );
+}
+
+///
+/*void UseRef(
+    Poco::Data::Statement& s )
+{
+    for( auto const& kv : m_struct ) s, Keywords::useRef( kv.second );
+}*/
+
+} //end Keywords
+} //end Data
+} //end Poco
