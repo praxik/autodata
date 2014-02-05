@@ -1,43 +1,106 @@
-cmake_minimum_required (VERSION 2.8.8)
 
-add_subdirectory( noTH )
-add_subdirectory( storable )
+cmake_minimum_required( VERSION 2.8.8 )
 
+project( AUTODATA )
 
-project( json_util_proj )
+set( ${CMAKE_PROJECT_NAME}_MAJOR_VERSION 0 )
+set( ${CMAKE_PROJECT_NAME}_MINOR_VERSION 1 )
+set( ${CMAKE_PROJECT_NAME}_PATCH_VERSION 0 )
+set( v ${CMAKE_PROJECT_NAME}_VERSION )
+set( ${v} ${${CMAKE_PROJECT_NAME}_MAJOR_VERSION} )
+set( ${v} ${${v}}.${${CMAKE_PROJECT_NAME}_MINOR_VERSION} )
+set( ${v} ${${v}}.${${CMAKE_PROJECT_NAME}_PATCH_VERSION} )
+set( v ${${v}} )
+message( STATUS "Configuring ${CMAKE_PROJECT_NAME}: v${v}\n" )
 
-SET( CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/../../../CMakeModules" )
+set( INSTALL_LIBDIR lib )
+set( INSTALL_BINDIR bin )
+set( INSTALL_INCDIR include )
+set( INSTALL_SHRDIR share )
 
+if( WIN32 )
+    string( REGEX REPLACE "(^| )[/-]D *NDEBUG($| )" " "
+        CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}" )
+    string( REGEX REPLACE "(^| )[/-]D *NDEBUG($| )" " "
+        CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}" )
 
-set( POCO_ROOT "Please specify" CACHE PATH "Root directory where POCO is installed" )
-FIND_PACKAGE(POCO 1.5.1 REQUIRED COMPONENTS PocoFoundation PocoUtil PocoData PocoDataSQLite PocoJSON)
+    if( MSVC )
+        if( ${CMAKE_GENERATOR} MATCHES "Win64" )
+            set( VC_PLATFORM "x64" )
+        else()
+            set( VC_PLATFORM "Win32" )
+        endif()
+        message( STATUS "VC++ Platform: ${VC_PLATFORM}\n" )
 
+        if( MSVC90 )
+            set( VC_VERSION 9 )
+        elseif( MSVC10 )
+            set( VC_VERSION 10 )
+        elseif( MSVC11 )
+            set( VC_VERSION 11 )
+        else()
+            message( FATAL_ERROR "VC++ version not supported" )
+        endif()
+        message( STATUS "VC++ Version: ${VC_VERSION}\n" )
+    endif()
+endif()
 
-INCLUDE_DIRECTORIES(
-    ${POCO_INCLUDE_DIR}
-)
+#Set a default build type if none was specified
+if( NOT WIN32 AND NOT CMAKE_BUILD_TYPE )
+    set( CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Set build type" FORCE )
+endif()
 
-set( HEADERS AutoData.h AutoDataCRTP.h AutoDataConcept.h ADerivedDataClass.h Persister.h )
-set( SOURCES AutoData.cxx ADerivedDataClass.cxx test.cxx )
+#Update CMake module path
+set( CMAKE_MODULE_PATH
+    "${PROJECT_SOURCE_DIR}/CMakeModules"
+    ${CMAKE_MODULE_PATH} )
 
-set( TARGET_NAME json_util )
-set( TARGET_VERSION 0.1 )
-set( TARGET_EXPORT ${CMAKE_PROJECT_NAME}Targets )
-set( TARGET_CATEGORY App )
+#POCO
+if( POCO_STATIC )
+    add_definitions( -DPOCO_STATIC )
+endif()
+set( POCO_ROOT "Please specify"
+    CACHE PATH "Root directory where POCO is installed" )
+find_package( POCO 1.5.0 REQUIRED COMPONENTS
+    Data DataODBC DataSQLite Foundation JSON Net Util XML )
+set( POCO_MYSQL_API_DEFINE "undef" )
+set( POCO_ODBC_API_DEFINE "undef" )
 
-include_directories( ${POCO_INCLUDE_DIR} )
+foreach( config IN LISTS CMAKE_CONFIGURATION_TYPES ITEMS ${CMAKE_BUILD_TYPE} )
+    string( TOUPPER ${config} config )
+    if( config MATCHES "DEBUG" )
+        if( POCO_DataMySQL_LIBRARY_DEBUG )
+            #set( CMAKE_CXX_FLAGS_DEBUG
+            #    "-DPOCO_MYSQL_API ${CMAKE_CXX_FLAGS_DEBUG}" )
+            set( POCO_MYSQL_API_DEFINE "define" )
+        endif()
+        if( POCO_DataODBC_LIBRARY_DEBUG )
+            #set( CMAKE_CXX_FLAGS_DEBUG
+            #    "-DPOCO_ODBC_API ${CMAKE_CXX_FLAGS_DEBUG}" )
+            set( POCO_ODBC_API_DEFINE "define" )
+        endif()
+    else()
+        if( POCO_DataMySQL_LIBRARY )
+            #set( CMAKE_CXX_FLAGS_${config}
+            #    "-DPOCO_MYSQL_API ${CMAKE_CXX_FLAGS_${config}}" )
+            set( POCO_MYSQL_API_DEFINE "define" )
+        endif()
+        if( POCO_DataODBC_LIBRARY )
+            #set( CMAKE_CXX_FLAGS_${config}
+            #    "-DPOCO_ODBC_API ${CMAKE_CXX_FLAGS_${config}}" )
+            set( POCO_ODBC_API_DEFINE "define" )
+        endif()
+    endif()
+endforeach()
+configure_file( ${PROJECT_SOURCE_DIR}/src/autodata/AutoDataConfig.h.in
+    ${PROJECT_SOURCE_DIR}/src/autodata/AutoDataConfig.h @ONLY )
 
-add_executable( ${TARGET_NAME} ${SOURCES} ${HEADERS} )
-target_link_libraries( ${TARGET_NAME}
-    ${POCO_LIBRARIES} )
+add_subdirectory( src )
 
-SET(INSTALL_BINDIR bin)
+set( EXPORT_LIBRARY_TARGETS
+    autodata )
 
-INSTALL(
-        TARGETS ${TARGET_NAME}
-        RUNTIME DESTINATION ${INSTALL_BINDIR}
-    )
+set( CONFIGURE_VARS
+    INSTALL_LIBDIR )
 
-install(FILES data.json
-    DESTINATION bin
-    COMPONENT development)
+include( InstallAutoDiscoveryTools )
