@@ -1,0 +1,15 @@
+
+file( GLOB HEADERS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.h*" )
+
+set( TARGET_NAME cpplinq )
+set( TARGET_VERSION ${${CMAKE_PROJECT_NAME}_VERSION} )
+set( TARGET_EXPORT ${CMAKE_PROJECT_NAME}Targets )
+set( PRIVATE_HEADERS ${HEADERS} )
+set( PUBLIC_HEADERS ${HEADERS} )
+set( INCDIR_NAME "cpplinq" )
+
+foreach( HDR ${PUBLIC_HEADERS} )
+    install(
+        FILES ${HDR}
+        DESTINATION ${INSTALL_INCDIR}/${INCDIR_NAME} )
+endforeach()
