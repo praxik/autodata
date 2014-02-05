@@ -62,7 +62,7 @@ endif()
 set( POCO_ROOT "Please specify"
     CACHE PATH "Root directory where POCO is installed" )
 find_package( POCO 1.5.0 REQUIRED COMPONENTS
-    Data DataODBC DataSQLite Foundation JSON Net Util XML )
+    Data DataSQLite Foundation JSON Net Util XML )
 set( POCO_MYSQL_API_DEFINE "undef" )
 set( POCO_ODBC_API_DEFINE "undef" )
 
