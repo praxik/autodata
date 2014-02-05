@@ -28,6 +28,8 @@
 #include <Poco/Dynamic/Struct.h>
 #include <Poco/Data/Session.h>
 
+namespace autodata
+{
 namespace dynamic
 {
 
@@ -39,12 +41,24 @@ public:
     Struct();
 
     ///
+    ~Struct();
+
+    ///
+    operator Poco::Dynamic::Struct< std::string >&();
+
+    ///
+    operator Poco::Dynamic::Struct< std::string > const&() const;
+
+    ///
     Poco::Dynamic::Var& operator [](
         std::string const& name );
 
     ///
     Poco::Dynamic::Var const& operator [](
         std::string const& name ) const;
+
+    ///
+    Poco::Dynamic::Var const& GetID() const;
 
     ///
     Poco::Dynamic::Struct< std::string >& GetStruct();
@@ -56,15 +70,20 @@ public:
     std::string const& GetTypename() const;
 
     ///
-    void SetTypename(
-        std::string name );
-
-    ///
-    Poco::Dynamic::Var const& GetID() const;
+    void Into(
+        Poco::Data::Statement& s );
 
     ///
     void SetID(
         Poco::Dynamic::Var id );
+
+    ///
+    void SetTypename(
+        std::string name );
+
+    ///
+    void UseRef(
+        Poco::Data::Statement& s );
 
 private:
     ///
@@ -76,3 +95,5 @@ private:
 };
 
 } //end dynamic
+} //end autodata
+

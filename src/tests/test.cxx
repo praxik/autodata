@@ -22,6 +22,7 @@ int main(
     int argc,
     char* argv[] )
 {
+    autodata::dynamic::Struct astruct;
 
 
     return 0;
