@@ -79,6 +79,8 @@ public:
     void SetTypename(
         std::string name );
 
+    ///
+    std::string ToJson();
 
 private:
     ///

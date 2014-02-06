@@ -52,8 +52,7 @@ int main(
         astruct[ "four" ] = 7;
         astruct[ "five" ] = 7;
 
-        std::string json = Poco::Dynamic::Var::toString( astruct.GetStruct() );
-        std::cout << json << std::endl;
+        std::cout << astruct.ToJson() << std::endl;
 
         autodata::dynamic::Struct bstruct;
         bstruct[ "zero" ] = 6;
@@ -65,8 +64,7 @@ int main(
 
         astruct[ "three" ] = bstruct;
 
-        json = astruct.GetStruct().toString();
-        std::cout << json << std::endl;
+        std::cout << astruct.ToJson() << std::endl;
 
         /*statement
             << "select\n"
