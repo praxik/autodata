@@ -24,6 +24,8 @@
 // --- AutoData Includes --- //
 #include <autodata/AutoDataConfig.h>
 
+#include <autodata/util/DataHelper.h>
+
 // --- POCO Includes --- //
 #include <Poco/Dynamic/Struct.h>
 #include <Poco/Data/Session.h>
@@ -98,19 +100,48 @@ namespace Keywords
 {
 
 ///
-inline AbstractExtraction::Ptr into(
+/*inline AbstractExtractionVec into(
     autodata::dynamic::Struct& s )
 {
-    for( auto& kv : s.GetStruct() ) s, Keywords::into( kv.second );
+    AbstractExtractionVec extVec;
+    for( auto& kv : s.GetStruct() )
+    {
+        extVec.push_back( into( kv.second ) );
+    }
+    return extVec;
 }
 
 ///
-/*void UseRef(
-    Poco::Data::Statement& s )
+inline AbstractBindingVec useRef(
+    autodata::dynamic::Struct& s )
 {
-    for( auto const& kv : m_struct ) s, Keywords::useRef( kv.second );
+    AbstractBindingVec bindVec;
+    for( auto& kv : s.GetStruct() )
+    {
+        bindVec.push_back( useRef( kv.second ) );
+    }
+    return bindVec;
 }*/
 
 } //end Keywords
 } //end Data
+
+namespace Dynamic
+{
+
+///Assignment operator for assigning autodata::dynamic::Struct to Var
+template<>
+Var& Var::operator =(
+    autodata::dynamic::Struct const& o )
+{
+#ifdef POCO_NO_SOO
+    Var tmp( o.GetStruct() );
+    swap( tmp );
+#else
+    construct( o.GetStruct() );
+#endif
+    return *this;
+}
+
+} //end Dynamic
 } //end Poco

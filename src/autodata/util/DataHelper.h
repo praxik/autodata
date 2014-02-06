@@ -432,7 +432,7 @@ namespace Poco
 namespace Data
 {
 
-template<>
+/*template<>
 class Extraction< Dynamic::Struct< std::string > > : public AbstractExtraction
 {
 public:
@@ -495,8 +495,9 @@ public:
         std::size_t pos )
     {
         Dynamic::Var tmp;
-        TypeHandler< Dynamic::Var >::extract( pos, tmp, _default, getExtractor() );
-        //_rResult[ pos ] = tmp;
+        TypeHandler< Dynamic::Var >::extract(
+            pos, tmp, _default, getExtractor() );
+        _rResult[ "three" ] = tmp;
         return 1u;
     }
 
@@ -515,7 +516,7 @@ private:
     ///
     Dynamic::Var _default;
 
-};
+};*/
 #endif //SWIG
 
 } //end Data
