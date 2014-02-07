@@ -35,6 +35,9 @@ namespace autodata
 namespace dynamic
 {
 
+class Struct;
+typedef std::vector< Poco::Dynamic::Struct< std::string > > Table;
+
 ///
 class AUTODATA_EXPORTS Struct
 {
@@ -44,6 +47,23 @@ public:
 
     ///
     ~Struct();
+
+    ///Creates the Struct from the given value
+    Struct(
+        Poco::Dynamic::Struct< std::string >::Data const& val )
+        :
+        m_struct( val )
+    {
+        ;
+    }
+
+    ///
+    template< typename T >
+    Struct(
+        std::map< std::string, T > const& val )
+    {
+        for( auto const& kv : val ) m_struct[ kv.first ] = kv.second;
+    }
 
     ///
     operator Poco::Dynamic::Struct< std::string >&();
@@ -60,6 +80,10 @@ public:
         std::string const& name ) const;
 
     ///
+    void FromJson(
+        std::string const& json );
+
+    ///
     Poco::Dynamic::Var const& GetID() const;
 
     ///
@@ -70,6 +94,25 @@ public:
 
     ///
     std::string const& GetTypename() const;
+
+    ///
+    void Load(
+        Poco::Data::Session& session );
+
+    ///
+    std::string colstr(
+        unsigned int n = 2 ) const
+    {
+        std::string out;
+        Poco::Dynamic::Struct< std::string >::ConstIterator kv;
+        for( kv = m_struct.begin(); kv != --m_struct.end(); ++kv )
+        {
+            out += ( kv->first + ",\n" ).insert( 0, n, ' ' );
+        }
+        out += ( kv->first + "\n" ).insert( 0, n, ' ' );
+
+        return out;
+    }
 
     ///
     void SetID(
@@ -102,11 +145,11 @@ namespace Keywords
 {
 
 ///
-/*inline AbstractExtractionVec into(
-    autodata::dynamic::Struct& s )
+inline AbstractExtractionVec into(
+    autodata::dynamic::Struct& o )
 {
     AbstractExtractionVec extVec;
-    for( auto& kv : s.GetStruct() )
+    for( auto& kv : o.GetStruct() )
     {
         extVec.push_back( into( kv.second ) );
     }
@@ -115,15 +158,15 @@ namespace Keywords
 
 ///
 inline AbstractBindingVec useRef(
-    autodata::dynamic::Struct& s )
+    autodata::dynamic::Struct& o )
 {
     AbstractBindingVec bindVec;
-    for( auto& kv : s.GetStruct() )
+    for( auto& kv : o.GetStruct() )
     {
         bindVec.push_back( useRef( kv.second ) );
     }
     return bindVec;
-}*/
+}
 
 } //end Keywords
 } //end Data

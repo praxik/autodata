@@ -31,7 +31,9 @@
 #include <Poco/JSON/ParseHandler.h>
 
 using namespace Poco::Data;
+using namespace Poco::Data::Keywords;
 using namespace Poco::Dynamic;
+using namespace Poco::JSON;
 
 namespace autodata
 {
@@ -73,6 +75,38 @@ Var const& Struct::operator [](
     return m_struct[ name ];
 }
 ////////////////////////////////////////////////////////////////////////////////
+void Struct::FromJson(
+    std::string const& json )
+{
+    ParseHandler::Ptr handler = new ParseHandler( true );
+    Parser parser( handler );
+    Var result = parser.parse( json );
+
+    Object::Ptr set;
+    if( result.type() == typeid( Object::Ptr ) )
+    {
+        set = result.extract< Object::Ptr >();
+    }
+
+    //First we check for a typename and make sure it matches
+    /*if( !set->has( "typename" ) )
+    {
+        // throw exception?
+        std::cout << "Error: No typename in json. Aborting FromJSON operation!" << std::endl;
+        return;
+    }
+    if( set->getValue< std::string >( "typename" ) != T::type() )
+    {
+        //throw exception?
+        std::cout << "Error: Typename specified in JSON does not match this object's typename." << std::endl;
+        return;
+    }*/
+
+    //Pull the data and load it into m_struct
+    Object::Ptr data = set->getObject( "data" );
+    m_struct = *data;
+}
+////////////////////////////////////////////////////////////////////////////////
 Var const& Struct::GetID() const
 {
     return m_struct[ "id" ];
@@ -91,6 +125,24 @@ Poco::Dynamic::Struct< std::string > const& Struct::GetStruct() const
 std::string const& Struct::GetTypename() const
 {
     return m_typename;
+}
+////////////////////////////////////////////////////////////////////////////////
+void Struct::Load(
+    Session& session )
+{
+    //Build statement of form:
+    //select col1, col2, etc. from TYPENAME where id = ?
+    Statement statement( session );
+    statement
+        << "select\n"
+        <<  colstr()
+        << "from " << m_typename << "\n"
+        << "where\n"
+        << "  id = ?",
+        into( *this ),
+        useRef( m_struct[ "id" ] );
+    std::cout << statement.toString() << std::endl;
+    //statement.execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Struct::SetID(

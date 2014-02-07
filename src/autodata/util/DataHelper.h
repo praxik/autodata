@@ -100,6 +100,31 @@ std::string to_string_p(
     return oss.str();
 }
 
+///std::initializer_list alternative for non c++11 compliant
+///ex.
+///#define foo( x, ... ) FOO( ( varargls< std::string >( x ), __VA_ARGS__ ) )
+///void FOO( varargls< std::string > args )
+template< typename T, typename A = std::allocator< T > >
+struct varargls : public std::vector< T, A >
+{
+    ///
+    varargls(
+        T const& v )
+        :
+        std::vector< T, A > ( 1, v )
+    {
+        ;
+    }
+
+    ///
+    varargls& operator ,(
+        T const& v )
+    {
+        push_back( v );
+        return *this;
+    }
+};
+
 ///
 class AUTODATA_EXPORTS StmtObj
 {
@@ -495,10 +520,13 @@ public:
         std::size_t pos )
     {
         Dynamic::Var tmp;
-        TypeHandler< Dynamic::Var >::extract(
-            pos, tmp, _default, getExtractor() );
-        _rResult[ "three" ] = tmp;
-        return 1u;
+        for( auto const& kv : _rResult )
+        {
+            TypeHandler< Dynamic::Var >::extract(
+                pos, tmp, _default, getExtractor() );
+            _rResult[ kv.first ] = tmp;
+        }
+        return _rResult.size();
     }
 
     ///

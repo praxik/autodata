@@ -41,10 +41,10 @@ int main(
             << "  three text,\n"
             << "  four text,\n"
             << "  five text )";
-        //RecordSet rs( statement );
         statement.execute(); statement.reset( session );
 
         autodata::dynamic::Struct astruct;
+        astruct.SetTypename( "table1" );
         astruct[ "zero" ] = 7;
         astruct[ "one" ] = 7;
         astruct[ "two" ] = "twamy";
@@ -54,39 +54,9 @@ int main(
 
         std::cout << astruct.ToJson() << std::endl;
 
-        autodata::dynamic::Struct bstruct;
-        bstruct[ "zero" ] = 6;
-        bstruct[ "one" ] = 8;
-        bstruct[ "two" ] = "cool";
-        bstruct[ "three" ] = 5.46;
-        bstruct[ "four" ] = "somestringy";
-        bstruct[ "five" ] = 9.0;
-
-        astruct[ "three" ] = bstruct;
-
-        std::cout << astruct.ToJson() << std::endl;
+        astruct.Load( session );
 
         /*statement
-            << "select\n"
-            << "  7 as zero,\n"
-            << "  'awesome' as one,\n"
-            << "  6.66 as two,\n"
-            << "  'sauce' as three,\n"
-            << "  5.0 as four,\n"
-            << "  'sweet' as five",
-            into( astruct );
-        statement.execute(); statement.reset( session );
-
-        for( auto const& kv : astruct.GetStruct() )
-        {
-            std::cout << "aName: " << kv.first << "\taValue: "
-                << Convert< std::string >( kv.second ) << std::endl;
-        }
-
-        std::string json = Poco::Dynamic::Var::toString( astruct.GetStruct() );
-        std::cout << json << std::endl;
-
-        statement
             << "insert into table1 values( ?, ?, ?, ?, ?, ? )",
             useRef( astruct );
         statement.execute(); statement.reset( session );
