@@ -165,3 +165,26 @@ std::string Struct::ToJson()
 
 } //end dynamic
 } //end autodata
+
+namespace Poco
+{
+namespace Dynamic
+{
+
+///////////////////////////////////////////////////////////////////////////////////
+template<>
+Var& Var::operator =(
+    autodata::dynamic::Struct const& o )
+{
+#ifdef POCO_NO_SOO
+    Var tmp( o.GetStruct() );
+    swap( tmp );
+#else
+    construct( o.GetStruct() );
+#endif
+    return *this;
+}
+////////////////////////////////////////////////////////////////////////////////
+
+} //end Dynamic
+} //end Poco

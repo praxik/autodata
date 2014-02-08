@@ -1,6 +1,7 @@
 
 // --- AutoData Includes --- //
 #include <autodata/dynamic/Struct.h>
+#include <autodata/dynamic/Table.h>
 
 using namespace autodata::util;
 
@@ -43,7 +44,23 @@ int main(
             << "  five text )";
         statement.execute(); statement.reset( session );
 
-        autodata::dynamic::Struct astruct;
+        statement
+            << "select * from table1",
+            now;
+        autodata::dynamic::Table table( statement );
+        autodata::dynamic::StructVec rows = table.ToStructVec();
+        for( auto& row : rows )
+        {
+            std::cout << "zero: " << Convert< std::string >( row[ "zero" ], "null" ) << std::endl;
+            std::cout << "one: " << Convert< std::string >( row[ "one" ], "null" ) << std::endl;
+            std::cout << "two: " << Convert< std::string >( row[ "two" ], "null" ) << std::endl;
+            std::cout << "three: " << Convert< std::string >( row[ "three" ], "null" ) << std::endl;
+            std::cout << "four: " << Convert< std::string >( row[ "four" ], "null" ) << std::endl;
+            std::cout << "five: " << Convert< std::string >( row[ "five" ], "null" ) << std::endl;
+            std::cout << row.ToJson() << std::endl;
+        }
+
+        /*autodata::dynamic::Struct astruct;
         astruct.SetTypename( "table1" );
         astruct[ "zero" ] = 7;
         astruct[ "one" ] = 7;
@@ -54,7 +71,7 @@ int main(
 
         std::cout << astruct.ToJson() << std::endl;
 
-        astruct.Load( session );
+        astruct.Load( session );*/
 
         /*statement
             << "insert into table1 values( ?, ?, ?, ?, ?, ? )",

@@ -27,8 +27,9 @@
 #include <autodata/util/DataHelper.h>
 
 // --- POCO Includes --- //
-#include <Poco/Dynamic/Struct.h>
 #include <Poco/Data/Session.h>
+
+#include <Poco/Dynamic/Struct.h>
 
 namespace autodata
 {
@@ -36,7 +37,7 @@ namespace dynamic
 {
 
 class Struct;
-typedef std::vector< Poco::Dynamic::Struct< std::string > > Table;
+typedef std::vector< Struct > StructVec;
 
 ///
 class AUTODATA_EXPORTS Struct
@@ -177,16 +178,7 @@ namespace Dynamic
 ///Assignment operator for assigning autodata::dynamic::Struct to Var
 template<>
 Var& Var::operator =(
-    autodata::dynamic::Struct const& o )
-{
-#ifdef POCO_NO_SOO
-    Var tmp( o.GetStruct() );
-    swap( tmp );
-#else
-    construct( o.GetStruct() );
-#endif
-    return *this;
-}
+    autodata::dynamic::Struct const& o );
 
 } //end Dynamic
 } //end Poco
