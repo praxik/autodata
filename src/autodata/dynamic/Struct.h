@@ -44,6 +44,11 @@ class AUTODATA_EXPORTS Struct
 {
 public:
     ///
+    typedef Poco::Dynamic::Struct< std::string >::Iterator iterator;
+    typedef Poco::Dynamic::Struct< std::string >::ConstIterator const_iterator;
+    typedef Poco::Dynamic::Struct< std::string >::Data::value_type value_type;
+
+    ///
     Struct();
 
     ///
@@ -79,6 +84,18 @@ public:
     ///
     Poco::Dynamic::Var const& operator [](
         std::string const& name ) const;
+
+    ///
+    iterator begin();
+
+    ///
+    const_iterator begin() const;
+
+    ///
+    iterator end();
+
+    ///
+    const_iterator end() const;
 
     ///
     void FromJson(
@@ -137,6 +154,28 @@ private:
 
 } //end dynamic
 } //end autodata
+
+//For cpplinq use
+inline
+auto begin( autodata::dynamic::Struct& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+inline
+auto begin( autodata::dynamic::Struct const& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+inline
+auto end( autodata::dynamic::Struct& o ) -> decltype( o.end() )
+{
+    return o.end();
+}
+inline
+auto end( autodata::dynamic::Struct const& o ) -> decltype( o.end() )
+{
+    return o.end();
+}
 
 namespace Poco
 {

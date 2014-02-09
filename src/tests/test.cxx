@@ -51,14 +51,25 @@ int main(
         autodata::dynamic::StructVec rows = table.ToStructVec();
         for( auto& row : rows )
         {
-            std::cout << "zero: " << Convert< std::string >( row[ "zero" ], "null" ) << std::endl;
-            std::cout << "one: " << Convert< std::string >( row[ "one" ], "null" ) << std::endl;
-            std::cout << "two: " << Convert< std::string >( row[ "two" ], "null" ) << std::endl;
-            std::cout << "three: " << Convert< std::string >( row[ "three" ], "null" ) << std::endl;
-            std::cout << "four: " << Convert< std::string >( row[ "four" ], "null" ) << std::endl;
-            std::cout << "five: " << Convert< std::string >( row[ "five" ], "null" ) << std::endl;
             std::cout << row.ToJson() << std::endl;
+            auto var = cpplinq::
+                from( row ).
+                select( []( autodata::dynamic::Struct::value_type const& var ) -> double
+                {
+                    return Convert< double >( var.second, 0.0 );
+                } ).
+                aggregate( std::plus< double >() );
+            std::cout << "Summation of cols: " << var << std::endl;
         }
+
+        auto var = cpplinq::
+            from( rows ).
+            select( []( autodata::dynamic::Struct const& row ) -> double
+            {
+                return row[ "zero" ];
+            } ).
+            aggregate( std::plus< double >() );
+        std::cout << "Summation of col 'zero': " << var << std::endl;
 
         /*autodata::dynamic::Struct astruct;
         astruct.SetTypename( "table1" );
