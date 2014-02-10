@@ -37,13 +37,13 @@ class AUTODATA_EXPORTS Table : private Poco::Data::Statement
 {
 public:
     ///
-    explicit Table(
-        Poco::Data::Statement const& statement );
+    typedef Records::iterator iterator;
+    typedef Records::const_iterator const_iterator;
+    typedef Records::value_type value_type;
 
     ///
     explicit Table(
-        Poco::Data::Session& session,
-        std::string const& query );
+        Poco::Data::Statement const& statement );
 
     ///
     Table(
@@ -53,7 +53,30 @@ public:
     ~Table();
 
     ///
-    RecordVec ToRecordVec();
+    Record& operator [](
+        unsigned int pos );
+
+    ///
+    Record const& operator [](
+        unsigned int pos ) const;
+
+    ///
+    std::vector< Poco::Dynamic::Var > operator [](
+        std::string const& name );
+
+    ///
+    iterator begin();
+
+    ///
+    const_iterator begin() const;
+
+    ///
+    iterator end();
+
+    ///
+    const_iterator end() const;
+
+protected:
 
 private:
     ///Returns the reference to column at specified position
@@ -108,6 +131,9 @@ private:
     Poco::Data::MetaColumn::ColumnDataType columnType(
         std::size_t pos ) const;
 
+    ///
+    void FromDB();
+
     ///Returns the data value at column, row location
     Poco::Dynamic::Var value(
         std::size_t col,
@@ -142,7 +168,32 @@ private:
         }
     }
 
+    ///
+    Records m_records;
+
 };
 
 } //end dynamic
 } //end autodata
+
+//For cpplinq use
+inline
+auto begin( autodata::dynamic::Table& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+inline
+auto begin( autodata::dynamic::Table const& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+inline
+auto end( autodata::dynamic::Table& o ) -> decltype( o.end() )
+{
+    return o.end();
+}
+inline
+auto end( autodata::dynamic::Table const& o ) -> decltype( o.end() )
+{
+    return o.end();
+}

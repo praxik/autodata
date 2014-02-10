@@ -36,18 +36,10 @@ namespace dynamic
 Table::Table(
     Statement const& statement )
     :
-    Statement( statement )
+    Statement( statement ),
+    m_records()
 {
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::Table(
-    Session& session,
-    std::string const& query )
-    :
-    Statement( ( session << query, now ) )
-{
-    ;
+    FromDB();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Table::Table(
@@ -63,10 +55,71 @@ Table::~Table()
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
+Record& Table::operator [](
+    unsigned int pos )
+{
+    return m_records.at( pos );
+}
+////////////////////////////////////////////////////////////////////////////////
+Record const& Table::operator [](
+    unsigned int pos ) const
+{
+    return m_records.at( pos );
+}
+////////////////////////////////////////////////////////////////////////////////
+Table::iterator Table::begin()
+{
+    return m_records.begin();
+}
+////////////////////////////////////////////////////////////////////////////////
+Table::const_iterator Table::begin() const
+{
+    return m_records.begin();
+}
+////////////////////////////////////////////////////////////////////////////////
+Table::iterator Table::end()
+{
+    return m_records.end();
+}
+////////////////////////////////////////////////////////////////////////////////
+Table::const_iterator Table::end() const
+{
+    return m_records.end();
+}
+////////////////////////////////////////////////////////////////////////////////
+std::vector< Poco::Dynamic::Var > Table::operator [](
+    std::string const& name )
+{
+    return cpplinq::
+        from( m_records ).
+        select( [ &name ]( Record& record )
+        {
+            return record[ name ];
+        } ).to_vector();
+}
+////////////////////////////////////////////////////////////////////////////////
 MetaColumn::ColumnDataType Table::columnType(
     std::size_t pos ) const
 {
     return metaColumn( static_cast< Poco::UInt32 >( pos ) ).type();
+}
+////////////////////////////////////////////////////////////////////////////////
+void Table::FromDB()
+{
+    size_t colcnt = columnsExtracted();
+    size_t rowcnt = rowsExtracted();
+    m_records.reserve( rowcnt );
+    for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
+    {
+        Record record;
+        for( std::size_t colidx = 0; colidx < colcnt; ++colidx )
+        {
+            MetaColumn const& mc =
+                metaColumn( static_cast< Poco::UInt32 >( colidx ) );
+            record[ mc.name() ] = value( colidx, rowidx );
+        }
+        m_records.push_back( std::move( record ) );
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 Var Table::value(
@@ -96,27 +149,6 @@ Var Table::value(
         case MetaColumn::FDT_TIMESTAMP: return value< Poco::DateTime >( col, row );
         default: throw UnknownTypeException( "Data type not supported." );
     }
-}
-////////////////////////////////////////////////////////////////////////////////
-RecordVec Table::ToRecordVec()
-{
-    size_t colcnt = columnsExtracted();
-    poco_assert( colcnt );
-
-    size_t rowcnt = rowsExtracted();
-    RecordVec _rowMap; _rowMap.reserve( rowcnt );
-    for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
-    {
-        Record row;
-        for( std::size_t colidx = 0; colidx < colcnt; ++colidx )
-        {
-            MetaColumn const& mc =
-                metaColumn( static_cast< Poco::UInt32 >( colidx ) );
-            row[ mc.name() ] = value( colidx, rowidx );
-        }
-        _rowMap.push_back( std::move( row ) );
-    }
-    return _rowMap;
 }
 ////////////////////////////////////////////////////////////////////////////////
 

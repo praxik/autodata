@@ -36,8 +36,10 @@ namespace autodata
 namespace dynamic
 {
 
+///
 class Record;
-typedef std::vector< Record > RecordVec;
+typedef std::vector< Record > Records;
+//typedef std::vector< Poco::Dynamic::Var > Attributes;
 
 ///
 class AUTODATA_EXPORTS Record
