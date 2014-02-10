@@ -145,6 +145,14 @@ public:
     ///
     std::string ToJson();
 
+#ifndef SWIG
+    ///
+    AUTODATA_EXPORTS
+    friend std::ostream& operator <<(
+        std::ostream& os,
+        Record const& record );
+#endif SWIG
+
 private:
     ///
     std::string m_typename;
