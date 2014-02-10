@@ -87,17 +87,6 @@ Table::const_iterator Table::end() const
     return m_records.end();
 }
 ////////////////////////////////////////////////////////////////////////////////
-std::vector< Poco::Dynamic::Var > Table::operator [](
-    std::string const& name )
-{
-    return cpplinq::
-        from( m_records ).
-        select( [ &name ]( Record& record )
-        {
-            return record[ name ];
-        } ).to_vector();
-}
-////////////////////////////////////////////////////////////////////////////////
 MetaColumn::ColumnDataType Table::columnType(
     std::size_t pos ) const
 {

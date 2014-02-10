@@ -61,10 +61,6 @@ public:
         unsigned int pos ) const;
 
     ///
-    std::vector< Poco::Dynamic::Var > operator [](
-        std::string const& name );
-
-    ///
     iterator begin();
 
     ///
@@ -75,6 +71,20 @@ public:
 
     ///
     const_iterator end() const;
+
+    ///
+    template< typename T >
+    std::vector< T > col(
+        std::string const& name,
+        T const& defVal = T() ) const
+    {
+        return cpplinq::
+            from( m_records ).
+            select( [ &name, &defVal ]( Record const& record )
+            {
+                return util::Convert< T >( record[ name ], defVal );
+            } ).to_vector();
+    }
 
 protected:
 

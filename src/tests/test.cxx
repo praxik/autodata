@@ -49,8 +49,7 @@ int main(
             << "select * from table1",
             now;
         Table table( statement );
-        RecordVec rows = table.ToRecordVec();
-        for( auto& row : rows )
+        for( auto& row : table )
         {
             std::cout << row.ToJson() << std::endl;
             auto var = cpplinq::
@@ -64,13 +63,18 @@ int main(
         }
 
         auto var = cpplinq::
-            from( rows ).
+            from( table ).
             select( []( Record const& row ) -> double
             {
                 return row[ "zero" ];
             } ).
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var << std::endl;
+
+        auto var2 = cpplinq::
+            from( table.col< double >( "zero" ) ).
+            aggregate( std::plus< double >() );
+        std::cout << "Summation of col 'zero': " << var2 << std::endl;
 
         /*Record astruct;
         astruct.SetTypename( "table1" );
