@@ -36,11 +36,11 @@ namespace autodata
 namespace dynamic
 {
 
-class Struct;
-typedef std::vector< Struct > StructVec;
+class Record;
+typedef std::vector< Record > RecordVec;
 
 ///
-class AUTODATA_EXPORTS Struct
+class AUTODATA_EXPORTS Record
 {
 public:
     ///
@@ -49,13 +49,13 @@ public:
     typedef Poco::Dynamic::Struct< std::string >::Data::value_type value_type;
 
     ///
-    Struct();
+    Record();
 
     ///
-    ~Struct();
+    ~Record();
 
-    ///Creates the Struct from the given value
-    Struct(
+    ///Creates the record from the given value
+    Record(
         Poco::Dynamic::Struct< std::string >::Data const& val )
         :
         m_struct( val )
@@ -65,7 +65,7 @@ public:
 
     ///
     template< typename T >
-    Struct(
+    Record(
         std::map< std::string, T > const& val )
     {
         for( auto const& kv : val ) m_struct[ kv.first ] = kv.second;
@@ -157,22 +157,22 @@ private:
 
 //For cpplinq use
 inline
-auto begin( autodata::dynamic::Struct& o ) -> decltype( o.begin() )
+auto begin( autodata::dynamic::Record& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 inline
-auto begin( autodata::dynamic::Struct const& o ) -> decltype( o.begin() )
+auto begin( autodata::dynamic::Record const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 inline
-auto end( autodata::dynamic::Struct& o ) -> decltype( o.end() )
+auto end( autodata::dynamic::Record& o ) -> decltype( o.end() )
 {
     return o.end();
 }
 inline
-auto end( autodata::dynamic::Struct const& o ) -> decltype( o.end() )
+auto end( autodata::dynamic::Record const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
@@ -186,7 +186,7 @@ namespace Keywords
 
 ///
 inline AbstractExtractionVec into(
-    autodata::dynamic::Struct& o )
+    autodata::dynamic::Record& o )
 {
     AbstractExtractionVec extVec;
     for( auto& kv : o.GetStruct() )
@@ -198,7 +198,7 @@ inline AbstractExtractionVec into(
 
 ///
 inline AbstractBindingVec useRef(
-    autodata::dynamic::Struct& o )
+    autodata::dynamic::Record& o )
 {
     AbstractBindingVec bindVec;
     for( auto& kv : o.GetStruct() )
@@ -214,10 +214,10 @@ inline AbstractBindingVec useRef(
 namespace Dynamic
 {
 
-///Assignment operator for assigning autodata::dynamic::Struct to Var
+///Assignment operator for assigning autodata::dynamic::Record to Var
 template<>
 Var& Var::operator =(
-    autodata::dynamic::Struct const& o );
+    autodata::dynamic::Record const& o );
 
 } //end Dynamic
 } //end Poco

@@ -98,16 +98,16 @@ Var Table::value(
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-StructVec Table::ToStructVec()
+RecordVec Table::ToRecordVec()
 {
     size_t colcnt = columnsExtracted();
     poco_assert( colcnt );
 
     size_t rowcnt = rowsExtracted();
-    StructVec _rowMap; _rowMap.reserve( rowcnt );
+    RecordVec _rowMap; _rowMap.reserve( rowcnt );
     for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
     {
-        Struct row;
+        Record row;
         for( std::size_t colidx = 0; colidx < colcnt; ++colidx )
         {
             MetaColumn const& mc =

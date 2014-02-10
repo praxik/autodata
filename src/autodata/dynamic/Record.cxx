@@ -20,7 +20,7 @@
 
 
 // --- AutoData Includes --- //
-#include <autodata/dynamic/Struct.h>
+#include <autodata/dynamic/Record.h>
 
 // --- Poco Includes --- //
 #include <Poco/UUIDGenerator.h>
@@ -41,61 +41,61 @@ namespace dynamic
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-Struct::Struct()
+Record::Record()
     :
-    m_struct( Poco::Dynamic::Struct< std::string >() )
+    m_struct( Struct< std::string >() )
 {
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::~Struct()
+Record::~Record()
 {
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::operator Poco::Dynamic::Struct< std::string >&()
+Record::operator Struct< std::string >&()
 {
     return m_struct;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::operator Poco::Dynamic::Struct< std::string >const&() const
+Record::operator Struct< std::string >const&() const
 {
     return m_struct;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var& Struct::operator [](
+Var& Record::operator [](
     std::string const& name )
 {
     return m_struct[ name ];
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var const& Struct::operator [](
+Var const& Record::operator [](
     std::string const& name ) const
 {
     return m_struct[ name ];
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::iterator Struct::begin()
+Record::iterator Record::begin()
 {
     return m_struct.begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::const_iterator Struct::begin() const
+Record::const_iterator Record::begin() const
 {
     return m_struct.begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::iterator Struct::end()
+Record::iterator Record::end()
 {
     return m_struct.end();
 }
 ////////////////////////////////////////////////////////////////////////////////
-Struct::const_iterator Struct::end() const
+Record::const_iterator Record::end() const
 {
     return m_struct.end();
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Struct::FromJson(
+void Record::FromJson(
     std::string const& json )
 {
     ParseHandler::Ptr handler = new ParseHandler( true );
@@ -127,27 +127,27 @@ void Struct::FromJson(
     m_struct = *data;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var const& Struct::GetID() const
+Var const& Record::GetID() const
 {
     return m_struct[ "id" ];
 }
 ////////////////////////////////////////////////////////////////////////////////
-Poco::Dynamic::Struct< std::string >& Struct::GetStruct()
+Struct< std::string >& Record::GetStruct()
 {
     return m_struct;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Poco::Dynamic::Struct< std::string > const& Struct::GetStruct() const
+Struct< std::string > const& Record::GetStruct() const
 {
     return m_struct;
 }
 ////////////////////////////////////////////////////////////////////////////////
-std::string const& Struct::GetTypename() const
+std::string const& Record::GetTypename() const
 {
     return m_typename;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Struct::Load(
+void Record::Load(
     Session& session )
 {
     //Build statement of form:
@@ -165,19 +165,19 @@ void Struct::Load(
     //statement.execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Struct::SetID(
+void Record::SetID(
     Var id )
 {
     m_struct[ "id" ] = std::move( id );
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Struct::SetTypename(
+void Record::SetTypename(
     std::string name )
 {
     m_typename = std::move( name );
 }
 ////////////////////////////////////////////////////////////////////////////////
-std::string Struct::ToJson()
+std::string Record::ToJson()
 {
     return m_struct.toString();
 }
@@ -194,7 +194,7 @@ namespace Dynamic
 ///////////////////////////////////////////////////////////////////////////////////
 template<>
 Var& Var::operator =(
-    autodata::dynamic::Struct const& o )
+    autodata::dynamic::Record const& o )
 {
 #ifdef POCO_NO_SOO
     Var tmp( o.GetStruct() );

@@ -1,8 +1,9 @@
 
 // --- AutoData Includes --- //
-#include <autodata/dynamic/Struct.h>
+#include <autodata/dynamic/Record.h>
 #include <autodata/dynamic/Table.h>
 
+using namespace autodata::dynamic;
 using namespace autodata::util;
 
 // --- Poco Includes --- //
@@ -47,14 +48,14 @@ int main(
         statement
             << "select * from table1",
             now;
-        autodata::dynamic::Table table( statement );
-        autodata::dynamic::StructVec rows = table.ToStructVec();
+        Table table( statement );
+        RecordVec rows = table.ToRecordVec();
         for( auto& row : rows )
         {
             std::cout << row.ToJson() << std::endl;
             auto var = cpplinq::
                 from( row ).
-                select( []( autodata::dynamic::Struct::value_type const& var ) -> double
+                select( []( Record::value_type const& var ) -> double
                 {
                     return Convert< double >( var.second, 0.0 );
                 } ).
@@ -64,14 +65,14 @@ int main(
 
         auto var = cpplinq::
             from( rows ).
-            select( []( autodata::dynamic::Struct const& row ) -> double
+            select( []( Record const& row ) -> double
             {
                 return row[ "zero" ];
             } ).
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var << std::endl;
 
-        /*autodata::dynamic::Struct astruct;
+        /*Record astruct;
         astruct.SetTypename( "table1" );
         astruct[ "zero" ] = 7;
         astruct[ "one" ] = 7;
@@ -89,7 +90,7 @@ int main(
             useRef( astruct );
         statement.execute(); statement.reset( session );
 
-        autodata::dynamic::Struct bstruct;
+        Record bstruct;
         bstruct[ "zero" ];
         bstruct[ "one" ];
         bstruct[ "two" ];

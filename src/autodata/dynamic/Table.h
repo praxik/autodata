@@ -25,7 +25,7 @@
 #include <autodata/AutoDataConfig.h>
 #include <autodata/CompilerGuards.h>
 
-#include <autodata/dynamic/Struct.h>
+#include <autodata/dynamic/Record.h>
 
 namespace autodata
 {
@@ -53,7 +53,7 @@ public:
     ~Table();
 
     ///
-    StructVec ToStructVec();
+    RecordVec ToRecordVec();
 
 private:
     ///Returns the reference to column at specified position
