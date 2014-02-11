@@ -165,22 +165,28 @@ private:
 } //end dynamic
 } //end autodata
 
-//For cpplinq use
+///For cpplinq use
 inline
 auto begin( autodata::dynamic::Record& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
+
+///For cpplinq use
 inline
 auto begin( autodata::dynamic::Record const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
+
+///For cpplinq use
 inline
 auto end( autodata::dynamic::Record& o ) -> decltype( o.end() )
 {
     return o.end();
 }
+
+///For cpplinq use
 inline
 auto end( autodata::dynamic::Record const& o ) -> decltype( o.end() )
 {

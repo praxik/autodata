@@ -40,6 +40,11 @@ public:
     typedef Records::iterator iterator;
     typedef Records::const_iterator const_iterator;
     typedef Records::value_type value_type;
+    typedef void (*Manipulator)( Table& );
+
+    ///
+    explicit Table(
+        Poco::Data::Session& session );
 
     ///
     explicit Table(
@@ -51,6 +56,23 @@ public:
 
     ///
     ~Table();
+
+    ///Handles manipulators, such as now, async, etc.
+    template< typename T >
+    Table& operator <<(
+        T const& t )
+    {
+        Statement::operator <<( t );
+        return *this;
+    }
+
+    ///
+    Table& operator ,(
+        Manipulator manip )
+    {
+        manip( *this );
+        return *this;
+    }
 
     ///
     Record& operator [](
@@ -67,12 +89,6 @@ public:
     const_iterator begin() const;
 
     ///
-    iterator end();
-
-    ///
-    const_iterator end() const;
-
-    ///
     template< typename T >
     std::vector< T > col(
         std::string const& name,
@@ -85,6 +101,16 @@ public:
                 return util::Convert< T >( record[ name ], defVal );
             } ).to_vector();
     }
+
+    ///
+    iterator end();
+
+    ///
+    const_iterator end() const;
+
+    ///
+    std::size_t execute(
+        bool reset = true );
 
 protected:
 
@@ -183,27 +209,42 @@ private:
 
 };
 
+/// Enforces immediate execution of the statement.
+inline
+void now(
+    Table& table)
+{
+    table.execute();
+}
+
 } //end dynamic
 } //end autodata
 
-//For cpplinq use
+///For cpplinq use
 inline
 auto begin( autodata::dynamic::Table& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
+
+///For cpplinq use
 inline
 auto begin( autodata::dynamic::Table const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
+
+///For cpplinq use
 inline
 auto end( autodata::dynamic::Table& o ) -> decltype( o.end() )
 {
     return o.end();
 }
+
+///For cpplinq use
 inline
 auto end( autodata::dynamic::Table const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
+

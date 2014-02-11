@@ -34,6 +34,15 @@ namespace dynamic
 
 ////////////////////////////////////////////////////////////////////////////////
 Table::Table(
+    Session& session )
+    :
+    Statement( session ),
+    m_records()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+Table::Table(
     Statement const& statement )
     :
     Statement( statement ),
@@ -77,6 +86,12 @@ Table::const_iterator Table::begin() const
     return m_records.begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
+MetaColumn::ColumnDataType Table::columnType(
+    std::size_t pos ) const
+{
+    return metaColumn( static_cast< Poco::UInt32 >( pos ) ).type();
+}
+////////////////////////////////////////////////////////////////////////////////
 Table::iterator Table::end()
 {
     return m_records.end();
@@ -87,10 +102,12 @@ Table::const_iterator Table::end() const
     return m_records.end();
 }
 ////////////////////////////////////////////////////////////////////////////////
-MetaColumn::ColumnDataType Table::columnType(
-    std::size_t pos ) const
+std::size_t Table::execute(
+    bool reset )
 {
-    return metaColumn( static_cast< Poco::UInt32 >( pos ) ).type();
+    std::size_t size = Statement::execute( reset );
+    FromDB();
+    return size;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Table::FromDB()
