@@ -48,7 +48,7 @@ Table::Table(
     Statement( statement ),
     m_records()
 {
-    FromDB();
+    execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Table::Table(
@@ -105,13 +105,9 @@ Table::const_iterator Table::end() const
 std::size_t Table::execute(
     bool reset )
 {
+    m_records.clear();
     std::size_t size = Statement::execute( reset );
-    FromDB();
-    return size;
-}
-////////////////////////////////////////////////////////////////////////////////
-void Table::FromDB()
-{
+
     size_t colcnt = columnsExtracted();
     size_t rowcnt = rowsExtracted();
     m_records.reserve( rowcnt );
@@ -126,6 +122,9 @@ void Table::FromDB()
         }
         m_records.push_back( std::move( record ) );
     }
+
+    Statement::reset( Statement::session() );
+    return size;
 }
 ////////////////////////////////////////////////////////////////////////////////
 Var Table::value(

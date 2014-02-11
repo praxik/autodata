@@ -46,6 +46,7 @@ int main(
         statement.execute(); statement.reset( session );
 
         //statement << "select * from table1", now;
+        //Table table( statement );
         Table table( session );
         table << "select * from table1", now;
         for( auto& record : table )
@@ -61,14 +62,19 @@ int main(
             std::cout << "Summation of cols: " << var << std::endl;
         }
 
-        auto var = cpplinq::
-            from( table ).
-            select( []( Record const& record ) -> double
-            {
-                return record[ "zero" ];
-            } ).
-            aggregate( std::plus< double >() );
-        std::cout << "Summation of col 'zero': " << var << std::endl;
+        table << "select zero, one from table1", now;
+        for( auto& record : table )
+        {
+            std::cout << record.ToJson() << std::endl;
+            auto var = cpplinq::
+                from( record ).
+                select( []( Record::value_type const& var ) -> double
+                {
+                    return Convert< double >( var.second, 0.0 );
+                } ).
+                aggregate( std::plus< double >() );
+            std::cout << "Summation of cols: " << var << std::endl;
+        }
 
         auto var2 = cpplinq::
             from( table.col< double >( "zero" ) ).

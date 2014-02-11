@@ -167,9 +167,6 @@ private:
     Poco::Data::MetaColumn::ColumnDataType columnType(
         std::size_t pos ) const;
 
-    ///
-    void FromDB();
-
     ///Returns the data value at column, row location
     Poco::Dynamic::Var value(
         std::size_t col,
