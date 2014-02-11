@@ -39,7 +39,6 @@ namespace dynamic
 ///
 class Record;
 typedef std::vector< Record > Records;
-//typedef std::vector< Poco::Dynamic::Var > Attributes;
 
 ///
 class AUTODATA_EXPORTS Record
@@ -94,6 +93,15 @@ public:
     const_iterator begin() const;
 
     ///
+    std::string columns(
+        unsigned int n,
+        bool usePH = false ) const;
+
+    ///
+    void CreateTable(
+        Poco::Data::Session& session );
+
+    ///
     iterator end();
 
     ///
@@ -120,19 +128,8 @@ public:
         Poco::Data::Session& session );
 
     ///
-    std::string colstr(
-        unsigned int n = 2 ) const
-    {
-        std::string out;
-        Poco::Dynamic::Struct< std::string >::ConstIterator kv;
-        for( kv = m_struct.begin(); kv != --m_struct.end(); ++kv )
-        {
-            out += ( kv->first + ",\n" ).insert( 0, n, ' ' );
-        }
-        out += ( kv->first + "\n" ).insert( 0, n, ' ' );
-
-        return out;
-    }
+    void Save(
+        Poco::Data::Session& session );
 
     ///
     void SetID(
@@ -155,6 +152,10 @@ public:
 
 private:
     ///
+    std::string ph(
+        std::string const& s ) const;
+
+    ///
     std::string m_typename;
 
     ///
@@ -167,28 +168,32 @@ private:
 
 ///For cpplinq use
 inline
-auto begin( autodata::dynamic::Record& o ) -> decltype( o.begin() )
+auto begin(
+    autodata::dynamic::Record& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
 inline
-auto begin( autodata::dynamic::Record const& o ) -> decltype( o.begin() )
+auto begin(
+    autodata::dynamic::Record const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
 inline
-auto end( autodata::dynamic::Record& o ) -> decltype( o.end() )
+auto end(
+    autodata::dynamic::Record& o ) -> decltype( o.end() )
 {
     return o.end();
 }
 
 ///For cpplinq use
 inline
-auto end( autodata::dynamic::Record const& o ) -> decltype( o.end() )
+auto end(
+    autodata::dynamic::Record const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
@@ -201,7 +206,8 @@ namespace Keywords
 {
 
 ///
-inline AbstractExtractionVec into(
+inline
+AbstractExtractionVec into(
     autodata::dynamic::Record& o )
 {
     AbstractExtractionVec extVec;
@@ -213,7 +219,8 @@ inline AbstractExtractionVec into(
 }
 
 ///
-inline AbstractBindingVec useRef(
+inline
+AbstractBindingVec useRef(
     autodata::dynamic::Record& o )
 {
     AbstractBindingVec bindVec;

@@ -85,6 +85,67 @@ Record::const_iterator Record::begin() const
     return m_struct.begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
+void Record::CreateTable(
+    Session& session )
+{
+    //
+    Poco::Data::Statement statement( session );
+    statement << "create table if not exists " << m_typename << "(\n";
+    for( auto& kv : m_struct )
+    {
+        statement << "  '" << kv.first << "' ";
+        Var const& var = kv.second;
+        if( var.isNumeric() )
+        {
+            if( var.isInteger() )
+            {
+                statement << "integer";
+            }
+            else
+            {
+                statement << "float";
+            }
+        }
+        else if( var.isString() )
+        {
+            std::string const& str = var.extract< std::string >();
+            std::size_t size = str.size();
+            if( size > 255 )
+            {
+                statement << "text";
+            }
+            else
+            {
+                statement << "varchar( " << size << " )";
+            }
+        }
+        statement << ",\n";
+    }
+    statement
+        << "constraint " << m_typename << "_ukey_1\n"
+        << "  unique(\n"
+        << "    id ) );";
+
+    statement.execute();
+}
+////////////////////////////////////////////////////////////////////////////////
+std::string Record::columns(
+    unsigned int n,
+    bool usePH ) const
+{
+    std::string out;
+    Poco::Dynamic::Struct< std::string >::ConstIterator kv;
+    for( kv = m_struct.begin(); kv != --m_struct.end(); ++kv )
+    {
+        out += ( (
+            usePH ? ph( kv->first ) : kv->first ) + ",\n" ).insert( 0, n, ' ' );
+    }
+    out += std::string(
+        usePH ? ph( kv->first ) : kv->first ).insert( 0, n, ' ' );
+
+    return out;
+}
+////////////////////////////////////////////////////////////////////////////////
 Record::iterator Record::end()
 {
     return m_struct.end();
@@ -150,19 +211,37 @@ std::string const& Record::GetTypename() const
 void Record::Load(
     Session& session )
 {
-    //Build statement of form:
-    //select col1, col2, etc. from TYPENAME where id = ?
+    //
     Statement statement( session );
     statement
         << "select\n"
-        <<  colstr()
+        <<    columns( 2 ) << "\n"
         << "from " << m_typename << "\n"
         << "where\n"
         << "  id = ?",
         into( *this ),
         useRef( m_struct[ "id" ] );
-    std::cout << statement.toString() << std::endl;
-    //statement.execute();
+    statement.execute();
+}
+////////////////////////////////////////////////////////////////////////////////
+std::string Record::ph(
+    std::string const& s ) const
+{
+    return "? /*" + s + "*/";
+}
+////////////////////////////////////////////////////////////////////////////////
+void Record::Save(
+    Session& session )
+{
+    //
+    Statement statement( session );
+    statement
+        << "insert or replace into " << m_typename << "(\n"
+        <<    columns( 2 ) << " )\n"
+        << "values(\n"
+        <<    columns( 2, true ) << " )",
+        useRef( *this );
+    statement.execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::SetID(

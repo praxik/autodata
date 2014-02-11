@@ -34,32 +34,24 @@ int main(
     {
         SQLite::Connector::registerConnector();
         Session session( "SQLite", "test.db" );
-        Statement statement( session );
-        statement
-            << "create table if not exists table1(\n"
-            << "  zero text,\n"
-            << "  one text,\n"
-            << "  two text,\n"
-            << "  three text,\n"
-            << "  four text,\n"
-            << "  five text )";
-        statement.execute(); statement.reset( session );
 
-        //statement << "select * from table1", now;
-        //Table table( statement );
+        Record astruct;
+        astruct.SetTypename( "table1" );
+        astruct[ "id" ] = 1;
+        astruct[ "zero" ] = 7;
+        astruct[ "one" ] = 7;
+        astruct[ "two" ] = "twamy";
+        astruct[ "three" ] = 7;
+        astruct[ "four" ] = 7;
+        astruct[ "five" ] = 7;
+        astruct.CreateTable( session );
+        astruct.Save( session );
+
         Table table( session );
         table << "select * from table1", now;
         for( auto& record : table )
         {
-            std::cout << record.ToJson() << std::endl;
-            auto var = cpplinq::
-                from( record ).
-                select( []( Record::value_type const& var ) -> double
-                {
-                    return Convert< double >( var.second, 0.0 );
-                } ).
-                aggregate( std::plus< double >() );
-            std::cout << "Summation of cols: " << var << std::endl;
+            record.SetTypename( "table1" );
         }
 
         table << "select zero, one from table1", now;
@@ -80,47 +72,6 @@ int main(
             from( table.col< double >( "zero" ) ).
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var2 << std::endl;
-
-        /*Record astruct;
-        astruct.SetTypename( "table1" );
-        astruct[ "zero" ] = 7;
-        astruct[ "one" ] = 7;
-        astruct[ "two" ] = "twamy";
-        astruct[ "three" ] = 7;
-        astruct[ "four" ] = 7;
-        astruct[ "five" ] = 7;
-
-        std::cout << astruct.ToJson() << std::endl;
-
-        astruct.Load( session );*/
-
-        /*statement
-            << "insert into table1 values( ?, ?, ?, ?, ?, ? )",
-            useRef( astruct );
-        statement.execute(); statement.reset( session );
-
-        Record bstruct;
-        bstruct[ "zero" ];
-        bstruct[ "one" ];
-        bstruct[ "two" ];
-        bstruct[ "three" ];
-        bstruct[ "four" ];
-        bstruct[ "five" ];
-
-        statement
-            << "select ?, ?, ?, ?, ?, ?",
-            into( bstruct ),
-            useRef( astruct );
-        statement.execute(); statement.reset( session );
-
-        for( auto const& kv : bstruct.GetStruct() )
-        {
-            std::cout << "bName: " << kv.first << "\tbValue: "
-                << Convert< std::string >( kv.second ) << std::endl;
-        }
-
-        json = Poco::Dynamic::Var::toString( bstruct.GetStruct() );
-        std::cout << json << std::endl;*/
 
         SQLite::Connector::unregisterConnector();
     }
