@@ -12,12 +12,14 @@ set( PRIVATE_SOURCES ${SOURCES} )
 set( INCDIR_NAME "autodata" )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
+include_directories( ${Boost_INCLUDE_DIRS} )
 include_directories( ${POCO_INCLUDE_DIR} )
 
 add_definitions( -DAUTODATA_LIBRARY )
 
 add_library( ${TARGET_NAME} SHARED ${SOURCES} ${HEADERS} )
 target_link_libraries( ${TARGET_NAME}
+    ${Boost_LIBRARIES}
     ${POCO_LIBRARIES} )
 
 include( ModuleInstall )

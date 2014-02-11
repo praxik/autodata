@@ -55,6 +55,19 @@ set( CMAKE_MODULE_PATH
     "${PROJECT_SOURCE_DIR}/CMakeModules"
     ${CMAKE_MODULE_PATH} )
 
+#Boost
+if( WIN32 )
+    add_definitions( -DBOOST_ALL_DYN_LINK )
+endif()
+set( BOOST_USE_STATIC_LIBS OFF )
+set( BOOST_USE_MULTITHREADED ON )
+set( BOOST_USE_STATIC_RUNTIME OFF )
+set( BOOST_ROOT "Please specify"
+    CACHE PATH "Root directory where Boost is installed" )
+find_package( Boost 1.53.0 REQUIRED COMPONENTS
+    chrono date_time filesystem prg_exec_monitor program_options regex system
+    thread )
+
 #POCO
 if( POCO_STATIC )
     add_definitions( -DPOCO_STATIC )

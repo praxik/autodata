@@ -219,29 +219,32 @@ void now(
 
 ///For cpplinq use
 inline
-auto begin( autodata::dynamic::Table& o ) -> decltype( o.begin() )
+auto begin(
+    autodata::dynamic::Table& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
 inline
-auto begin( autodata::dynamic::Table const& o ) -> decltype( o.begin() )
+auto begin(
+    autodata::dynamic::Table const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
 inline
-auto end( autodata::dynamic::Table& o ) -> decltype( o.end() )
+auto end(
+    autodata::dynamic::Table& o ) -> decltype( o.end() )
 {
     return o.end();
 }
 
 ///For cpplinq use
 inline
-auto end( autodata::dynamic::Table const& o ) -> decltype( o.end() )
+auto end(
+    autodata::dynamic::Table const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
-
