@@ -35,16 +35,19 @@ int main(
         SQLite::Connector::registerConnector();
         Session session( "SQLite", "test.db" );
 
-        Record astruct;
-        astruct.SetTypename( "table1" );
-        astruct[ "zero" ] = 5.4;
-        astruct[ "one" ] = 7.32;
-        astruct[ "two" ] = "twamy";
-        astruct[ "three" ] = 7;
-        astruct[ "four" ] = 3.0;
-        astruct[ "five" ] = 8;
-        astruct.CreateTable( session );
-        astruct.Save( session );
+        Record astruct = load(
+            "table1", "7946fc0a-9384-11e3-a0e2-3c970eb4a232", session );
+        if( astruct.empty() )
+        {
+            astruct[ "zero" ] = 5.4;
+            astruct[ "one" ] = 7.32;
+            astruct[ "two" ] = "twamy";
+            astruct[ "three" ] = 7;
+            astruct[ "four" ] = 3.0;
+            astruct[ "five" ] = 8;
+            astruct.CreateTable( session );
+            astruct.Save( session );
+        }
 
         Table table( session );
         table << "select * from table1", now;

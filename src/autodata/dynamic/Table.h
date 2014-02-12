@@ -206,10 +206,10 @@ private:
 
 };
 
-/// Enforces immediate execution of the statement.
+///Enforces immediate execution of the statement
 inline
 void now(
-    Table& table)
+    Table& table )
 {
     table.execute();
 }

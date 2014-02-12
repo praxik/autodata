@@ -41,6 +41,13 @@ class Record;
 typedef std::vector< Record > Records;
 
 ///
+AUTODATA_EXPORTS
+Record load(
+    std::string const& typeName,
+    Poco::Dynamic::Var const& id,
+    Poco::Data::Session& session );
+
+///
 class AUTODATA_EXPORTS Record
 {
 public:
@@ -103,6 +110,9 @@ public:
     ///
     void CreateTable(
         Poco::Data::Session& session );
+
+    ///
+    bool empty();
 
     ///
     iterator end();

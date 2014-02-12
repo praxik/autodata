@@ -21,6 +21,10 @@
 
 // --- AutoData Includes --- //
 #include <autodata/dynamic/Record.h>
+#include <autodata/dynamic/Table.h>
+
+using namespace autodata::dynamic;
+using namespace autodata::util;
 
 // --- Poco Includes --- //
 #include <Poco/UUIDGenerator.h>
@@ -40,6 +44,25 @@ namespace autodata
 namespace dynamic
 {
 
+////////////////////////////////////////////////////////////////////////////////
+Record load(
+    std::string const& typeName,
+    Var const& id,
+    Session& session )
+{
+    poco_assert( !typeName.empty() && !id.isEmpty() );
+
+    //
+    Statement statement( session );
+    statement
+        << "select\n"
+        << "  *\n"
+        << "from " << typeName << "\n"
+        << "where\n"
+        << "  id = ?",
+        useRef( id );
+    return cpplinq::from( Table( statement ) ).first_or_default();
+}
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()
     :
@@ -130,6 +153,8 @@ std::string Record::columns(
     unsigned int n,
     bool usePH ) const
 {
+    if( m_struct.empty() ) return std::string( "*" ).insert( 0, n, ' ' );
+
     std::string out;
     Poco::Dynamic::Struct< std::string >::ConstIterator kv;
     for( kv = m_struct.begin(); kv != --m_struct.end(); ++kv )
@@ -141,6 +166,11 @@ std::string Record::columns(
         usePH ? ph( kv->first ) : kv->first ).insert( 0, n, ' ' );
 
     return out;
+}
+////////////////////////////////////////////////////////////////////////////////
+bool Record::empty()
+{
+    return m_struct.empty();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::iterator Record::end()
@@ -186,6 +216,11 @@ std::string const& Record::GetTypename() const
 void Record::Load(
     Session& session )
 {
+    poco_assert(
+        !m_typename.empty() &&
+        m_struct.contains( "id" ) &&
+        !m_struct[ "id" ].isEmpty() );
+
     //
     Statement statement( session );
     statement
