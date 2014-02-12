@@ -98,6 +98,9 @@ public:
         bool usePH = false ) const;
 
     ///
+    void CreateId();
+
+    ///
     void CreateTable(
         Poco::Data::Session& session );
 
@@ -112,7 +115,7 @@ public:
         std::string const& json );
 
     ///
-    Poco::Dynamic::Var const& GetID() const;
+    Poco::Dynamic::Var const& GetId() const;
 
     ///
     Poco::Dynamic::Struct< std::string >& GetStruct();
@@ -132,7 +135,7 @@ public:
         Poco::Data::Session& session );
 
     ///
-    void SetID(
+    void SetId(
         Poco::Dynamic::Var id );
 
     ///

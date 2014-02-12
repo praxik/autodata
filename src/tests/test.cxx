@@ -37,13 +37,12 @@ int main(
 
         Record astruct;
         astruct.SetTypename( "table1" );
-        astruct[ "id" ] = 1;
-        astruct[ "zero" ] = 7;
-        astruct[ "one" ] = 7;
+        astruct[ "zero" ] = 5.4;
+        astruct[ "one" ] = 7.32;
         astruct[ "two" ] = "twamy";
         astruct[ "three" ] = 7;
-        astruct[ "four" ] = 7;
-        astruct[ "five" ] = 7;
+        astruct[ "four" ] = 3.0;
+        astruct[ "five" ] = 8;
         astruct.CreateTable( session );
         astruct.Save( session );
 
@@ -51,13 +50,8 @@ int main(
         table << "select * from table1", now;
         for( auto& record : table )
         {
-            record.SetTypename( "table1" );
-        }
-
-        table << "select zero, one from table1", now;
-        for( auto& record : table )
-        {
-            std::cout << record.ToJson() << std::endl;
+            Record bstruct; bstruct.FromJson( record.ToJson() );
+            std::cout << bstruct.ToJson() << std::endl;
             auto var = cpplinq::
                 from( record ).
                 select( []( Record::value_type const& var ) -> double

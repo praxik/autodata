@@ -85,10 +85,16 @@ Record::const_iterator Record::begin() const
     return m_struct.begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
+void Record::CreateId()
+{
+    SetId( Poco::UUIDGenerator::defaultGenerator().createOne().toString() );
+}
+////////////////////////////////////////////////////////////////////////////////
 void Record::CreateTable(
     Session& session )
 {
     //
+    if( !m_struct.contains( "id" ) ) CreateId();
     Poco::Data::Statement statement( session );
     statement << "create table if not exists " << m_typename << "(\n";
     for( auto& kv : m_struct )
@@ -103,21 +109,12 @@ void Record::CreateTable(
             }
             else
             {
-                statement << "float";
+                statement << "real";
             }
         }
         else if( var.isString() )
         {
-            std::string const& str = var.extract< std::string >();
-            std::size_t size = str.size();
-            if( size > 255 )
-            {
-                statement << "text";
-            }
-            else
-            {
-                statement << "varchar( " << size << " )";
-            }
+            statement << "text";
         }
         statement << ",\n";
     }
@@ -162,33 +159,11 @@ void Record::FromJson(
     ParseHandler::Ptr handler = new ParseHandler( true );
     Parser parser( handler );
     Var result = parser.parse( json );
-
-    Object::Ptr set;
-    if( result.type() == typeid( Object::Ptr ) )
-    {
-        set = result.extract< Object::Ptr >();
-    }
-
-    //First we check for a typename and make sure it matches
-    /*if( !set->has( "typename" ) )
-    {
-        // throw exception?
-        std::cout << "Error: No typename in json. Aborting FromJSON operation!" << std::endl;
-        return;
-    }
-    if( set->getValue< std::string >( "typename" ) != T::type() )
-    {
-        //throw exception?
-        std::cout << "Error: Typename specified in JSON does not match this object's typename." << std::endl;
-        return;
-    }*/
-
-    //Pull the data and load it into m_struct
-    Object::Ptr data = set->getObject( "data" );
-    m_struct = *data;
+    poco_assert( result.type() == typeid( Object::Ptr ) );
+    m_struct = *result.extract< Object::Ptr >();
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var const& Record::GetID() const
+Var const& Record::GetId() const
 {
     return m_struct[ "id" ];
 }
@@ -234,6 +209,7 @@ void Record::Save(
     Session& session )
 {
     //
+    if( !m_struct.contains( "id" ) ) CreateId();
     Statement statement( session );
     statement
         << "insert or replace into " << m_typename << "(\n"
@@ -244,7 +220,7 @@ void Record::Save(
     statement.execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Record::SetID(
+void Record::SetId(
     Var id )
 {
     m_struct[ "id" ] = std::move( id );
