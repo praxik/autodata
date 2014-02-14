@@ -130,11 +130,10 @@ void Drivers(
         typedef ODBC::Utility::DriverMap Drivers;
         Drivers drivers;
         ODBC::Utility::drivers( drivers );
-        Drivers::const_iterator itr = drivers.begin();
         std::cout << "Available ODBC Drivers:" << std::endl;
-        for ( ; itr != drivers.end(); ++itr )
+        for( auto const& driver : drivers )
         {
-            std::string const& name = itr->first;
+            std::string const& name = driver.first;
             std::cout << "  " << name << std::endl;
         }
     }
@@ -150,11 +149,10 @@ void DataSources(
         typedef ODBC::Utility::DSNMap DataSources;
         DataSources dataSources;
         ODBC::Utility::dataSources( dataSources );
-        DataSources::const_iterator itr = dataSources.begin();
         std::cout << "Available ODBC Data Sources:" << std::endl;
-        for ( ; itr != dataSources.end(); ++itr )
+        for( auto const& dataSource : dataSources )
         {
-            std::string const& name = itr->first;
+            std::string const& name = dataSource.first;
             std::cout << "  " << name << std::endl;
         }
     }
@@ -193,12 +191,11 @@ Session GetSession(
 void RegisterConnectors(
     ConnectionVector const& connections )
 {
-    ConnectionVector::const_iterator citr = connections.begin();
-    for( ; citr != connections.end(); ++citr )
+    for( auto const& c : connections )
     {
-        std::string const& name = std::get< 0 >( *citr );
-        ConnectorEnum connector = std::get< 1 >( *citr );
-        std::string const& value = std::get< 2 >( *citr );
+        std::string const& name = std::get< 0 >( c );
+        ConnectorEnum connector = std::get< 1 >( c );
+        std::string const& value = std::get< 2 >( c );
 
         Registers[ connector ]();
         Connections.insert( ConnectionMap::value_type( name,
