@@ -31,17 +31,6 @@ namespace autodata
 namespace db
 {
 
-///
-enum GeoFormatEnum
-{
-    GEO_WKT,
-    GEO_WKB,
-    GEO_GML,
-    GEO_KML,
-    GEO_JSON,
-    GEO_SVG
-};
-
 #ifndef SWIG
 ///
 enum ConnectorEnum
