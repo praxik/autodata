@@ -26,9 +26,6 @@ using namespace autodata::util;
 
 // --- Boost Includes --- //
 #include <boost/assign.hpp>
-#include <boost/filesystem.hpp>
-
-namespace fs = boost::filesystem;
 
 // --- POCO Includes --- //
 #ifdef POCO_ODBC_API
