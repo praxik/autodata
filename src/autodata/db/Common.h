@@ -71,6 +71,11 @@ void DataSources(
 
 ///
 AUTODATA_EXPORTS
+std::string GetConnString(
+    std::string const& name );
+
+///
+AUTODATA_EXPORTS
 ConnectorEnum GetConnector(
     std::string const& name );
 
