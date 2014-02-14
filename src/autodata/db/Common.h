@@ -124,7 +124,7 @@ public:
 
 private:
     ///
-    friend void RegisterConnectors( ConnectionVector const& );
+    friend AUTODATA_EXPORTS void RegisterConnectors( ConnectionVector const& );
 
     ///constructor
     Connection(
