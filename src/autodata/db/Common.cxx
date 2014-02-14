@@ -44,8 +44,6 @@ namespace db
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionVector Connections;
-////////////////////////////////////////////////////////////////////////////////
 typedef std::function< void () > RegisterFunction;
 typedef std::map< ConnectorEnum, RegisterFunction > RegisterMap;
 RegisterMap Registers = boost::assign::map_list_of
@@ -78,67 +76,50 @@ ConnectorStringMap ConnectorStrings = boost::assign::map_list_of
 #endif //POCO_ODBC_API
     ( CONN_SQLITE, SQLite::Connector::KEY );
 ////////////////////////////////////////////////////////////////////////////////
-typedef std::map< std::string, ConnectorEnum > DatabaseMap;
-DatabaseMap Databases;
-////////////////////////////////////////////////////////////////////////////////
-typedef boost::shared_ptr< SessionPool > SessionPoolPtr;
-typedef std::map< std::string, SessionPoolPtr > SessionPoolMap;
-SessionPoolMap SessionPools;
-////////////////////////////////////////////////////////////////////////////////
-void RegisterConnectors(
-    ConnectionVector const& connections )
+Connection::Connection(
+    ConnectorEnum connector,
+    std::string value,
+    std::shared_ptr< SessionPool > sessionPool )
+    :
+    m_connector( connector ),
+    m_value( std::move( value ) ),
+    m_sessionPool( std::move( sessionPool ) )
 {
-    Connections = connections;
-    ConnectionVector::const_iterator citr = Connections.begin();
-    for( ; citr != Connections.end(); ++citr )
-    {
-        std::string dbEnum = citr->Name;
-        ConnectorEnum connEnum = citr->Connector;
-        std::string const& connStr = citr->Value;
-
-        Registers[ connEnum ]();
-        Databases[ dbEnum ] = connEnum;
-        SessionPools[ dbEnum ] = boost::make_shared< SessionPool >(
-            ConnectorStrings[ connEnum ], connStr, 1, 16, 0 );
-        switch( connEnum )
-        {
-#ifdef POCO_ODBC_API
-            case CONN_ODBC:
-            {
-                SessionPools[ dbEnum ]->setFeature( "autoBind", true );
-                SessionPools[ dbEnum ]->setFeature( "autoExtract", true );
-                break;
-            }
-#endif //POCO_ODBC_API
-            case CONN_SQLITE:
-            {
-                //Foreign key support is not enabled in SQLite by default
-                //This may need to be moved to GetSession() function below
-                StmtObj stmtObj( GetSession( dbEnum ) );
-                stmtObj.m_statement << "PRAGMA foreign_keys = ON;";
-                ExecuteRetry( stmtObj );
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
-    }
+    ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void UnregisterConnectors()
+Connection::Connection(
+    Connection&& o )
+    :
+    m_connector( o.m_connector ),
+    m_value( std::move( o.m_value ) ),
+    m_sessionPool( std::move( o.m_sessionPool ) )
 {
-    ConnectionVector::const_iterator citr = Connections.begin();
-    for( ; citr != Connections.end(); ++citr )
-    {
-        std::string dbEnum = citr->Name;
-        ConnectorEnum connEnum = citr->Connector;
-
-        SessionPools[ dbEnum ]->shutdown();
-        Unregisters[ connEnum ]();
-    }
+    ;
 }
+////////////////////////////////////////////////////////////////////////////////
+Connection::~Connection()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+ConnectorEnum Connection::Connector() const
+{
+    return m_connector;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::string const& Connection::Value() const
+{
+    return m_value;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::shared_ptr< SessionPool > const& Connection::SessPool() const
+{
+    return m_sessionPool;
+}
+////////////////////////////////////////////////////////////////////////////////
+typedef std::map< std::string, Connection > ConnectionMap;
+ConnectionMap Connections;
 ////////////////////////////////////////////////////////////////////////////////
 void Drivers(
     unsigned int connectors )
@@ -180,8 +161,14 @@ void DataSources(
 #endif //POCO_ODBC_API
 }
 ////////////////////////////////////////////////////////////////////////////////
+ConnectorEnum GetConnector(
+    std::string const& name )
+{
+    return Connections.at( name ).Connector();
+}
+////////////////////////////////////////////////////////////////////////////////
 Session GetSession(
-    std::string const& dbEnum,
+    std::string const& name,
     unsigned int maxRetryAttempts,
     unsigned int retrySleep )
 {
@@ -190,11 +177,12 @@ Session GetSession(
     {
         try
         {
-            Session session = SessionPools[ dbEnum ]->get();
+            Connection const& connection = Connections.at( name );
+            Session session = connection.SessPool()->get();
             if( !session.isConnected() ) session.reconnect();
             return session;
         }
-        catch( Poco::Data::ExecutionException const& ){;}
+        catch( ExecutionException const& ){;}
         catch( Poco::Exception const& ex ){ ex.rethrow(); }
         Poco::Thread::sleep( retrySleep );
     }
@@ -202,21 +190,68 @@ Session GetSession(
     throw std::runtime_error( "leaf::open::GetSession failed" );
 }
 ////////////////////////////////////////////////////////////////////////////////
-ConnectorEnum GetConnector(
-    std::string const& dbEnum )
+void RegisterConnectors(
+    ConnectionVector const& connections )
 {
-    return Databases[ dbEnum ];
+    ConnectionVector::const_iterator citr = connections.begin();
+    for( ; citr != connections.end(); ++citr )
+    {
+        std::string const& name = std::get< 0 >( *citr );
+        ConnectorEnum connector = std::get< 1 >( *citr );
+        std::string const& value = std::get< 2 >( *citr );
+
+        Registers[ connector ]();
+        Connections.insert( ConnectionMap::value_type( name,
+            Connection( connector, value, std::make_shared< SessionPool >(
+                ConnectorStrings[ connector ], value, 1, 16, 0 ) ) ) );
+        Connection const& connection = Connections.at( name );
+        switch( connector )
+        {
+#ifdef POCO_ODBC_API
+            case CONN_ODBC:
+            {
+                connection.SessPool()->setFeature( "autoBind", true );
+                connection.SessPool()->setFeature( "autoExtract", true );
+                break;
+            }
+#endif //POCO_ODBC_API
+            case CONN_SQLITE:
+            {
+                //Foreign key support is not enabled in SQLite by default
+                //This may need to be moved to GetSession() function below
+                StmtObj stmtObj( GetSession( name ) );
+                stmtObj.m_statement << "PRAGMA foreign_keys = ON;";
+                ExecuteRetry( stmtObj );
+                break;
+            }
+            default:
+            {
+                break;
+            }
+        }
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void SetMaxFieldSize(
-    std::string const& dbEnum,
+    std::string const& name,
     std::size_t maxFldSize )
 {
-    ConnectorEnum connEnum = GetConnector( dbEnum );
-    if( connEnum == CONN_ODBC )
+    Connection const& connection = Connections.at( name );
+    ConnectorEnum connector = connection.Connector();
+    if( connector == CONN_ODBC )
     {
-        SessionPools[ dbEnum ]->setProperty(
+        connection.SessPool()->setProperty(
             "maxFieldSize", Poco::Any( maxFldSize ) );
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+void UnregisterConnectors()
+{
+    for( auto const& kv : Connections )
+    {
+        Connection const& connection = kv.second;
+        connection.SessPool()->shutdown();
+        Unregisters[ connection.Connector() ]();
     }
 }
 ////////////////////////////////////////////////////////////////////////////////

@@ -55,32 +55,10 @@ enum ConnectorEnum
 };
 
 ///
-class AUTODATA_EXPORTS Connection
-{
-public:
-    ///
-    Connection();
+typedef std::tuple<
+    std::string, ConnectorEnum, std::string > ConnectionTuple;
+typedef std::vector< ConnectionTuple > ConnectionVector;
 
-    ///
-    std::string Name;
-    std::string Value;
-    ConnectorEnum Connector;
-};
-
-///
-typedef std::vector< Connection > ConnectionVector;
-
-///
-AUTODATA_EXPORTS
-void RegisterConnectors(
-    ConnectionVector const& connections );
-#endif //SWIG
-
-///
-AUTODATA_EXPORTS
-void UnregisterConnectors();
-
-#ifndef SWIG
 ///
 AUTODATA_EXPORTS
 void Drivers(
@@ -93,22 +71,78 @@ void DataSources(
 
 ///
 AUTODATA_EXPORTS
+ConnectorEnum GetConnector(
+    std::string const& name );
+
+///
+AUTODATA_EXPORTS
 Poco::Data::Session GetSession(
-    std::string const& dbEnum,
+    std::string const& name,
     unsigned int maxRetryAttempts = 100,
     unsigned int retrySleep = 100 );
 
 ///
 AUTODATA_EXPORTS
-ConnectorEnum GetConnector(
-    std::string const& dbEnum );
+void RegisterConnectors(
+    ConnectionVector const& connections );
 
 ///
 ///\param maxFldSize set the maximum field size in bytes
 AUTODATA_EXPORTS
 void SetMaxFieldSize(
-    std::string const& dbEnum,
+    std::string const& name,
     std::size_t maxFldSize );
+
+///
+AUTODATA_EXPORTS
+void UnregisterConnectors();
+
+///For internal use only
+class Connection
+{
+public:
+    ///
+    Connection(
+        Connection&& o );
+
+    ///destructor
+    ~Connection();
+
+    ///
+    ConnectorEnum Connector() const;
+
+    ///
+    std::string const& Value() const;
+
+    ///
+    std::shared_ptr< Poco::Data::SessionPool > const& SessPool() const;
+
+private:
+    ///
+    friend void RegisterConnectors( ConnectionVector const& );
+
+    ///constructor
+    Connection(
+        ConnectorEnum connector,
+        std::string value,
+        std::shared_ptr< Poco::Data::SessionPool > sessionPool );
+
+    ///
+    Connection( Connection const& ); //= delete;
+
+    ///
+    Connection& operator =( Connection ); //= delete
+
+    ///
+    ConnectorEnum m_connector;
+
+    ///
+    std::string m_value;
+
+    ///
+    std::shared_ptr< Poco::Data::SessionPool > m_sessionPool;
+
+};
 #endif //SWIG
 
 } //end db
