@@ -35,14 +35,14 @@ namespace db
 ///
 enum ConnectorEnum
 {
-    CONN_NONE = 0x0,
+    CONN_NONE = ( 0 << 0 ),
 #ifdef POCO_MYSQL_API
-    CONN_MYSQL = 0x1,
+    CONN_MYSQL = ( 1 << 0 ),
 #endif //POCO_MYSQL_API
 #ifdef POCO_ODBC_API
-    CONN_ODBC = 0x2,
+    CONN_ODBC = ( 1 << 1 ),
 #endif //POCO_ODBC_API
-    CONN_SQLITE = 0x4,
+    CONN_SQLITE = ( 1 << 2 ),
 #if defined( POCO_MYSQL_API ) && defined( POCO_ODBC_API )
     CONN_ALL = CONN_MYSQL | CONN_ODBC | CONN_SQLITE,
 #elif defined( POCO_MYSQL_API ) && !defined( POCO_ODBC_API )
