@@ -224,10 +224,7 @@ AbstractExtractionVec into(
     autodata::dynamic::Record& o )
 {
     AbstractExtractionVec extVec;
-    for( auto& kv : o.GetStruct() )
-    {
-        extVec.push_back( into( kv.second ) );
-    }
+    for( auto& kv : o.GetStruct() ) extVec.push_back( into( kv.second ) );
     return extVec;
 }
 
@@ -237,10 +234,7 @@ AbstractBindingVec useRef(
     autodata::dynamic::Record& o )
 {
     AbstractBindingVec bindVec;
-    for( auto& kv : o.GetStruct() )
-    {
-        bindVec.push_back( useRef( kv.second ) );
-    }
+    for( auto& kv : o.GetStruct() ) bindVec.push_back( useRef( kv.second ) );
     return bindVec;
 }
 

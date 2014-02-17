@@ -30,6 +30,9 @@ int main(
 {
     std::cin >> std::string();
 
+    Var vv;
+    std::cout << vv << std::endl;
+
     try
     {
         SQLite::Connector::registerConnector();

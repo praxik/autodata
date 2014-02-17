@@ -22,6 +22,8 @@
 // --- AutoData Includes --- //
 #include <autodata/util/DataHelper.h>
 
+using namespace autodata::util;
+
 // --- POCO Includes --- //
 using namespace Poco::Data;
 
@@ -101,8 +103,8 @@ void ExecuteRetry(
             }
             return;
         }
-        catch( Poco::Data::SQLite::DBLockedException const& ){;}
-        catch( Poco::Data::SQLite::TableLockedException const& ){;}
+        catch( SQLite::DBLockedException const& ){;}
+        catch( SQLite::TableLockedException const& ){;}
         catch( Poco::Exception const& ex ){ ex.rethrow(); }
         Poco::Thread::sleep( retrySleep );
     }
@@ -113,3 +115,22 @@ void ExecuteRetry(
 
 } //end util
 } //end autodata
+
+namespace Poco
+{
+namespace Dynamic
+{
+
+////////////////////////////////////////////////////////////////////////////////
+std::ostream& operator <<(
+    std::ostream& os,
+    Var const& o )
+{
+    if( o.isString() ) return os << o.extract< std::string >();
+    return os << Convert< std::string >( o, "null" );
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+} //end Dynamic
+} //end Poco

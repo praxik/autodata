@@ -90,7 +90,8 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 
 #ifndef SWIG
 #ifndef isnan
-AUTODATA_EXPORTS bool isnan(
+AUTODATA_EXPORTS
+bool isnan(
     double v );
 #endif
 #endif //SWIG
@@ -103,7 +104,8 @@ namespace std
 {
 
 ///
-AUTODATA_EXPORTS double round(
+AUTODATA_EXPORTS
+double round(
     double const v );
 
 }
@@ -484,6 +486,7 @@ namespace Poco
 namespace Data
 {
 
+///
 template< typename J >
 class Extraction< boost::shared_ptr< J > > : public AbstractExtraction
 {
@@ -581,6 +584,7 @@ private:
     bool _null;
 };
 
+///
 template< typename J >
 class Extraction< std::vector< boost::shared_ptr< J > > > :
     public AbstractExtraction
@@ -675,6 +679,7 @@ private:
 
 };
 
+///
 template< typename J, typename K >
 class Extraction< boost::multi_index_container< J, K > > :
     public AbstractExtraction
@@ -899,6 +904,7 @@ private:
 
 };
 
+///
 /*template<>
 class Extraction< Dynamic::Struct< std::string > > : public AbstractExtraction
 {
@@ -992,6 +998,12 @@ private:
 
 namespace Dynamic
 {
+
+///
+AUTODATA_EXPORTS
+std::ostream& operator <<(
+    std::ostream& os,
+    Var const& o );
 
 ///
 /*template<>

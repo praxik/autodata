@@ -43,6 +43,9 @@ public:
     typedef void (*Manipulator)( Table& );
 
     ///
+    Table();
+
+    ///
     explicit Table(
         Poco::Data::Session& session );
 
@@ -89,6 +92,9 @@ public:
     const_iterator begin() const;
 
     ///
+    void clear();
+
+    ///
     template< typename T >
     std::vector< T > col(
         std::string const& name,
@@ -111,6 +117,10 @@ public:
     ///
     std::size_t execute(
         bool reset = true );
+
+    ///
+    void push_back(
+        Record record );
 
 protected:
 
