@@ -26,6 +26,9 @@
 
 #include <autodata/util/DataHelper.h>
 
+// --- Poco Includes --- //
+#include <Poco/Data/SessionPool.h>
+
 namespace autodata
 {
 namespace db

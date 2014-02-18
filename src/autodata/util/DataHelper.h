@@ -33,8 +33,6 @@
 #include <Poco/Data/Extraction.h>
 #include <Poco/Data/Limit.h>
 #include <Poco/Data/RecordSet.h>
-#include <Poco/Data/SessionFactory.h>
-#include <Poco/Data/SessionPool.h>
 
 #ifdef POCO_MYSQL_API
 #include <Poco/Data/MySQL/Connector.h>

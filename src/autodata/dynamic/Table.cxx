@@ -35,6 +35,7 @@ using namespace Poco::Dynamic;
 // --- Standard Includes --- //
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 
 namespace autodata
@@ -43,37 +44,33 @@ namespace dynamic
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-LoadPolicyDB::LoadPolicyDB(
-    Statement const& statement )
-    :
-    m_statement( statement )
-{
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-LoadPolicyDB::~LoadPolicyDB()
-{
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-void LoadPolicyDB::In()
-{
-    Query query( m_statement );
-    query.Execute();
-    static_cast< Table< LoadPolicyDB >& >( *this ) =
-        std::move( query.ToRecords() );
-}
-////////////////////////////////////////////////////////////////////////////////
-void LoadPolicyIStream::In()
+void DBPolicy::Load(
+    Statement& statement )
 {
     //
-    //poco_assert( m_is.is_open() );
+    Table< DBPolicy >& table =
+        static_cast< Table< DBPolicy >& >( *this );
+
+    //
+    Query query( statement );
+    query.Execute();
+    table.m_records = std::move( query.ToRecords() );
+}
+////////////////////////////////////////////////////////////////////////////////
+void IFStreamPolicy::Load(
+    std::ifstream& ifs )
+{
+    //
+    Table< IFStreamPolicy >& table =
+        static_cast< Table< IFStreamPolicy >& >( *this );
+
+    //
+    poco_assert( ifs.is_open() );
 
     //Strip off the column names
-    //DailyDayCent_list100/Table.f names contain no spaces, so this is safe
     unsigned int idx = 0;
     std::string col;
-    std::string line; std::getline( m_is, line );
+    std::string line; std::getline( ifs, line );
     std::istringstream iss( line );
     std::map< unsigned int, std::string > columns;
     while( iss >> col )
@@ -81,9 +78,9 @@ void LoadPolicyIStream::In()
         columns.insert( std::make_pair( idx++, col ) );
     }
     //Skip the blank line between column names and values
-    std::getline( m_is, line );
+    std::getline( ifs, line );
     Records records; records.reserve( columns.size() );
-    while( std::getline( m_is, line ) )
+    while( std::getline( ifs, line ) )
     {
         iss.str( line ); iss.clear();
         float value;
@@ -95,9 +92,9 @@ void LoadPolicyIStream::In()
         }
         records.push_back( std::move( record ) );
     }
-    static_cast< Table< LoadPolicyIStream >& >( *this ) =
-        std::move( records );
-    //m_is.close();
+    table.m_records = std::move( records );
+
+    ifs.close();
 }
 ////////////////////////////////////////////////////////////////////////////////
 

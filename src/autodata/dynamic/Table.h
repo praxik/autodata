@@ -33,7 +33,7 @@ namespace dynamic
 {
 
 ///
-template< typename LoadPolicy >
+template< typename LoadPolicy = void >
 class Table : public LoadPolicy
 {
 public:
@@ -43,22 +43,11 @@ public:
     typedef Records::value_type value_type;
 
     ///
-    template< typename T >
-    Table(
-        T&& t )
+    Table()
         :
-        LoadPolicy( std::forward< T >( t ) ),
         m_records()
     {
         ;
-    }
-
-    ///assignment operator
-    Table& operator =(
-        Records records )
-    {
-        m_records = std::move( records );
-        return *this;
     }
 
     ///
@@ -133,10 +122,11 @@ public:
     }
 
     ///
-    inline
-    void Load()
+    template< typename T > inline
+    void Load(
+        T&& t )
     {
-        In();
+        LoadPolicy::Load( std::forward< T >( t ) );
     }
 
     ///
@@ -154,7 +144,10 @@ private:
     friend LoadPolicy;
 
     ///copy constructor
-    Table( Table const& );// = delete;
+    Table( Table const& ); // = delete;
+
+    ///assignment operator
+    Table& operator =( Table ); // = delete;
 
     ///
     Records m_records;
@@ -194,58 +187,34 @@ auto end(
 }
 
 ///
-class AUTODATA_EXPORTS LoadPolicyDB
+class AUTODATA_EXPORTS DBPolicy
 {
 public:
     ///
-    void In();
+    void Load(
+        Poco::Data::Statement& statement );
 
 protected:
     ///
-    explicit LoadPolicyDB(
-        Poco::Data::Statement const& statement );
-
-    ///
-    ~LoadPolicyDB();
+    ~DBPolicy(){;}
 
 private:
-    ///copy constructor
-    LoadPolicyDB( LoadPolicyDB const& );// = delete;
-
-    ///assignment operator
-    LoadPolicyDB& operator =( LoadPolicyDB );// = delete;
-
-    ///
-    Poco::Data::Statement m_statement;
 
 };
 
 ///
-class AUTODATA_EXPORTS LoadPolicyIStream
+class AUTODATA_EXPORTS IFStreamPolicy
 {
 public:
     ///
-    void In();
+    void Load(
+        std::ifstream& ifs );
 
 protected:
     ///
-    LoadPolicyIStream(
-        std::istream& is )
-        :
-        m_is( is )
-    {
-        ;
-    }
-
-    ///
-    ~LoadPolicyIStream()
-    {
-        ;
-    }
+    ~IFStreamPolicy(){;}
 
 private:
-    ///
-    std::istream& m_is;
 
 };
 

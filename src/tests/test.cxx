@@ -59,9 +59,8 @@ int main(
             astruct.Save( GetSession( TEST_DB ) );
         }
 
-        Table< LoadPolicyDB > table( (
-            GetSession( TEST_DB ) << "select * from table1" ) );
-        table.Load();
+        Table< DBPolicy > table;
+        table.Load( ( GetSession( TEST_DB ) << "select * from table1" ) );
         for( auto& record : table )
         {
             Record bstruct; bstruct.FromJson( record.ToJson() );
