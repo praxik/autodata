@@ -58,6 +58,20 @@ public:
 
     ///
     inline
+    operator Records&()
+    {
+        return m_records;
+    }
+
+    ///
+    inline
+    operator Records const&() const
+    {
+        return m_records;
+    }
+
+    ///
+    inline
     Record& operator [](
         unsigned int pos )
     {

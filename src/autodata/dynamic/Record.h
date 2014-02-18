@@ -104,6 +104,14 @@ public:
         unsigned int n,
         bool usePH = false ) const;
 
+    ///Returns true if the Struct contains a member with the given name
+    inline
+    bool contains(
+        std::string const& name ) const
+    {
+        return m_struct.contains( name );
+    }
+
     ///
     void CreateId();
 

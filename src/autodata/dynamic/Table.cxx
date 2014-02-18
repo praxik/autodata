@@ -83,7 +83,7 @@ void IFStreamPolicy::Load(
     while( std::getline( ifs, line ) )
     {
         iss.str( line ); iss.clear();
-        float value;
+        Var value;
         Record record;
         idx = 0;
         while( iss >> value )

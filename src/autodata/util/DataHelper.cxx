@@ -74,7 +74,23 @@ std::ostream& operator <<(
     if( o.isString() ) return os << o.extract< std::string >();
     return os << Convert< std::string >( o, "null" );
 }
+////////////////////////////////////////////////////////////////////////////////
+std::istream& operator >>(
+    std::istream& is,
+    Var& o )
+{
+    std::string s;
+    is >> s;
 
+    try{ int i = boost::lexical_cast< int >( s ); o = i; return is; }
+    catch( boost::bad_lexical_cast& ){;}
+
+    try{ double d = boost::lexical_cast< double >( s ); o = d; return is; }
+    catch( boost::bad_lexical_cast& ){;}
+
+    o = s;
+    return is;
+}
 ////////////////////////////////////////////////////////////////////////////////
 
 } //end Dynamic
