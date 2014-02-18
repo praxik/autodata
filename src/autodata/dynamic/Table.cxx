@@ -67,29 +67,34 @@ void IFStreamPolicy::Load(
     //
     poco_assert( ifs.is_open() );
 
-    //Strip off the column names
-    unsigned int idx = 0;
-    std::string col;
-    std::string line; std::getline( ifs, line );
-    std::istringstream iss( line );
-    std::map< unsigned int, std::string > columns;
-    while( iss >> col )
+    //Line characters to ignore
+    std::string const iggy = " \t\v\r\n";
+
+    //Read until we find the first line with something...
+    std::string line;
+    while( std::getline( ifs, line ) )
     {
-        columns.insert( std::make_pair( idx++, col ) );
+        if( line.find_first_not_of( iggy ) != std::string::npos ) break;
     }
-    //Skip the blank line between column names and values
-    std::getline( ifs, line );
+
+    //Strip off the column names
+    std::string name;
+    std::istringstream iss( line );
+    std::vector< std::string > columns;
+    while( iss >> name ) columns.push_back( name );
+
+    //Get the values
     Records records; records.reserve( columns.size() );
     while( std::getline( ifs, line ) )
     {
+        //Skip blank lines
+        if( line.find_first_not_of( iggy ) == std::string::npos ) continue;
+
         iss.str( line ); iss.clear();
         Var value;
         Record record;
-        idx = 0;
-        while( iss >> value )
-        {
-            record[ columns.at( idx++ ) ] = value;
-        }
+        unsigned int idx = 0;
+        while( iss >> value ) record[ columns.at( idx++ ) ] = value;
         records.push_back( std::move( record ) );
     }
     table.m_records = std::move( records );
