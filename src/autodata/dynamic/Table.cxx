@@ -22,6 +22,8 @@
 // --- AutoData Includes --- //
 #include <autodata/dynamic/Table.h>
 
+using namespace autodata::util;
+
 // --- Poco Includes --- //
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -33,97 +35,32 @@ namespace dynamic
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-Table::Table()
-    :
-    Statement( NULL ),
-    m_records()
-{
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::Table(
-    Session& session )
-    :
-    Statement( session ),
-    m_records()
-{
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::Table(
+LoadPolicyDB::LoadPolicyDB(
     Statement const& statement )
     :
-    Statement( statement ),
-    m_records()
-{
-    execute();
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::Table(
-    Table const& o )
-    :
-    Statement( o.impl() )
+    Statement( statement )
 {
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Table::~Table()
+LoadPolicyDB::~LoadPolicyDB()
 {
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Record& Table::operator [](
-    unsigned int pos )
-{
-    return m_records.at( pos );
-}
-////////////////////////////////////////////////////////////////////////////////
-Record const& Table::operator [](
-    unsigned int pos ) const
-{
-    return m_records.at( pos );
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::iterator Table::begin()
-{
-    return m_records.begin();
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::const_iterator Table::begin() const
-{
-    return m_records.begin();
-}
-////////////////////////////////////////////////////////////////////////////////
-MetaColumn::ColumnDataType Table::columnType(
+MetaColumn::ColumnDataType LoadPolicyDB::columnType(
     std::size_t pos ) const
 {
     return metaColumn( static_cast< Poco::UInt32 >( pos ) ).type();
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Table::clear()
+std::size_t LoadPolicyDB::execute()
 {
-    m_records.clear();
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::iterator Table::end()
-{
-    return m_records.end();
-}
-////////////////////////////////////////////////////////////////////////////////
-Table::const_iterator Table::end() const
-{
-    return m_records.end();
-}
-////////////////////////////////////////////////////////////////////////////////
-std::size_t Table::execute(
-    bool reset )
-{
-    m_records.clear();
-    std::size_t size = Statement::execute( reset );
+    std::size_t size = Statement::execute();
 
     size_t colcnt = columnsExtracted();
     size_t rowcnt = rowsExtracted();
-    m_records.reserve( rowcnt );
+    Records records; records.reserve( rowcnt );
     for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
     {
         Record record;
@@ -133,20 +70,22 @@ std::size_t Table::execute(
                 metaColumn( static_cast< Poco::UInt32 >( colidx ) );
             record[ mc.name() ] = value( colidx, rowidx );
         }
-        m_records.push_back( std::move( record ) );
+        records.push_back( std::move( record ) );
     }
+    static_cast< Table< LoadPolicyDB >& >( *this ) =
+        std::move( records );
 
     Statement::reset( Statement::session() );
+
     return size;
 }
 ////////////////////////////////////////////////////////////////////////////////
-void Table::push_back(
-    Record record )
+void LoadPolicyDB::In()
 {
-    m_records.push_back( std::move( record ) );
+    poco_assert( !!execute() );
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var Table::value(
+Var LoadPolicyDB::value(
     std::size_t col,
     std::size_t row ) const
 {

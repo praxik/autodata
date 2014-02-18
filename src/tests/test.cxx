@@ -1,10 +1,16 @@
 
 // --- AutoData Includes --- //
+#include <autodata/db/Connection.h>
+
 #include <autodata/dynamic/Record.h>
 #include <autodata/dynamic/Table.h>
 
+using namespace autodata::db;
 using namespace autodata::dynamic;
 using namespace autodata::util;
+
+// --- Boost Includes --- //
+#include <boost/assign.hpp>
 
 // --- Poco Includes --- //
 #include <Poco/Data/SQLite/SQLite.h>
@@ -35,12 +41,14 @@ int main(
 
     try
     {
-        SQLite::Connector::registerConnector();
-        Session session( "SQLite", "test.db" );
+        std::string const TEST_DB = "TEST_DB";
+        ConnectionVector connections = boost::assign::list_of
+            ( ConnectionTuple( TEST_DB, CONN_SQLITE, "test.db" ) );
+        RegisterConnectors( connections );
 
         std::string tableName = "table1";
-        Record astruct;// = load(
-            //tableName, "7946fc0a-9384-11e3-a0e2-3c970eb4a232", session );
+        Record astruct;// = load( tableName,
+            //"13dad76e-9844-11e3-8ee5-3c970eb4a232", GetSession( TEST_DB ) );
         if( astruct.empty() )
         {
             astruct.SetTypename( tableName );
@@ -50,12 +58,13 @@ int main(
             astruct[ "three" ] = 7;
             astruct[ "four" ] = 3.0;
             astruct[ "five" ] = 8;
-            astruct.CreateTable( session );
-            astruct.Save( session );
+            astruct.CreateTable( GetSession( TEST_DB ) );
+            astruct.Save( GetSession( TEST_DB ) );
         }
 
-        Table table( session );
-        table << "select * from table1", now;
+        Table< LoadPolicyDB > table( (
+            GetSession( TEST_DB ) << "select * from table1" ) );
+        table.Load();
         for( auto& record : table )
         {
             Record bstruct; bstruct.FromJson( record.ToJson() );
@@ -75,7 +84,7 @@ int main(
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var2 << std::endl;
 
-        SQLite::Connector::unregisterConnector();
+        UnregisterConnectors();
     }
     catch( SQLite::SQLiteException const& e )
     {

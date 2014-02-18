@@ -61,7 +61,9 @@ Record load(
         << "where\n"
         << "  id = ?",
         useRef( id );
-    return cpplinq::from( Table( statement ) ).first_or_default();
+    Table< LoadPolicyDB > table( statement );
+    table.Load();
+    return cpplinq::from( table ).first_or_default();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()

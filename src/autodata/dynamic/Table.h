@@ -33,66 +33,76 @@ namespace dynamic
 {
 
 ///
-class AUTODATA_EXPORTS Table : private Poco::Data::Statement
+template< typename LoadPolicy >
+class Table : public LoadPolicy
 {
 public:
     ///
     typedef Records::iterator iterator;
     typedef Records::const_iterator const_iterator;
     typedef Records::value_type value_type;
-    typedef void (*Manipulator)( Table& );
 
     ///
-    Table();
-
-    ///
-    explicit Table(
-        Poco::Data::Session& session );
-
-    ///
-    explicit Table(
-        Poco::Data::Statement const& statement );
-
-    ///
-    Table(
-        Table const& o );
-
-    ///
-    ~Table();
-
-    ///Handles manipulators, such as now, async, etc.
     template< typename T >
-    Table& operator <<(
-        T const& t )
+    Table(
+        T&& t )
+        :
+        LoadPolicy( std::forward< T >( t ) ),
+        m_records()
     {
-        Statement::operator <<( t );
+        ;
+    }
+
+    ///assignment operator
+    Table& operator =(
+        Records records )
+    {
+        m_records = std::move( records );
         return *this;
     }
 
     ///
-    Table& operator ,(
-        Manipulator manip )
+    ~Table()
     {
-        manip( *this );
-        return *this;
+        ;
     }
 
     ///
+    inline
     Record& operator [](
-        unsigned int pos );
+        unsigned int pos )
+    {
+        return m_records.at( pos );
+    }
 
     ///
+    inline
     Record const& operator [](
-        unsigned int pos ) const;
+        unsigned int pos ) const
+    {
+        return m_records.at( pos );
+    }
 
     ///
-    iterator begin();
+    inline
+    iterator begin()
+    {
+        return m_records.begin();
+    }
 
     ///
-    const_iterator begin() const;
+    inline
+    const_iterator begin() const
+    {
+        return m_records.begin();
+    }
 
     ///
-    void clear();
+    inline
+    void clear()
+    {
+        m_records.clear();
+    }
 
     ///
     template< typename T >
@@ -109,22 +119,102 @@ public:
     }
 
     ///
-    iterator end();
+    inline
+    iterator end()
+    {
+        return m_records.end();
+    }
 
     ///
-    const_iterator end() const;
+    inline
+    const_iterator end() const
+    {
+        return m_records.end();
+    }
 
     ///
-    std::size_t execute(
-        bool reset = true );
+    inline
+    void Load()
+    {
+        In();
+    }
 
     ///
+    inline
     void push_back(
-        Record record );
+        Record record )
+    {
+        m_records.push_back( std::move( record ) );
+    }
 
 protected:
 
 private:
+    ///
+    friend LoadPolicy;
+
+    ///copy constructor
+    Table( Table const& );// = delete;
+
+    ///
+    Records m_records;
+
+};
+
+///For cpplinq use
+template< typename LoadPolicy > inline
+auto begin(
+    autodata::dynamic::Table< LoadPolicy >& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+
+///For cpplinq use
+template< typename LoadPolicy > inline
+auto begin(
+    autodata::dynamic::Table< LoadPolicy > const& o ) -> decltype( o.begin() )
+{
+    return o.begin();
+}
+
+///For cpplinq use
+template< typename LoadPolicy > inline
+auto end(
+    autodata::dynamic::Table< LoadPolicy >& o ) -> decltype( o.end() )
+{
+    return o.end();
+}
+
+///For cpplinq use
+template< typename LoadPolicy > inline
+auto end(
+    autodata::dynamic::Table< LoadPolicy > const& o ) -> decltype( o.end() )
+{
+    return o.end();
+}
+
+///
+class AUTODATA_EXPORTS LoadPolicyDB : private Poco::Data::Statement
+{
+public:
+    ///
+    void In();
+
+protected:
+    ///
+    explicit LoadPolicyDB(
+        Poco::Data::Statement const& statement );
+
+    ///
+    ~LoadPolicyDB();
+
+private:
+    ///copy constructor
+    LoadPolicyDB( LoadPolicyDB const& );// = delete;
+
+    ///assignment operator
+    LoadPolicyDB& operator =( LoadPolicyDB );// = delete;
+
     ///Returns the reference to column at specified position
     template< typename C >
     Poco::Data::Column< C > const& column(
@@ -177,6 +267,9 @@ private:
     Poco::Data::MetaColumn::ColumnDataType columnType(
         std::size_t pos ) const;
 
+    ///
+    std::size_t execute();
+
     ///Returns the data value at column, row location
     Poco::Dynamic::Var value(
         std::size_t col,
@@ -211,50 +304,33 @@ private:
         }
     }
 
+};
+
+///
+class AUTODATA_EXPORTS LoadPolicyIStream
+{
+public:
     ///
-    Records m_records;
+    void In()
+    {
+        ;
+    }
+
+protected:
+    ///
+    LoadPolicyIStream(
+        std::istream& is )
+        :
+        m_is( is )
+    {
+        ;
+    }
+
+private:
+    ///
+    std::istream& m_is;
 
 };
 
-///Enforces immediate execution of the statement
-inline
-void now(
-    Table& table )
-{
-    table.execute();
-}
-
 } //end dynamic
 } //end autodata
-
-///For cpplinq use
-inline
-auto begin(
-    autodata::dynamic::Table& o ) -> decltype( o.begin() )
-{
-    return o.begin();
-}
-
-///For cpplinq use
-inline
-auto begin(
-    autodata::dynamic::Table const& o ) -> decltype( o.begin() )
-{
-    return o.begin();
-}
-
-///For cpplinq use
-inline
-auto end(
-    autodata::dynamic::Table& o ) -> decltype( o.end() )
-{
-    return o.end();
-}
-
-///For cpplinq use
-inline
-auto end(
-    autodata::dynamic::Table const& o ) -> decltype( o.end() )
-{
-    return o.end();
-}
