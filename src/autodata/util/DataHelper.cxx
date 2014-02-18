@@ -56,61 +56,6 @@ namespace util
 {
 
 ////////////////////////////////////////////////////////////////////////////////
-StmtObj::StmtObj(
-    Session const& session )
-    :
-    m_session( session ),
-    m_statementImpl( m_session.createStatementImpl() ),
-    m_statement( m_session )
-{
-    Statement stmt( m_statementImpl );
-    m_statement.swap( stmt );
-}
-////////////////////////////////////////////////////////////////////////////////
-StmtObj::~StmtObj()
-{
-    ;
-}
-////////////////////////////////////////////////////////////////////////////////
-void ExecuteRetry(
-    StmtObj& stmtObj,
-    bool const& reset,
-    unsigned int const& maxRetryAttempts,
-    unsigned int const& retrySleep )
-{
-    //
-    Statement& stmt = stmtObj.m_statement;
-    if( stmt.isAsync() )
-    {
-        throw std::runtime_error(
-            "autodata::util::ExecuteRetry does not support asynchronous queries" );
-    }
-
-    StatementImpl& impl = *( stmtObj.m_statementImpl );
-    unsigned int cnt( 0 );
-    while( ++cnt <= maxRetryAttempts )
-    {
-        try
-        {
-            if( cnt == 1 )
-            {
-                stmt.execute();
-            }
-            else
-            {
-                impl.reset();
-                impl.execute( true );
-            }
-            return;
-        }
-        catch( SQLite::DBLockedException const& ){;}
-        catch( SQLite::TableLockedException const& ){;}
-        catch( Poco::Exception const& ex ){ ex.rethrow(); }
-        Poco::Thread::sleep( retrySleep );
-    }
-
-    throw std::runtime_error( "autodata::util::ExecuteRetry failed" );
-}
 ////////////////////////////////////////////////////////////////////////////////
 
 } //end util

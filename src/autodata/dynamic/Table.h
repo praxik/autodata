@@ -194,7 +194,7 @@ auto end(
 }
 
 ///
-class AUTODATA_EXPORTS LoadPolicyDB : private Poco::Data::Statement
+class AUTODATA_EXPORTS LoadPolicyDB
 {
 public:
     ///
@@ -215,94 +215,8 @@ private:
     ///assignment operator
     LoadPolicyDB& operator =( LoadPolicyDB );// = delete;
 
-    ///Returns the reference to column at specified position
-    template< typename C >
-    Poco::Data::Column< C > const& column(
-        std::size_t pos ) const
-    {
-        if( isBulkExtraction() )
-        {
-            typedef InternalBulkExtraction< C > E;
-            return columnImpl< C, E >( pos );
-        }
-        else
-        {
-            typedef InternalExtraction< C > E;
-            return columnImpl< C, E >( pos );
-        }
-    }
-
-    ///Returns the reference to column at specified position
-    template< typename C, typename E >
-    Poco::Data::Column< C > const& columnImpl(
-        std::size_t pos ) const
-    {
-        typedef typename C::value_type T;
-        typedef E const* ExtractionVecPtr;
-
-        Poco::Data::AbstractExtractionVec const& rExtractions = extractions();
-        std::size_t s = rExtractions.size();
-        if( 0 == s || pos >= s )
-        {
-            throw Poco::RangeException(
-                Poco::format( "Invalid column index: %z", pos ) );
-        }
-
-        ExtractionVecPtr pExtraction =
-            dynamic_cast< ExtractionVecPtr >( rExtractions[ pos ].get() );
-        if( pExtraction )
-        {
-            return pExtraction->column();
-        }
-        else
-        {
-            throw Poco::BadCastException( Poco::format(
-                "Type cast failed!\nColumn: %z\nTarget type:\t%s",
-                pos,
-                std::string( typeid( T ).name() ) ) );
-        }
-    }
-
-    ///Returns the type for the column at specified position
-    Poco::Data::MetaColumn::ColumnDataType columnType(
-        std::size_t pos ) const;
-
     ///
-    std::size_t execute();
-
-    ///Returns the data value at column, row location
-    Poco::Dynamic::Var value(
-        std::size_t col,
-        std::size_t row ) const;
-
-    ///Returns the reference to data value at [col, row] location
-    template< typename T >
-    T const& value(
-        std::size_t col,
-        std::size_t row ) const
-    {
-        switch( storage() )
-        {
-            case STORAGE_VECTOR:
-            {
-                typedef typename std::vector< T > C;
-                return column< C >( col ).value( row );
-            }
-            case STORAGE_LIST:
-            {
-                typedef typename std::list< T > C;
-                return column< C >( col ).value( row );
-            }
-            case STORAGE_DEQUE:
-            case STORAGE_UNKNOWN:
-            {
-                typedef typename std::deque< T > C;
-                return column< C >( col ).value( row );
-            }
-            default:
-                throw Poco::IllegalStateException( "Invalid storage setting." );
-        }
-    }
+    Poco::Data::Statement m_statement;
 
 };
 
@@ -311,10 +225,7 @@ class AUTODATA_EXPORTS LoadPolicyIStream
 {
 public:
     ///
-    void In()
-    {
-        ;
-    }
+    void In();
 
 protected:
     ///
@@ -322,6 +233,12 @@ protected:
         std::istream& is )
         :
         m_is( is )
+    {
+        ;
+    }
+
+    ///
+    ~LoadPolicyIStream()
     {
         ;
     }

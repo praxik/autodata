@@ -20,9 +20,11 @@
 
 
 // --- AutoData Includes --- //
-#include <autodata/dynamic/Record.h>
-#include <autodata/dynamic/Table.h>
+#include <autodata/db/Query.h>
 
+#include <autodata/dynamic/Record.h>
+
+using namespace autodata::db;
 using namespace autodata::dynamic;
 using namespace autodata::util;
 
@@ -53,17 +55,15 @@ Record load(
     poco_assert( !typeName.empty() && !id.isEmpty() );
 
     //
-    Statement statement( session );
-    statement
+    Query query = ( session
         << "select\n"
         << "  *\n"
         << "from " << typeName << "\n"
         << "where\n"
         << "  id = ?",
-        useRef( id );
-    Table< LoadPolicyDB > table( statement );
-    table.Load();
-    return cpplinq::from( table ).first_or_default();
+        useRef( id ) );
+    query.Execute();
+    return cpplinq::from( query.ToRecords() ).first_or_default();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()

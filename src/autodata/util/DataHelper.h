@@ -155,48 +155,6 @@ struct varargls : public std::vector< T, A >
 };
 
 ///
-class AUTODATA_EXPORTS StmtObj
-{
-public:
-    ///
-    StmtObj(
-        Poco::Data::Session const& session );
-
-    ///destructor
-    ~StmtObj();
-
-    ///
-    Poco::Data::Session m_session;
-
-    ///
-    Poco::Data::Statement m_statement;
-
-    ///
-    Poco::Data::StatementImpl* m_statementImpl;
-
-protected:
-
-private:
-    ///constructor
-    StmtObj();
-
-    ///copy constructor
-    StmtObj( StmtObj const& );// = delete;
-
-    ///assignment operator
-    StmtObj& operator =( StmtObj );// = delete;
-
-};
-
-///
-AUTODATA_EXPORTS
-void ExecuteRetry(
-    util::StmtObj& stmtObj,
-    bool const& reset = true,
-    unsigned int const& maxRetryAttempts = 100,
-    unsigned int const& retrySleep = 100 );
-
-///
 template< typename T >
 bool Convert(
     Poco::Dynamic::Var const& var,

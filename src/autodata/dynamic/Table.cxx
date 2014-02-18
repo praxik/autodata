@@ -20,14 +20,22 @@
 
 
 // --- AutoData Includes --- //
+#include <autodata/db/Query.h>
+
 #include <autodata/dynamic/Table.h>
 
+using namespace autodata::db;
 using namespace autodata::util;
 
 // --- Poco Includes --- //
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using namespace Poco::Dynamic;
+
+// --- Standard Includes --- //
+#include <iomanip>
+#include <iostream>
+#include <sstream>
 
 namespace autodata
 {
@@ -38,7 +46,7 @@ namespace dynamic
 LoadPolicyDB::LoadPolicyDB(
     Statement const& statement )
     :
-    Statement( statement )
+    m_statement( statement )
 {
     ;
 }
@@ -48,70 +56,48 @@ LoadPolicyDB::~LoadPolicyDB()
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-MetaColumn::ColumnDataType LoadPolicyDB::columnType(
-    std::size_t pos ) const
+void LoadPolicyDB::In()
 {
-    return metaColumn( static_cast< Poco::UInt32 >( pos ) ).type();
+    Query query( m_statement );
+    query.Execute();
+    static_cast< Table< LoadPolicyDB >& >( *this ) =
+        std::move( query.ToRecords() );
 }
 ////////////////////////////////////////////////////////////////////////////////
-std::size_t LoadPolicyDB::execute()
+void LoadPolicyIStream::In()
 {
-    std::size_t size = Statement::execute();
+    //
+    //poco_assert( m_is.is_open() );
 
-    size_t colcnt = columnsExtracted();
-    size_t rowcnt = rowsExtracted();
-    Records records; records.reserve( rowcnt );
-    for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
+    //Strip off the column names
+    //DailyDayCent_list100/Table.f names contain no spaces, so this is safe
+    unsigned int idx = 0;
+    std::string col;
+    std::string line; std::getline( m_is, line );
+    std::istringstream iss( line );
+    std::map< unsigned int, std::string > columns;
+    while( iss >> col )
     {
+        columns.insert( std::make_pair( idx++, col ) );
+    }
+    //Skip the blank line between column names and values
+    std::getline( m_is, line );
+    Records records; records.reserve( columns.size() );
+    while( std::getline( m_is, line ) )
+    {
+        iss.str( line ); iss.clear();
+        float value;
         Record record;
-        for( std::size_t colidx = 0; colidx < colcnt; ++colidx )
+        idx = 0;
+        while( iss >> value )
         {
-            MetaColumn const& mc =
-                metaColumn( static_cast< Poco::UInt32 >( colidx ) );
-            record[ mc.name() ] = value( colidx, rowidx );
+            record[ columns.at( idx++ ) ] = value;
         }
         records.push_back( std::move( record ) );
     }
-    static_cast< Table< LoadPolicyDB >& >( *this ) =
+    static_cast< Table< LoadPolicyIStream >& >( *this ) =
         std::move( records );
-
-    Statement::reset( Statement::session() );
-
-    return size;
-}
-////////////////////////////////////////////////////////////////////////////////
-void LoadPolicyDB::In()
-{
-    poco_assert( !!execute() );
-}
-////////////////////////////////////////////////////////////////////////////////
-Var LoadPolicyDB::value(
-    std::size_t col,
-    std::size_t row ) const
-{
-    if( isNull( col, row ) ) return Var();
-
-    switch( columnType( col ) )
-    {
-        case MetaColumn::FDT_BOOL: return value< bool >( col, row );
-        case MetaColumn::FDT_INT8: return value< Poco::Int8 >( col, row );
-        case MetaColumn::FDT_UINT8: return value< Poco::UInt8 >( col, row );
-        case MetaColumn::FDT_INT16: return value< Poco::Int16 >( col, row );
-        case MetaColumn::FDT_UINT16: return value< Poco::UInt16 >( col, row );
-        case MetaColumn::FDT_INT32: return value< Poco::Int32 >( col, row );
-        case MetaColumn::FDT_UINT32: return value< Poco::UInt32 >( col, row );
-        case MetaColumn::FDT_INT64: return value< Poco::Int64 >( col, row );
-        case MetaColumn::FDT_UINT64: return value< Poco::UInt64 >( col, row );
-        case MetaColumn::FDT_FLOAT: return value< float >( col, row );
-        case MetaColumn::FDT_DOUBLE: return value< double >( col, row );
-        case MetaColumn::FDT_STRING: return value< std::string >( col, row );
-        case MetaColumn::FDT_BLOB: return value< BLOB >( col, row );
-        case MetaColumn::FDT_CLOB: return value< CLOB >( col, row );
-        case MetaColumn::FDT_DATE: return value< Date >( col, row );
-        case MetaColumn::FDT_TIME: return value< Time >( col, row );
-        case MetaColumn::FDT_TIMESTAMP: return value< Poco::DateTime >( col, row );
-        default: throw UnknownTypeException( "Data type not supported." );
-    }
+    //m_is.close();
 }
 ////////////////////////////////////////////////////////////////////////////////
 

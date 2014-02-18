@@ -21,7 +21,9 @@
 
 // --- AutoData Includes --- //
 #include <autodata/db/Connection.h>
+#include <autodata/db/Query.h>
 
+using namespace autodata::db;
 using namespace autodata::util;
 
 // --- Boost Includes --- //
@@ -219,9 +221,9 @@ void RegisterConnectors(
             {
                 //Foreign key support is not enabled in SQLite by default
                 //This may need to be moved to GetSession() function below
-                StmtObj stmtObj( GetSession( name ) );
-                stmtObj.m_statement << "PRAGMA foreign_keys = ON;";
-                ExecuteRetry( stmtObj );
+                Query query = ( GetSession( name )
+                    << "PRAGMA foreign_keys = ON;" );
+                query.Execute();
                 break;
             }
             default:

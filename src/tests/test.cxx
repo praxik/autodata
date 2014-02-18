@@ -36,9 +36,6 @@ int main(
 {
     std::cin >> std::string();
 
-    Var vv;
-    std::cout << vv << std::endl;
-
     try
     {
         std::string const TEST_DB = "TEST_DB";
