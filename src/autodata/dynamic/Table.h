@@ -50,6 +50,15 @@ public:
         ;
     }
 
+    ///move constructor
+    Table(
+        Table&& o )
+        :
+        m_records( std::move( o.m_records ) )
+    {
+        ;
+    }
+
     ///
     ~Table()
     {

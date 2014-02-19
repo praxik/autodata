@@ -117,6 +117,11 @@ namespace util
 
 #ifndef SWIG
 ///
+AUTODATA_EXPORTS
+bool only_1_bit(
+    int x );
+
+///
 template< typename T >
 std::string to_string_p(
     T const t,
