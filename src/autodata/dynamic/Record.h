@@ -161,7 +161,7 @@ public:
         std::string name );
 
     ///
-    std::string ToJson();
+    std::string ToJson() const;
 
 #ifndef SWIG
     ///

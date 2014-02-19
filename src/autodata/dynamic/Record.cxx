@@ -269,9 +269,9 @@ void Record::SetTypename(
     m_typename = std::move( name );
 }
 ////////////////////////////////////////////////////////////////////////////////
-std::string Record::ToJson()
+std::string Record::ToJson() const
 {
-    return m_struct.toString();
+    return const_cast< Struct< std::string >& >( m_struct ).toString();
 }
 ////////////////////////////////////////////////////////////////////////////////
 
