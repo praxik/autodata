@@ -127,31 +127,6 @@ std::string to_string_p(
     return oss.str();
 }
 
-///std::initializer_list alternative for non c++11 compliant
-///ex.
-///#define foo( x, ... ) FOO( ( varargls< std::string >( x ), __VA_ARGS__ ) )
-///void FOO( varargls< std::string > args )
-template< typename T, typename A = std::allocator< T > >
-struct varargls : public std::vector< T, A >
-{
-    ///
-    varargls(
-        T const& v )
-        :
-        std::vector< T, A > ( 1, v )
-    {
-        ;
-    }
-
-    ///
-    varargls& operator ,(
-        T const& v )
-    {
-        push_back( v );
-        return *this;
-    }
-};
-
 ///
 template< typename T >
 bool Convert(
