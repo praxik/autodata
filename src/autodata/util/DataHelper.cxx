@@ -88,7 +88,7 @@ std::istream& operator >>(
     try{ double d = boost::lexical_cast< double >( s ); o = d; return is; }
     catch( boost::bad_lexical_cast& ){;}
 
-    o = s;
+    o = std::move( s );
     return is;
 }
 ////////////////////////////////////////////////////////////////////////////////

@@ -224,7 +224,22 @@ public:
     void Load(
         std::ifstream& ifs );
 
+    ///
+    char DelimChar;
+    char EscapeChar;
+    char QuoteChar;
+
 protected:
+    ///
+    IFStreamPolicy()
+        :
+        DelimChar( ' ' ),
+        EscapeChar( '\\' ),
+        QuoteChar( '\"' )
+    {
+        ;
+    }
+
     ///
     ~IFStreamPolicy(){;}
 

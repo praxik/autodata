@@ -27,6 +27,11 @@
 using namespace autodata::db;
 using namespace autodata::util;
 
+// --- Boost Includes --- //
+#include <boost/tokenizer.hpp>
+
+#include <boost/algorithm/string.hpp>
+
 // --- Poco Includes --- //
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -84,17 +89,41 @@ void IFStreamPolicy::Load(
     while( iss >> name ) columns.push_back( name );
 
     //Get the values
-    Records records; records.reserve( columns.size() );
+    Records records; records.reserve( 100 );
+    typedef boost::escaped_list_separator< char > Sep;
+    typedef boost::tokenizer< Sep > Toker;
+    Sep const sep( EscapeChar, DelimChar, QuoteChar );
+    bool DelimWS = ( DelimChar == ' ' );
     while( std::getline( ifs, line ) )
     {
         //Skip blank lines
         if( line.find_first_not_of( iggy ) == std::string::npos ) continue;
 
-        iss.str( line ); iss.clear();
         Var value;
         Record record;
         unsigned int idx = 0;
-        while( iss >> value ) record[ columns.at( idx++ ) ] = value;
+        if( DelimWS ) boost::trim( line );
+        Toker tok( line, sep );
+        for( auto const& s : tok )
+        {
+            if( DelimWS && s.empty() ) continue;
+
+            try
+            {
+                int i = boost::lexical_cast< int >( s );
+                record[ columns.at( idx++ ) ] = i;
+                continue;
+            }
+            catch( boost::bad_lexical_cast& ){;}
+            try
+            {
+                double d = boost::lexical_cast< double >( s );
+                record[ columns.at( idx++ ) ] = d;
+                continue;
+            }
+            catch( boost::bad_lexical_cast& ){;}
+            record[ columns.at( idx++ ) ] = std::move( s );
+        }
         records.push_back( std::move( record ) );
     }
     table.m_records = std::move( records );
