@@ -942,12 +942,6 @@ std::ostream& operator <<(
     Var const& o );
 
 ///
-AUTODATA_EXPORTS
-std::istream& operator >>(
-    std::istream& is,
-    Var& o );
-
-///
 /*template<>
 class VarHolderImpl< boost::shared_ptr< T > > : public VarHolder
 {
