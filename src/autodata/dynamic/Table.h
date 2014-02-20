@@ -233,26 +233,49 @@ public:
     void Load(
         std::ifstream& ifs );
 
-    ///
+    ///Specify whether to try conversion to a numerical value
+    bool ConvertType;
+
+    ///Specify the delimiter character for a row
     char DelimChar;
+
+    ///Specify if the file has a header with column values
+    bool HasHeader;
+
+    ///Specify characters to ignore when looking for empty lines
+    std::string EmptyLineChars;
+
+    ///Specify the character used for escaping in text fields
     char EscapeChar;
+
+    ///Specify the character used for quoting text fields
     char QuoteChar;
 
 protected:
     ///
     IFStreamPolicy()
         :
+        ConvertType( true ),
         DelimChar( ' ' ),
+        HasHeader( true ),
+        EmptyLineChars( " \t\v\r\n" ),
         EscapeChar( '\\' ),
-        QuoteChar( '\"' )
+        QuoteChar( '\"' ),
+        m_header()
     {
         ;
     }
 
     ///
+    Poco::Dynamic::Var TryCast(
+        std::string const& s );
+
+    ///
     ~IFStreamPolicy(){;}
 
 private:
+    ///
+    std::vector< std::string > m_header;
 
 };
 

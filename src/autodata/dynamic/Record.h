@@ -48,7 +48,7 @@ Record load(
     Poco::Data::Session& session );
 
 ///
-class AUTODATA_EXPORTS Record
+class AUTODATA_EXPORTS Record : public Poco::Dynamic::Struct< std::string >
 {
 public:
     ///
@@ -56,42 +56,15 @@ public:
     typedef Poco::Dynamic::Struct< std::string >::ConstIterator const_iterator;
     typedef Poco::Dynamic::Struct< std::string >::Data::value_type value_type;
 
-    ///
+    ///constructor
     Record();
 
-    ///
-    ~Record();
-
-    ///Creates the record from the given value
+    ///constructor
     Record(
-        Poco::Dynamic::Struct< std::string >::Data const& val )
-        :
-        m_struct( val )
-    {
-        ;
-    }
+        Data const& o );
 
     ///
-    template< typename T >
-    Record(
-        std::map< std::string, T > const& val )
-    {
-        for( auto const& kv : val ) m_struct[ kv.first ] = kv.second;
-    }
-
-    ///
-    operator Poco::Dynamic::Struct< std::string >&();
-
-    ///
-    operator Poco::Dynamic::Struct< std::string > const&() const;
-
-    ///
-    Poco::Dynamic::Var& operator [](
-        std::string const& name );
-
-    ///
-    Poco::Dynamic::Var const& operator [](
-        std::string const& name ) const;
+    virtual ~Record();
 
     ///
     iterator begin();
@@ -104,23 +77,12 @@ public:
         unsigned int n,
         bool usePH = false ) const;
 
-    ///Returns true if the Struct contains a member with the given name
-    inline
-    bool contains(
-        std::string const& name ) const
-    {
-        return m_struct.contains( name );
-    }
-
     ///
     void CreateId();
 
     ///
     void CreateTable(
         Poco::Data::Session& session );
-
-    ///
-    bool empty();
 
     ///
     iterator end();
@@ -134,12 +96,6 @@ public:
 
     ///
     Poco::Dynamic::Var const& GetId() const;
-
-    ///
-    Poco::Dynamic::Struct< std::string >& GetStruct();
-
-    ///
-    Poco::Dynamic::Struct< std::string > const& GetStruct() const;
 
     ///
     std::string const& GetTypename() const;
@@ -178,9 +134,6 @@ private:
 
     ///
     std::string m_typename;
-
-    ///
-    Poco::Dynamic::Struct< std::string > m_struct;
 
 };
 
@@ -232,7 +185,7 @@ AbstractExtractionVec into(
     autodata::dynamic::Record& o )
 {
     AbstractExtractionVec extVec;
-    for( auto& kv : o.GetStruct() ) extVec.push_back( into( kv.second ) );
+    for( auto& kv : o ) extVec.push_back( into( kv.second ) );
     return extVec;
 }
 
@@ -242,7 +195,7 @@ AbstractBindingVec useRef(
     autodata::dynamic::Record& o )
 {
     AbstractBindingVec bindVec;
-    for( auto& kv : o.GetStruct() ) bindVec.push_back( useRef( kv.second ) );
+    for( auto& kv : o ) bindVec.push_back( useRef( kv.second ) );
     return bindVec;
 }
 

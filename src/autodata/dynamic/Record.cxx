@@ -68,7 +68,15 @@ Record load(
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()
     :
-    m_struct( Struct< std::string >() )
+    Struct< std::string >()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+Record::Record(
+    Data const& o )
+    :
+    Struct< std::string >( o )
 {
     ;
 }
@@ -78,36 +86,14 @@ Record::~Record()
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
-Record::operator Struct< std::string >&()
-{
-    return m_struct;
-}
-////////////////////////////////////////////////////////////////////////////////
-Record::operator Struct< std::string >const&() const
-{
-    return m_struct;
-}
-////////////////////////////////////////////////////////////////////////////////
-Var& Record::operator [](
-    std::string const& name )
-{
-    return m_struct[ name ];
-}
-////////////////////////////////////////////////////////////////////////////////
-Var const& Record::operator [](
-    std::string const& name ) const
-{
-    return m_struct[ name ];
-}
-////////////////////////////////////////////////////////////////////////////////
 Record::iterator Record::begin()
 {
-    return m_struct.begin();
+    return Struct< std::string >::begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::const_iterator Record::begin() const
 {
-    return m_struct.begin();
+    return Struct< std::string >::begin();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::CreateId()
@@ -119,10 +105,10 @@ void Record::CreateTable(
     Session& session )
 {
     //
-    if( !m_struct.contains( "id" ) ) CreateId();
+    if( !contains( "id" ) ) CreateId();
     Poco::Data::Statement statement( session );
     statement << "create table if not exists " << m_typename << "(\n";
-    for( auto& kv : m_struct )
+    for( auto& kv : *this )
     {
         statement << "  '" << kv.first << "' ";
         Var const& var = kv.second;
@@ -155,11 +141,11 @@ std::string Record::columns(
     unsigned int n,
     bool usePH ) const
 {
-    if( m_struct.empty() ) return std::string( "*" ).insert( 0, n, ' ' );
+    if( empty() ) return std::string( "*" ).insert( 0, n, ' ' );
 
     std::string out;
     Poco::Dynamic::Struct< std::string >::ConstIterator kv;
-    for( kv = m_struct.begin(); kv != --m_struct.end(); ++kv )
+    for( kv = begin(); kv != --end(); ++kv )
     {
         out += ( (
             usePH ? ph( kv->first ) : kv->first ) + ",\n" ).insert( 0, n, ' ' );
@@ -170,19 +156,14 @@ std::string Record::columns(
     return out;
 }
 ////////////////////////////////////////////////////////////////////////////////
-bool Record::empty()
-{
-    return m_struct.empty();
-}
-////////////////////////////////////////////////////////////////////////////////
 Record::iterator Record::end()
 {
-    return m_struct.end();
+    return Struct< std::string >::end();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::const_iterator Record::end() const
 {
-    return m_struct.end();
+    return Struct< std::string >::end();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::FromJson(
@@ -192,22 +173,12 @@ void Record::FromJson(
     Parser parser( handler );
     Var result = parser.parse( json );
     poco_assert( result.type() == typeid( Object::Ptr ) );
-    m_struct = *result.extract< Object::Ptr >();
+    Struct< std::string >::operator =( *result.extract< Object::Ptr >() );
 }
 ////////////////////////////////////////////////////////////////////////////////
 Var const& Record::GetId() const
 {
-    return m_struct[ "id" ];
-}
-////////////////////////////////////////////////////////////////////////////////
-Struct< std::string >& Record::GetStruct()
-{
-    return m_struct;
-}
-////////////////////////////////////////////////////////////////////////////////
-Struct< std::string > const& Record::GetStruct() const
-{
-    return m_struct;
+    return operator []( "id" );
 }
 ////////////////////////////////////////////////////////////////////////////////
 std::string const& Record::GetTypename() const
@@ -220,8 +191,8 @@ void Record::Load(
 {
     poco_assert(
         !m_typename.empty() &&
-        m_struct.contains( "id" ) &&
-        !m_struct[ "id" ].isEmpty() );
+        contains( "id" ) &&
+        !operator []( "id" ).isEmpty() );
 
     //
     Statement statement( session );
@@ -232,7 +203,7 @@ void Record::Load(
         << "where\n"
         << "  id = ?",
         into( *this ),
-        useRef( m_struct[ "id" ] );
+        useRef( operator []( "id" ) );
     statement.execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +217,7 @@ void Record::Save(
     Session& session )
 {
     //
-    if( !m_struct.contains( "id" ) ) CreateId();
+    if( !contains( "id" ) ) CreateId();
     Statement statement( session );
     statement
         << "insert or replace into " << m_typename << "(\n"
@@ -260,7 +231,7 @@ void Record::Save(
 void Record::SetId(
     Var id )
 {
-    m_struct[ "id" ] = std::move( id );
+    operator []( "id" ) = std::move( id );
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::SetTypename(
@@ -271,7 +242,7 @@ void Record::SetTypename(
 ////////////////////////////////////////////////////////////////////////////////
 std::string Record::ToJson() const
 {
-    return const_cast< Struct< std::string >& >( m_struct ).toString();
+    return const_cast< Record& >( *this ).toString();
 }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -298,10 +269,10 @@ Var& Var::operator =(
     autodata::dynamic::Record const& o )
 {
 #ifdef POCO_NO_SOO
-    Var tmp( o.GetStruct() );
+    Var tmp( o );
     swap( tmp );
 #else
-    construct( o.GetStruct() );
+    construct( o );
 #endif
     return *this;
 }

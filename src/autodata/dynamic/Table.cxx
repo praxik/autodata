@@ -32,6 +32,13 @@ using namespace autodata::util;
 
 #include <boost/algorithm/string.hpp>
 
+#include <boost/spirit/include/qi.hpp>
+
+#include <boost/timer/timer.hpp>
+
+using namespace boost::spirit;
+using namespace boost::timer;
+
 // --- Poco Includes --- //
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -53,82 +60,89 @@ void DBPolicy::Load(
     Statement& statement )
 {
     //
-    Table< DBPolicy >& table =
-        static_cast< Table< DBPolicy >& >( *this );
-
-    //
     Query query( statement );
     query.Execute();
+
+    //
+    Table< DBPolicy >& table =
+        static_cast< Table< DBPolicy >& >( *this );
     table.m_records = std::move( query.ToRecords() );
 }
 ////////////////////////////////////////////////////////////////////////////////
 void IFStreamPolicy::Load(
     std::ifstream& ifs )
 {
+    auto_cpu_timer timer;
+
     //
     Table< IFStreamPolicy >& table =
         static_cast< Table< IFStreamPolicy >& >( *this );
+    table.m_records.clear();
 
     //
     poco_assert( ifs.is_open() );
 
-    //Line characters to ignore
-    std::string const iggy = " \t\v\r\n";
-
-    //Read until we find the first line with something...
+    //Declare variables
+    bool DelimWS = ( DelimChar == ' ' );
     std::string line;
-    while( std::getline( ifs, line ) )
-    {
-        if( line.find_first_not_of( iggy ) != std::string::npos ) break;
-    }
-
-    //Strip off the column names
-    std::string name;
-    std::istringstream iss( line );
-    std::vector< std::string > columns;
-    while( iss >> name ) columns.push_back( name );
-
-    //Get the values
-    Records records; records.reserve( 100 );
     typedef boost::escaped_list_separator< char > Sep;
     typedef boost::tokenizer< Sep > Toker;
     Sep const sep( EscapeChar, DelimChar, QuoteChar );
-    bool DelimWS = ( DelimChar == ' ' );
+    Toker tok( line, sep );
+
+    if( HasHeader && m_header.empty() )
+    {
+        //Read until we find the first line with something...
+        while( std::getline( ifs, line ) )
+        {
+            if( line.find_first_not_of( EmptyLineChars ) == std::string::npos )
+                continue;
+
+            //Strip off the column names
+            if( DelimWS ) boost::trim( line );
+            tok.assign( line.begin(), line.end() );
+            for( auto const& s : tok )
+            {
+                if( DelimWS && s.empty() ) continue;
+                m_header.push_back( s );
+            }
+            break;
+        }
+    }
+
+    //Get the values
     while( std::getline( ifs, line ) )
     {
         //Skip blank lines
-        if( line.find_first_not_of( iggy ) == std::string::npos ) continue;
+        if( line.find_first_not_of( EmptyLineChars ) == std::string::npos )
+            continue;
 
-        Var value;
+        //Push back new record
         Record record;
         unsigned int idx = 0;
         if( DelimWS ) boost::trim( line );
-        Toker tok( line, sep );
+        tok.assign( line.begin(), line.end() );
         for( auto const& s : tok )
         {
             if( DelimWS && s.empty() ) continue;
-
-            try
-            {
-                int i = boost::lexical_cast< int >( s );
-                record[ columns.at( idx++ ) ] = i;
-                continue;
-            }
-            catch( boost::bad_lexical_cast& ){;}
-            try
-            {
-                double d = boost::lexical_cast< double >( s );
-                record[ columns.at( idx++ ) ] = d;
-                continue;
-            }
-            catch( boost::bad_lexical_cast& ){;}
-            record[ columns.at( idx++ ) ] = std::move( s );
+            record[ m_header.at( idx++ ) ] = ( ConvertType ) ? TryCast( s ) : s;
         }
-        records.push_back( std::move( record ) );
+        table.m_records.push_back( std::move( record ) );
     }
-    table.m_records = std::move( records );
 
     ifs.close();
+}
+////////////////////////////////////////////////////////////////////////////////
+Var IFStreamPolicy::TryCast(
+    std::string const& s )
+{
+    static qi::real_parser< double, qi::strict_real_policies< double > > real_;
+    std::string::const_iterator b = s.begin();
+    std::string::const_iterator e = s.end();
+    double d; if( qi::parse( b, e, real_, d ) && ( b == e ) ) return d;
+    b = s.begin(); //reset
+    int i; if( qi::parse( b, e, qi::int_, i ) && ( b == e ) ) return i;
+    return s;
 }
 ////////////////////////////////////////////////////////////////////////////////
 
