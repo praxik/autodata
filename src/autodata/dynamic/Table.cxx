@@ -162,7 +162,6 @@ void FlatFilePolicy::Load(
         //Rewind a line if we have no header
         if( !HasHeader ) ifs.seekg( spos );
         poco_assert( !m_header.empty() );
-        for( auto const& h : m_header ) std::cout << "<" << h << ">"; std::cout << std::endl;
     }
 
     //Get the values
