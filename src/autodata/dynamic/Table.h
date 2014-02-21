@@ -233,34 +233,47 @@ public:
     void Load(
         std::ifstream& ifs );
 
-    ///Specify whether to try conversion to a numerical value
-    bool ConvertType;
+    ///
+    void SetHeader(
+        std::vector< std::string > header );
 
-    ///Specify the delimiter character for a row
-    char DelimChar;
+    ///Specify whether to try conversion from string to a numerical value
+    bool ConvertType;
 
     ///Specify if the file has a header with column values
     bool HasHeader;
 
-    ///Specify characters to ignore when looking for empty lines
-    std::string EmptyLineChars;
+    ///Specify the delimiter character for data rows
+    char ColumnDelimiter;
 
     ///Specify the character used for escaping in text fields
-    char EscapeChar;
+    char EscapeCharacter;
+
+    ///Specify the delimiter character for the header row
+    char HeaderDelimiter;
 
     ///Specify the character used for quoting text fields
-    char QuoteChar;
+    char TextQualifier;
+
+    ///Specify the number of nonblank header rows to skip
+    unsigned int HeaderRowsToSkip;
+
+    ///Specify characters to ignore when looking for empty lines
+    std::string EmptyLineCharacters;
 
 protected:
     ///
     FlatFilePolicy()
         :
         ConvertType( true ),
-        DelimChar( ' ' ),
         HasHeader( true ),
-        EmptyLineChars( " \t\v\r\n" ),
-        EscapeChar( '\\' ),
-        QuoteChar( '\"' ),
+        ColumnDelimiter( ' ' ),
+        EscapeCharacter( '\\' ),
+        HeaderDelimiter( ColumnDelimiter ),
+        RowDelimiter( '\n' ),
+        TextQualifier( '\"' ),
+        HeaderRowsToSkip( 0 ),
+        EmptyLineCharacters( " \t\v\r\n" ),
         m_header()
     {
         ;
@@ -274,6 +287,9 @@ protected:
     ~FlatFilePolicy(){;}
 
 private:
+    ///
+    char RowDelimiter;
+
     ///
     std::vector< std::string > m_header;
 

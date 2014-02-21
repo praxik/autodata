@@ -83,11 +83,11 @@ void FlatFilePolicy::Load(
     poco_assert( ifs.is_open() );
 
     //Declare variables
-    bool DelimWS = ( DelimChar == ' ' );
+    bool DelimWS = ( ColumnDelimiter == ' ' );
     std::string line;
     typedef boost::escaped_list_separator< char > Sep;
     typedef boost::tokenizer< Sep > Toker;
-    Sep const sep( EscapeChar, DelimChar, QuoteChar );
+    Sep const sep( EscapeCharacter, ColumnDelimiter, TextQualifier );
     Toker tok( line, sep );
 
     if( HasHeader && m_header.empty() )
@@ -95,7 +95,7 @@ void FlatFilePolicy::Load(
         //Read until we find the first line with something...
         while( std::getline( ifs, line ) )
         {
-            if( line.find_first_not_of( EmptyLineChars ) == std::string::npos )
+            if( line.find_first_not_of( EmptyLineCharacters ) == std::string::npos )
                 continue;
 
             //Strip off the column names
@@ -114,7 +114,7 @@ void FlatFilePolicy::Load(
     while( std::getline( ifs, line ) )
     {
         //Skip blank lines
-        if( line.find_first_not_of( EmptyLineChars ) == std::string::npos )
+        if( line.find_first_not_of( EmptyLineCharacters ) == std::string::npos )
             continue;
 
         //Push back new record
@@ -131,6 +131,12 @@ void FlatFilePolicy::Load(
     }
 
     ifs.close();
+}
+////////////////////////////////////////////////////////////////////////////////
+void FlatFilePolicy::SetHeader(
+    std::vector< std::string > header )
+{
+    m_header = std::move( header );
 }
 ////////////////////////////////////////////////////////////////////////////////
 Var FlatFilePolicy::TryCast(
