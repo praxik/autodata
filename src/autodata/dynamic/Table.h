@@ -33,7 +33,7 @@ namespace dynamic
 {
 
 ///
-template< typename LoadPolicy = void >
+template< typename LoadPolicy = DefaultPolicy >
 class Table : public LoadPolicy
 {
 public:
@@ -45,6 +45,7 @@ public:
     ///
     Table()
         :
+        LoadPolicy(),
         m_records()
     {
         ;
@@ -54,6 +55,7 @@ public:
     Table(
         Table&& o )
         :
+        LoadPolicy( std::move( o ) ),
         m_records( std::move( o.m_records ) )
     {
         ;
@@ -210,16 +212,34 @@ auto end(
 }
 
 ///
+class AUTODATA_EXPORTS DefaultPolicy
+{
+public:
+    ///
+    DefaultPolicy();
+
+protected:
+    ///
+    ~DefaultPolicy();
+
+private:
+
+};
+
+///
 class AUTODATA_EXPORTS DBPolicy
 {
 public:
+    ///
+    DBPolicy();
+
     ///
     void Load(
         Poco::Data::Statement& statement );
 
 protected:
     ///
-    ~DBPolicy(){;}
+    ~DBPolicy();
 
 private:
 
@@ -229,6 +249,9 @@ private:
 class AUTODATA_EXPORTS FlatFilePolicy
 {
 public:
+    ///
+    FlatFilePolicy();
+
     ///
     void Load(
         std::ifstream& ifs );
@@ -263,28 +286,11 @@ public:
 
 protected:
     ///
-    FlatFilePolicy()
-        :
-        ConvertType( true ),
-        HasHeader( true ),
-        ColumnDelimiter( ' ' ),
-        EscapeCharacter( '\\' ),
-        HeaderDelimiter( ColumnDelimiter ),
-        RowDelimiter( '\n' ),
-        TextQualifier( '\"' ),
-        HeaderRowsToSkip( 0 ),
-        EmptyLineCharacters( " \t\v\r\n" ),
-        m_header()
-    {
-        ;
-    }
-
-    ///
     Poco::Dynamic::Var TryCast(
         std::string const& s );
 
     ///
-    ~FlatFilePolicy(){;}
+    ~FlatFilePolicy();
 
 private:
     ///

@@ -56,6 +56,26 @@ namespace dynamic
 {
 
 ////////////////////////////////////////////////////////////////////////////////
+DefaultPolicy::DefaultPolicy()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+DefaultPolicy::~DefaultPolicy()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+DBPolicy::DBPolicy()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+DBPolicy::~DBPolicy()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
 void DBPolicy::Load(
     Statement& statement )
 {
@@ -67,6 +87,27 @@ void DBPolicy::Load(
     Table< DBPolicy >& table =
         static_cast< Table< DBPolicy >& >( *this );
     table.m_records = std::move( query.ToRecords() );
+}
+////////////////////////////////////////////////////////////////////////////////
+FlatFilePolicy::FlatFilePolicy()
+    :
+    ConvertType( true ),
+    HasHeader( true ),
+    ColumnDelimiter( ' ' ),
+    EscapeCharacter( '\\' ),
+    HeaderDelimiter( ColumnDelimiter ),
+    RowDelimiter( '\n' ),
+    TextQualifier( '\"' ),
+    HeaderRowsToSkip( 0 ),
+    EmptyLineCharacters( " \t\v\r\n" ),
+    m_header()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+FlatFilePolicy::~FlatFilePolicy()
+{
+    ;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void FlatFilePolicy::Load(
@@ -83,31 +124,45 @@ void FlatFilePolicy::Load(
     poco_assert( ifs.is_open() );
 
     //Declare variables
-    bool DelimWS = ( ColumnDelimiter == ' ' );
+    bool const hDelimWS = ( HeaderDelimiter == ' ' );
+    bool const DelimWS = ( ColumnDelimiter == ' ' );
     std::string line;
     typedef boost::escaped_list_separator< char > Sep;
     typedef boost::tokenizer< Sep > Toker;
+    Sep const hsep( EscapeCharacter, HeaderDelimiter, TextQualifier );
     Sep const sep( EscapeCharacter, ColumnDelimiter, TextQualifier );
-    Toker tok( line, sep );
+    Toker tok( line );
 
-    if( HasHeader && m_header.empty() )
+    if( m_header.empty() )
     {
-        //Read until we find the first line with something...
+        //
+        unsigned int skip = 0;
+        std::streampos spos = ifs.tellg();
         while( std::getline( ifs, line ) )
         {
-            if( line.find_first_not_of( EmptyLineCharacters ) == std::string::npos )
-                continue;
+            //Skip user defined blank lines
+            if( line.find_first_not_of( EmptyLineCharacters ) ==
+                std::string::npos ) continue;
+
+            //Skip user defined number of header rows
+            if( skip++ < HeaderRowsToSkip ) continue;
 
             //Strip off the column names
-            if( DelimWS ) boost::trim( line );
-            tok.assign( line.begin(), line.end() );
+            unsigned int idx = 0;
+            if( hDelimWS ) boost::trim( line );
+            tok.assign( line.begin(), line.end(), hsep );
             for( auto const& s : tok )
             {
-                if( DelimWS && s.empty() ) continue;
-                m_header.push_back( s );
+                if( hDelimWS && s.empty() ) continue;
+                m_header.push_back( ( HasHeader ) ?
+                    s : ( "Column_" + std::to_string( idx++ ) ) );
             }
             break;
         }
+        //Rewind a line if we have no header
+        if( !HasHeader ) ifs.seekg( spos );
+        poco_assert( !m_header.empty() );
+        for( auto const& h : m_header ) std::cout << "<" << h << ">"; std::cout << std::endl;
     }
 
     //Get the values
@@ -121,7 +176,7 @@ void FlatFilePolicy::Load(
         Record record;
         unsigned int idx = 0;
         if( DelimWS ) boost::trim( line );
-        tok.assign( line.begin(), line.end() );
+        tok.assign( line.begin(), line.end(), sep );
         for( auto const& s : tok )
         {
             if( DelimWS && s.empty() ) continue;
