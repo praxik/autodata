@@ -226,7 +226,7 @@ private:
 };
 
 ///
-class AUTODATA_EXPORTS IFStreamPolicy
+class AUTODATA_EXPORTS FlatFilePolicy
 {
 public:
     ///
@@ -253,7 +253,7 @@ public:
 
 protected:
     ///
-    IFStreamPolicy()
+    FlatFilePolicy()
         :
         ConvertType( true ),
         DelimChar( ' ' ),
@@ -271,7 +271,7 @@ protected:
         std::string const& s );
 
     ///
-    ~IFStreamPolicy(){;}
+    ~FlatFilePolicy(){;}
 
 private:
     ///

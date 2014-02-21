@@ -69,14 +69,14 @@ void DBPolicy::Load(
     table.m_records = std::move( query.ToRecords() );
 }
 ////////////////////////////////////////////////////////////////////////////////
-void IFStreamPolicy::Load(
+void FlatFilePolicy::Load(
     std::ifstream& ifs )
 {
     auto_cpu_timer timer;
 
     //
-    Table< IFStreamPolicy >& table =
-        static_cast< Table< IFStreamPolicy >& >( *this );
+    Table< FlatFilePolicy >& table =
+        static_cast< Table< FlatFilePolicy >& >( *this );
     table.m_records.clear();
 
     //
@@ -133,7 +133,7 @@ void IFStreamPolicy::Load(
     ifs.close();
 }
 ////////////////////////////////////////////////////////////////////////////////
-Var IFStreamPolicy::TryCast(
+Var FlatFilePolicy::TryCast(
     std::string const& s )
 {
     static qi::real_parser< double, qi::strict_real_policies< double > > real_;
