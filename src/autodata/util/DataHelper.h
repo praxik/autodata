@@ -123,9 +123,11 @@ bool only_1_bit(
 
 ///
 template< typename T >
+    //,typename std::enable_if< std::is_arithmetic< T >::value >::type = 0 >
 std::string to_string_p(
     T const t,
-    int const n )
+    int const n,
+    typename std::enable_if< std::is_arithmetic< T >::value >::type* = 0 )
 {
     std::ostringstream oss;
     oss << std::setprecision( n ) << std::fixed << t;
