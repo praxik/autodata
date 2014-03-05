@@ -18,6 +18,15 @@
  *
  *************** <auto-copyright.rb END do not edit this line> ***************/
 
+// --- Boost Includes --- //
+//These headers need to be first or the clang compiler errors out
+#include <boost/tokenizer.hpp>
+
+#include <boost/algorithm/string.hpp>
+
+#include <boost/spirit/include/qi.hpp>
+
+#include <boost/timer/timer.hpp>
 
 // --- AutoData Includes --- //
 #include <autodata/db/Query.h>
@@ -26,15 +35,6 @@
 
 using namespace autodata::db;
 using namespace autodata::util;
-
-// --- Boost Includes --- //
-#include <boost/tokenizer.hpp>
-
-#include <boost/algorithm/string.hpp>
-
-#include <boost/spirit/include/qi.hpp>
-
-#include <boost/timer/timer.hpp>
 
 using namespace boost::spirit;
 using namespace boost::timer;
@@ -179,7 +179,7 @@ void FlatFilePolicy::Load(
         for( auto const& s : tok )
         {
             if( DelimWS && s.empty() ) continue;
-            record[ m_header.at( idx++ ) ] = ( ConvertType ) ? TryCast( s ) : s;
+            record[ m_header.at( idx++ ) ] = ( ConvertType ) ? TryCast( s ) : Var( s );
         }
         table.m_records.push_back( std::move( record ) );
     }

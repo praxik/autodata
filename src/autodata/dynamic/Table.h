@@ -32,6 +32,8 @@ namespace autodata
 namespace dynamic
 {
 
+class DefaultPolicy;
+    
 ///
 template< typename LoadPolicy = DefaultPolicy >
 class Table : public LoadPolicy

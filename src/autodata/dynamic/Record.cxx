@@ -63,7 +63,8 @@ Record load(
         << "  id = ?",
         useRef( id ) );
     query.Execute();
-    return cpplinq::from( query.ToRecords() ).first_or_default();
+    Records records = query.ToRecords();
+    return cpplinq::from( records ).first_or_default();
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()

@@ -125,7 +125,7 @@ public:
     friend std::ostream& operator <<(
         std::ostream& os,
         Record const& record );
-#endif SWIG
+#endif //SWIG
 
 private:
     ///
@@ -136,9 +136,6 @@ private:
     std::string m_typename;
 
 };
-
-} //end dynamic
-} //end autodata
 
 ///For cpplinq use
 inline
@@ -171,6 +168,9 @@ auto end(
 {
     return o.end();
 }
+
+} //end dynamic
+} //end autodata
 
 namespace Poco
 {

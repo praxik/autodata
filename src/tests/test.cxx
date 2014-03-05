@@ -34,7 +34,8 @@ int main(
     int argc,
     char* argv[] )
 {
-    std::cin >> std::string();
+    std::string lString;
+    std::cin >> lString;
 
     try
     {
@@ -55,12 +56,14 @@ int main(
             astruct[ "three" ] = 7;
             astruct[ "four" ] = 3.0;
             astruct[ "five" ] = 8;
-            astruct.CreateTable( GetSession( TEST_DB ) );
-            astruct.Save( GetSession( TEST_DB ) );
+            Session session = GetSession( TEST_DB );
+            astruct.CreateTable( session );
+            astruct.Save( session );
         }
 
+        Statement statement( GetSession( TEST_DB ) << "select * from table1" );
         Table< DBPolicy > table;
-        table.Load( ( GetSession( TEST_DB ) << "select * from table1" ) );
+        table.Load( statement );
         for( auto& record : table )
         {
             Record bstruct; bstruct.FromJson( record.ToJson() );
@@ -75,8 +78,9 @@ int main(
             std::cout << "Summation of cols: " << var << std::endl;
         }
 
+        std::vector< double > doubleCol = table.col< double >( "zero" );
         auto var2 = cpplinq::
-            from( table.col< double >( "zero" ) ).
+            from( doubleCol ).
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var2 << std::endl;
 
