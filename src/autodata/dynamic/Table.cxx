@@ -29,9 +29,6 @@
 
 #include <boost/timer/timer.hpp>
 
-using namespace boost::spirit;
-using namespace boost::timer;
-
 // --- AutoData Includes --- //
 #include <autodata/db/Query.h>
 
@@ -44,6 +41,12 @@ using namespace autodata::util;
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using namespace Poco::Dynamic;
+
+//These declerations must be here otherwise the clang compiler gets
+//confused by the _1 in the spirit parser and the _1 in the multi-index headers
+//included through autodata/dynamic/Table.h back to data helper
+using namespace boost::spirit;
+using namespace boost::timer;
 
 // --- Standard Includes --- //
 #include <iomanip>
