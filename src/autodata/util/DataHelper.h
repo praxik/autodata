@@ -62,8 +62,6 @@ DIAG_ON( deprecated-declarations )
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
-#include <boost/math/special_functions.hpp>
-
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
@@ -85,6 +83,7 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 
 // --- Standard Includes --- //
 #include <limits>
+#include <iomanip>
 
 #ifndef SWIG
 #ifndef isnan
