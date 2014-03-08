@@ -82,8 +82,9 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <cpplinq/linq.hpp>
 
 // --- Standard Includes --- //
-#include <limits>
+#include <fstream>
 #include <iomanip>
+#include <limits>
 
 #ifndef SWIG
 #ifndef isnan
@@ -119,6 +120,11 @@ namespace util
 AUTODATA_EXPORTS
 bool only_1_bit(
     int x );
+
+///
+AUTODATA_EXPORTS
+std::string get_file_contents(
+    std::string const& filename );
 
 ///
 template< typename T >

@@ -62,6 +62,21 @@ bool only_1_bit(
     return ( x > 0 ) && !( x & ( x - 1 ) );
 }
 ////////////////////////////////////////////////////////////////////////////////
+std::string get_file_contents(
+    std::string const& filename )
+{
+    std::ifstream ifs( filename, std::ios::in | std::ios::binary );
+    if( !ifs ) throw( errno );
+
+    std::string contents;
+    ifs.seekg( 0, std::ios::end );
+    contents.resize( static_cast< std::size_t >( ifs.tellg() ) );
+    ifs.seekg( 0, std::ios::beg );
+    ifs.read( &contents[ 0 ], contents.size() );
+    ifs.close();
+    return contents;
+}
+////////////////////////////////////////////////////////////////////////////////
 
 } //end util
 } //end autodata
