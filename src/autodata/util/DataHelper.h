@@ -82,7 +82,6 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <cpplinq/linq.hpp>
 
 // --- Standard Includes --- //
-#include <fstream>
 #include <iomanip>
 #include <limits>
 

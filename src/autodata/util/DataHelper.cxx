@@ -27,6 +27,9 @@ using namespace autodata::util;
 // --- POCO Includes --- //
 using namespace Poco::Data;
 
+// --- Standard Includes --- //
+#include <fstream>
+
 ////////////////////////////////////////////////////////////////////////////////
 bool isnan(
     double v )
