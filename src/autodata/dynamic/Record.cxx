@@ -33,8 +33,6 @@ using namespace autodata::util;
 
 #include <Poco/JSON/Object.h>
 #include <Poco/JSON/Parser.h>
-#include <Poco/JSON/Handler.h>
-#include <Poco/JSON/ParseHandler.h>
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -170,8 +168,7 @@ Record::const_iterator Record::end() const
 void Record::FromJson(
     std::string const& json )
 {
-    ParseHandler::Ptr handler = new ParseHandler( true );
-    Parser parser( handler );
+    Parser parser;
     Var result = parser.parse( json );
     poco_assert( result.type() == typeid( Object::Ptr ) );
     Struct< std::string >::operator =( *result.extract< Object::Ptr >() );

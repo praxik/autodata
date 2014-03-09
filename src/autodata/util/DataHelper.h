@@ -185,11 +185,6 @@ T Convert(
 {
     try
     {
-        try
-        {
-            return Convert( var.extract< Poco::Nullable< T > >(), defVal );
-        }
-        catch( ... ){}
         return var.convert< T >();
     }
     catch( ... )
