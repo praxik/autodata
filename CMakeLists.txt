@@ -38,6 +38,9 @@ if( WIN32 )
             set( VC_VERSION 10 )
         elseif( MSVC11 )
             set( VC_VERSION 11 )
+            #https://connect.microsoft.com/VisualStudio/feedback/details/737019
+            add_definitions( -D_VARIADIC_MAX=10 )
+
         else()
             message( FATAL_ERROR "VC++ version not supported" )
         endif()
