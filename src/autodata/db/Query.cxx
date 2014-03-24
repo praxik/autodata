@@ -114,8 +114,8 @@ std::size_t Query::Execute()
 ////////////////////////////////////////////////////////////////////////////////
 Records Query::ToRecords()
 {
-    size_t colcnt = columnsExtracted();
-    size_t rowcnt = rowsExtracted();
+    size_t colcnt = extractions().size();
+    size_t rowcnt = subTotalRowCount();
     Records records; records.reserve( rowcnt );
     for( std::size_t rowidx = 0; rowidx < rowcnt; ++rowidx )
     {
