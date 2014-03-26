@@ -33,7 +33,7 @@ namespace dynamic
 {
 
 class DefaultPolicy;
-    
+
 ///
 template< typename LoadPolicy = DefaultPolicy >
 class Table : public LoadPolicy
@@ -184,7 +184,7 @@ private:
 ///For cpplinq use
 template< typename LoadPolicy > inline
 auto begin(
-    autodata::dynamic::Table< LoadPolicy >& o ) -> decltype( o.begin() )
+    Table< LoadPolicy >& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
@@ -192,7 +192,7 @@ auto begin(
 ///For cpplinq use
 template< typename LoadPolicy > inline
 auto begin(
-    autodata::dynamic::Table< LoadPolicy > const& o ) -> decltype( o.begin() )
+    Table< LoadPolicy > const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
@@ -200,7 +200,7 @@ auto begin(
 ///For cpplinq use
 template< typename LoadPolicy > inline
 auto end(
-    autodata::dynamic::Table< LoadPolicy >& o ) -> decltype( o.end() )
+    Table< LoadPolicy >& o ) -> decltype( o.end() )
 {
     return o.end();
 }
@@ -208,7 +208,7 @@ auto end(
 ///For cpplinq use
 template< typename LoadPolicy > inline
 auto end(
-    autodata::dynamic::Table< LoadPolicy > const& o ) -> decltype( o.end() )
+    Table< LoadPolicy > const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
