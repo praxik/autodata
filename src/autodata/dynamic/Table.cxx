@@ -103,6 +103,7 @@ FlatFilePolicy::FlatFilePolicy()
     RowDelimiter( '\n' ),
     TextQualifier( '\"' ),
     HeaderRowsToSkip( 0 ),
+    DataRowsToSkip( 0 ),
     EmptyLineCharacters( " \t\v\r\n" ),
     m_header()
 {
@@ -155,9 +156,17 @@ void FlatFilePolicy::Load(
             unsigned int idx = 0;
             if( hDelimWS ) boost::trim( line );
             tok.assign( line.begin(), line.end(), hsep );
-            for( auto const& s : tok )
+            for( auto const& t : tok )
             {
-                if( hDelimWS && s.empty() ) continue;
+                std::string s = t; //Don't like this copy
+                if( hDelimWS )
+                {
+                    if( s.empty() ) continue;
+                }
+                else
+                {
+                    boost::trim( s );
+                }
                 m_header.push_back( ( HasHeader ) ?
                     s : ( "Column_" + std::to_string( idx++ ) ) );
             }
@@ -169,20 +178,32 @@ void FlatFilePolicy::Load(
     }
 
     //Get the values
+    unsigned int skip = 0;
     while( std::getline( ifs, line ) )
     {
         //Skip blank lines
         if( line.find_first_not_of( EmptyLineCharacters ) == std::string::npos )
             continue;
 
+        //Skip user defined number of data rows
+        if( skip++ < DataRowsToSkip ) continue;
+
         //Push back new record
         Record record;
         unsigned int idx = 0;
         if( DelimWS ) boost::trim( line );
         tok.assign( line.begin(), line.end(), sep );
-        for( auto const& s : tok )
+        for( auto const& t : tok )
         {
-            if( DelimWS && s.empty() ) continue;
+            std::string s = t; //Don't like this copy
+            if( DelimWS )
+            {
+                if( s.empty() ) continue;
+            }
+            else
+            {
+                boost::trim( s );
+            }
             record[ m_header.at( idx++ ) ] =
                 ( ConvertType ) ? TryCast( s ) : Var( s );
         }

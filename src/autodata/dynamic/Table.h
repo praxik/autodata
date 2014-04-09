@@ -283,6 +283,9 @@ public:
     ///Specify the number of nonblank header rows to skip
     unsigned int HeaderRowsToSkip;
 
+    ///Specify the number of nonblank data rows to skip
+    unsigned int DataRowsToSkip;
+
     ///Specify characters to ignore when looking for empty lines
     std::string EmptyLineCharacters;
 
