@@ -90,7 +90,7 @@ void DBPolicy::Load(
     //
     Table< DBPolicy >& table =
         static_cast< Table< DBPolicy >& >( *this );
-    table.m_records = std::move( query.ToRecords() );
+    table.m_records = query.ToRecords();
 }
 ////////////////////////////////////////////////////////////////////////////////
 FlatFilePolicy::FlatFilePolicy()
