@@ -42,6 +42,7 @@ public:
     ///
     typedef Records::iterator iterator;
     typedef Records::const_iterator const_iterator;
+    typedef Records::size_type size_type;
     typedef Records::value_type value_type;
 
     ///
@@ -53,6 +54,9 @@ public:
         ;
     }
 
+    ///copy constructor
+    //Table( Table const& ) = default;
+
     ///move constructor
     Table(
         Table&& o )
@@ -63,6 +67,9 @@ public:
         ;
     }
 
+    ///assignment operator
+    //Table& operator =( Table ) = default;
+
     ///
     ~Table()
     {
@@ -70,21 +77,18 @@ public:
     }
 
     ///
-    inline
     operator Records&()
     {
         return m_records;
     }
 
     ///
-    inline
     operator Records const&() const
     {
         return m_records;
     }
 
     ///
-    inline
     Record& operator [](
         unsigned int pos )
     {
@@ -92,7 +96,6 @@ public:
     }
 
     ///
-    inline
     Record const& operator [](
         unsigned int pos ) const
     {
@@ -100,21 +103,18 @@ public:
     }
 
     ///
-    inline
     iterator begin()
     {
         return m_records.begin();
     }
 
     ///
-    inline
     const_iterator begin() const
     {
         return m_records.begin();
     }
 
     ///
-    inline
     void clear()
     {
         m_records.clear();
@@ -135,21 +135,25 @@ public:
     }
 
     ///
-    inline
+    bool empty() const
+    {
+        return m_records.empty();
+    }
+
+    ///
     iterator end()
     {
         return m_records.end();
     }
 
     ///
-    inline
     const_iterator end() const
     {
         return m_records.end();
     }
 
     ///
-    template< typename T > inline
+    template< typename T >
     void Load(
         T&& t )
     {
@@ -157,11 +161,24 @@ public:
     }
 
     ///
-    inline
     void push_back(
         Record record )
     {
         m_records.push_back( std::move( record ) );
+    }
+
+    ///
+    size_type size() const
+    {
+        return m_records.size();
+    }
+
+    ///
+    std::string ToJson() const
+    {
+        std::string json;
+        Var( *this ).convert< std::string >( json );
+        return json;
     }
 
 protected:
@@ -169,12 +186,6 @@ protected:
 private:
     ///
     friend LoadPolicy;
-
-    ///copy constructor
-    Table( Table const& ); // = delete;
-
-    ///assignment operator
-    Table& operator =( Table ); // = delete;
 
     ///
     Records m_records;
@@ -308,3 +319,198 @@ private:
 
 } //end dynamic
 } //end autodata
+
+namespace Poco
+{
+namespace Dynamic
+{
+
+///
+template< typename T >
+class VarHolderImpl< autodata::dynamic::Table< T > > : public VarHolder
+{
+public:
+    VarHolderImpl(
+        autodata::dynamic::Table< T > const& val )
+        :
+        _val( val )
+    {
+        ;
+    }
+
+    ~VarHolderImpl()
+    {
+        ;
+    }
+
+    const std::type_info& type() const
+    {
+        return typeid( autodata::dynamic::Table< T > );
+    }
+
+    void convert( Int8& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to Int8" );
+    }
+
+    void convert( Int16& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to Int16" );
+    }
+
+    void convert( Int32& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to Int32" );
+    }
+
+    void convert( Int64& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to Int64" );
+    }
+
+    void convert( UInt8& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to UInt8" );
+    }
+
+    void convert( UInt16& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to UInt16" );
+    }
+
+    void convert( UInt32& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to UInt32" );
+    }
+
+    void convert( UInt64& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to UInt64" );
+    }
+
+    void convert( bool& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to bool" );
+    }
+
+    void convert( float& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to float" );
+    }
+
+    void convert( double& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to double" );
+    }
+
+    void convert( char& ) const
+    {
+        throw BadCastException( "Cannot cast Table type to char" );
+    }
+
+    void convert( std::string& val ) const
+    {
+        val.append( "[ " );
+        autodata::dynamic::Table< T >::const_iterator it = _val.begin();
+        autodata::dynamic::Table< T >::const_iterator itEnd = _val.begin();
+        if( !_val.empty() )
+        {
+            val.append( it->ToJson() );
+            ++it;
+        }
+        for( ; it != itEnd; ++it )
+        {
+            val.append( ", " );
+            val.append( it->ToJson() );
+        }
+        val.append( " ]" );
+    }
+
+    void convert( Poco::DateTime& ) const
+    {
+        throw BadCastException( "Table -> Poco::DateTime" );
+    }
+
+    void convert( Poco::LocalDateTime& ) const
+    {
+        throw BadCastException( "Table -> Poco::LocalDateTime" );
+    }
+
+    void convert( Poco::Timestamp& ) const
+    {
+        throw BadCastException( "Table -> Poco::Timestamp" );
+    }
+
+    VarHolder* clone( Placeholder< VarHolder >* pVarHolder = 0 ) const
+    {
+        return cloneHolder( pVarHolder, _val );
+    }
+
+    autodata::dynamic::Table< T > const& value() const
+    {
+        return _val;
+    }
+
+    bool isArray() const
+    {
+        return true;
+    }
+
+    bool isStruct() const
+    {
+        return false;
+    }
+
+    bool isInteger() const
+    {
+        return false;
+    }
+
+    bool isSigned() const
+    {
+        return false;
+    }
+
+    bool isNumeric() const
+    {
+        return false;
+    }
+
+    bool isString() const
+    {
+        return false;
+    }
+
+    std::size_t size() const
+    {
+        return _val.size();
+    }
+
+    T& operator[](
+        typename autodata::dynamic::Table< T >::size_type n )
+    {
+        if( n < size() ) return _val.operator []( n );
+
+        throw RangeException( "Vector index out of range" );
+    }
+
+    T const& operator[](
+        typename autodata::dynamic::Table< T >::size_type n ) const
+    {
+        if( n < size() ) return _val.operator []( n );
+
+        throw RangeException( "Vector index out of range" );
+    }
+
+private:
+    VarHolderImpl();
+    VarHolderImpl( VarHolderImpl const& );
+    VarHolderImpl& operator =( VarHolderImpl const& );
+
+    ///
+    autodata::dynamic::Table< T > _val;
+
+};
+
+} // end Dynamic
+} // end Poco
