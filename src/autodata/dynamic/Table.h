@@ -412,7 +412,7 @@ public:
     {
         val.append( "[ " );
         typename autodata::dynamic::Table< T >::const_iterator it = _val.begin();
-        typename autodata::dynamic::Table< T >::const_iterator itEnd = _val.begin();
+        typename autodata::dynamic::Table< T >::const_iterator itEnd = _val.end();
         if( !_val.empty() )
         {
             val.append( it->ToJson() );
