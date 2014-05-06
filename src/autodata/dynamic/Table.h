@@ -177,7 +177,7 @@ public:
     std::string ToJson() const
     {
         std::string json;
-        Var( *this ).convert< std::string >( json );
+        Var( *this ).template convert< std::string >( json );
         return json;
     }
 
@@ -411,8 +411,8 @@ public:
     void convert( std::string& val ) const
     {
         val.append( "[ " );
-        autodata::dynamic::Table< T >::const_iterator it = _val.begin();
-        autodata::dynamic::Table< T >::const_iterator itEnd = _val.begin();
+        typename autodata::dynamic::Table< T >::const_iterator it = _val.begin();
+        typename autodata::dynamic::Table< T >::const_iterator itEnd = _val.begin();
         if( !_val.empty() )
         {
             val.append( it->ToJson() );
