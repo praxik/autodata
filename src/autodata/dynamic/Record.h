@@ -59,9 +59,17 @@ public:
     ///constructor
     Record();
 
-    ///constructor
+    ///copy constructor
+    //Record( Record const& ) = default;
     Record(
-        Data const& o );
+        Poco::Dynamic::Struct< std::string > const& o );
+
+    ///move constructor
+    Record(
+        Record&& o );
+
+    ///assignment operator
+    //Record& operator =( Record ) = default;
 
     ///
     virtual ~Record();

@@ -67,15 +67,26 @@ Record load(
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record()
     :
-    Struct< std::string >()
+    Struct< std::string >(),
+    m_typename()
 {
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record(
-    Data const& o )
+    Struct< std::string > const& o )
     :
-    Struct< std::string >( o )
+    Struct< std::string >( o ),
+    m_typename()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+Record::Record(
+    Record&& o )
+    :
+    Struct< std::string >( std::move( o ) ),
+    m_typename( std::move( o.m_typename ) )
 {
     ;
 }
