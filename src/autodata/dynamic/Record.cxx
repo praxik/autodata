@@ -74,6 +74,15 @@ Record::Record()
 }
 ////////////////////////////////////////////////////////////////////////////////
 Record::Record(
+    Record const& o )
+    :
+    Struct< std::string >( o ),
+    m_typename()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+Record::Record(
     Struct< std::string > const& o )
     :
     Struct< std::string >( o ),

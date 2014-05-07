@@ -60,7 +60,10 @@ public:
     Record();
 
     ///copy constructor
-    //Record( Record const& ) = default;
+    Record(
+        Record const& o );
+
+    ///copy constructor
     Record(
         Poco::Dynamic::Struct< std::string > const& o );
 
