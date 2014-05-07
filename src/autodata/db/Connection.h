@@ -113,6 +113,9 @@ public:
     Connection(
         Connection&& o );
 
+    ///
+    //Connection( Connection const& ) = default;
+
     ///destructor
     ~Connection();
 
@@ -134,9 +137,6 @@ private:
         ConnectorEnum connector,
         std::string value,
         std::shared_ptr< Poco::Data::SessionPool > sessionPool );
-
-    ///
-    Connection( Connection const& ); //= delete;
 
     ///
     Connection& operator =( Connection ); //= delete
