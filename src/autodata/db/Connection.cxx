@@ -203,9 +203,9 @@ void RegisterConnectors(
         std::string const& value = std::get< 2 >( c );
 
         Registers[ connector ]();
-        Connections.insert( ConnectionMap::value_type( name,
-            Connection( connector, value, std::make_shared< SessionPool >(
-                ConnectorStrings[ connector ], value, 1, 16, 0 ) ) ) );
+        Connections.emplace( name, Connection(
+            connector, value, std::make_shared< SessionPool >(
+                ConnectorStrings[ connector ], value, 1, 16, 0 ) ) );
         Connection const& connection = Connections.at( name );
         switch( connector )
         {
