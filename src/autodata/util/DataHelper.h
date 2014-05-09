@@ -26,7 +26,9 @@
 #include <autodata/CompilerGuards.h>
 
 // --- POCO Includes --- //
+DIAG_OFF( unused-local-typedefs )
 #include <Poco/Nullable.h>
+DIAG_ON( unused-local-typedefs )
 #include <Poco/SharedPtr.h>
 
 #include <Poco/Data/Binding.h>
@@ -84,8 +86,10 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 // --- Standard Includes --- //
 #include <iomanip>
 #include <limits>
-
-#define ISNAN_EXISTS
+#include <cmath>
+#ifdef __linux__
+#define ISNAN_EXISTS 1
+#endif
 
 #ifndef SWIG
 #ifndef isnan

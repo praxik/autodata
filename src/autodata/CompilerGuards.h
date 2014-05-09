@@ -23,9 +23,11 @@
 
 //From:
 //https://svn.boost.org/trac/boost/wiki/Guidelines/WarningsGuidelines
-
-#if( ( __GNUC__ * 100 ) + __GNUC_MINOR__ ) >= 402
+#ifdef __linux__
     #include <Poco/Platform_POSIX.h>
+    #define DIAG_OFF( x ) GCC_DIAG_OFF( x )
+    #define DIAG_ON( x ) GCC_DIAG_ON( x )
+#elif( ( __GNUC__ * 100 ) + __GNUC_MINOR__ ) >= 402
     #define GCC_DIAG_STR( s ) #s
     #ifndef GCC_DIAG_JOINSTR
         #define GCC_DIAG_JOINSTR( x, y ) GCC_DIAG_STR( x ## y )
