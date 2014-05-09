@@ -26,13 +26,6 @@
 #include <autodata/CompilerGuards.h>
 
 // --- POCO Includes --- //
-#ifndef SWIG
-DIAG_OFF( unused-local-typedefs )
-#endif
-#include <Poco/Nullable.h>
-#ifndef SWIG
-DIAG_ON( unused-local-typedefs )
-#endif
 #include <Poco/SharedPtr.h>
 
 #include <Poco/Data/Binding.h>
