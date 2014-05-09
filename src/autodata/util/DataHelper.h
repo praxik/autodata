@@ -85,11 +85,15 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <iomanip>
 #include <limits>
 
+#define ISNAN_EXISTS
+
 #ifndef SWIG
 #ifndef isnan
+#ifndef ISNAN_EXISTS
 AUTODATA_EXPORTS
 bool isnan(
     double v );
+#endif
 #endif
 #endif //SWIG
 
