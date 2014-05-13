@@ -153,6 +153,16 @@ public:
     }
 
     ///
+    void FromJson(
+        std::string const& json )
+    {
+        Poco::JSON::Parser parser;
+        Poco::Dynamic::Var result = parser.parse( json );
+        poco_assert( result.type() == typeid( Poco::JSON::Array::Ptr ) );
+        m_records = *result.extract< Poco::JSON::Array::Ptr >();
+    }
+
+    ///
     template< typename T >
     void Load(
         T&& t )
