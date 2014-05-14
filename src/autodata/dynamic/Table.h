@@ -55,7 +55,14 @@ public:
     }
 
     ///copy constructor
-    //Table( Table const& ) = default;
+    Table(
+        Table const& o )
+        :
+        LoadPolicy( o ),
+        m_records( o.m_records )
+    {
+        ;
+    }
 
     ///move constructor
     Table(
