@@ -27,6 +27,9 @@
 
 #include <autodata/dynamic/Record.h>
 
+// --- Poco Includes --- //
+#include <Poco/JSON/Parser.h>
+
 namespace autodata
 {
 namespace dynamic
