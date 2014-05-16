@@ -188,10 +188,23 @@ Record::const_iterator Record::end() const
 void Record::FromJson(
     std::string const& json )
 {
-    Parser parser;
-    Var result = parser.parse( json );
-    poco_assert( result.type() == typeid( Object::Ptr ) );
-    Struct< std::string >::operator =( *result.extract< Object::Ptr >() );
+    try
+    {
+        Parser parser;
+        Var result = parser.parse( json );
+        poco_assert( result.type() == typeid( Object::Ptr ) );
+        Struct< std::string >::operator =( *result.extract< Object::Ptr >() );
+    }
+    catch( Poco::Exception& ex )
+    {
+        std::cout << ex.displayText() << std::endl;
+        throw;
+    }
+    catch( std::exception& ex )
+    {
+        std::cout << ex.what() << std::endl;
+        throw;
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 Var const& Record::GetId() const
