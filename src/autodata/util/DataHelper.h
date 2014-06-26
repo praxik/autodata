@@ -131,6 +131,11 @@ std::string get_file_contents(
     std::string const& filename );
 
 ///
+AUTODATA_EXPORTS
+std::string escape_json(
+    std::string const& json );
+
+///
 template< typename T >
 std::string to_string_p(
     T const t,

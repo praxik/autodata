@@ -82,6 +82,45 @@ std::string get_file_contents(
     return contents;
 }
 ////////////////////////////////////////////////////////////////////////////////
+std::string escape_json(
+    std::string const& json )
+{
+    if( json.empty() ) return json;// "\"\"";
+    std::ostringstream oss;
+    for( auto itr = json.cbegin(); itr != json.cend(); ++itr )
+    {
+        switch( *itr )
+        {
+            case '\\': oss << "\\\\"; break;
+            case '"': oss << "\\\""; break;
+            case '/': oss << "\\/"; break;
+            case '\b': oss << "\\b"; break;
+            case '\t': oss << "\\t"; break;
+            case '\n': oss << "\\n"; break;
+            case '\f': oss << "\\f"; break;
+            case '\r': oss << "\\r"; break;
+            default:
+            {
+                if( *itr < ' ' )
+                {
+                    oss << "\\u"
+                        << std::uppercase
+                        << std::setfill( '0' )
+                        << std::setw( 4 )
+                        << std::hex
+                        << static_cast< unsigned int >( *itr );
+                }
+                else
+                {
+                    oss << *itr;
+                }
+                break;
+            }
+        }
+    }
+    return oss.str();
+}
+////////////////////////////////////////////////////////////////////////////////
 
 } //end util
 } //end autodata
