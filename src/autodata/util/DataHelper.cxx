@@ -85,7 +85,7 @@ std::string get_file_contents(
 std::string escape_json(
     std::string const& json )
 {
-    if( json.empty() ) return json;// "\"\"";
+    if( json.empty() ) return json;
     std::ostringstream oss;
     for( auto itr = json.cbegin(); itr != json.cend(); ++itr )
     {
@@ -93,7 +93,7 @@ std::string escape_json(
         {
             case '\\': oss << "\\\\"; break;
             case '"': oss << "\\\""; break;
-            case '/': oss << "\\/"; break;
+            //case '/': oss << "\\/"; break;
             case '\b': oss << "\\b"; break;
             case '\t': oss << "\\t"; break;
             case '\n': oss << "\\n"; break;
