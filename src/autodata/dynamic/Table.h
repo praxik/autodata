@@ -290,6 +290,9 @@ public:
         std::ifstream& ifs );
 
     ///
+    std::vector< std::string > const& GetHeader() const;
+
+    ///
     void SetHeader(
         std::vector< std::string > header );
 

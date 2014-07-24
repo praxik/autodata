@@ -213,6 +213,11 @@ void FlatFilePolicy::Load(
     ifs.close();
 }
 ////////////////////////////////////////////////////////////////////////////////
+std::vector< std::string > const& FlatFilePolicy::GetHeader() const
+{
+    return m_header;
+}
+////////////////////////////////////////////////////////////////////////////////
 void FlatFilePolicy::SetHeader(
     std::vector< std::string > header )
 {
