@@ -136,9 +136,9 @@ void DbSave::Save(
     //
     Query query = ( session
         << "insert into \"" << tmp << "\"(\n"
-        <<    records.back().columns( 2 ) << " )\n"
+        <<    r.columns( 2 ) << " )\n"
         << "values(\n"
-        <<    records.back().columns( 2, true ) << " )",
+        <<    r.columns( 2, true ) << " )",
         useRef( records ) );
     query.Execute();
 }

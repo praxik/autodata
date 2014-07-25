@@ -56,7 +56,7 @@ Record load(
     Query query = ( session
         << "select\n"
         << "  *\n"
-        << "from " << typeName << "\n"
+        << "from \"" << typeName << "\"\n"
         << "where\n"
         << "  id = ?",
         useRef( id ) );
@@ -126,10 +126,10 @@ void Record::CreateTable(
     //
     if( !contains( "id" ) ) CreateId();
     Statement statement( session );
-    statement << "create table if not exists " << m_typename << "(\n";
+    statement << "create table if not exists \"" << m_typename << "\"(\n";
     for( auto& kv : *this )
     {
-        statement << "  '" << kv.first << "' ";
+        statement << "  \"" << kv.first << "\" ";
         Var const& var = kv.second;
         if( var.isNumeric() )
         {
@@ -149,7 +149,7 @@ void Record::CreateTable(
         statement << ",\n";
     }
     statement
-        << "constraint " << m_typename << "_ukey_1\n"
+        << "constraint \"" << m_typename << "_ukey_1\"\n"
         << "  unique(\n"
         << "    id ) );";
 
@@ -178,11 +178,11 @@ std::string Record::columns(
     Struct< std::string >::ConstIterator kv;
     for( kv = begin(); kv != --end(); ++kv )
     {
-        out += ( (
-            usePH ? ph( kv->first ) : kv->first ) + ",\n" ).insert( 0, n, ' ' );
+        out += ( ( ( usePH ) ?  ph( kv->first ) :
+            "\"" + kv->first + "\"" ) + ",\n" ).insert( 0, n, ' ' );
     }
-    out += std::string(
-        usePH ? ph( kv->first ) : kv->first ).insert( 0, n, ' ' );
+    out += ( ( usePH ) ? ph( kv->first ) :
+        "\"" + kv->first + "\"" ).insert( 0, n, ' ' );
 
     return out;
 }
@@ -241,7 +241,7 @@ void Record::Load(
     Query query = ( session
         << "select\n"
         <<    columns( 2 ) << "\n"
-        << "from " << m_typename << "\n"
+        << "from \"" << m_typename << "\"\n"
         << "where\n"
         << "  id = ?",
         into( *this ),
@@ -261,7 +261,7 @@ void Record::Save(
     //
     if( !contains( "id" ) ) CreateId();
     Query query = ( session
-        << "insert or replace into " << m_typename << "(\n"
+        << "insert or replace into \"" << m_typename << "\"(\n"
         <<    columns( 2 ) << " )\n"
         << "values(\n"
         <<    columns( 2, true ) << " )",
