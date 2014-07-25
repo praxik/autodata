@@ -189,9 +189,10 @@ public:
     ///
     template< typename T >
     void Save(
-        T&& t )
+        T&& t,
+        std::string const& tableName = "" )
     {
-        SavePolicy::Save( std::forward< T >( t ), m_records );
+        SavePolicy::Save( std::forward< T >( t ), tableName, m_records );
     }
 
     ///
@@ -319,6 +320,7 @@ public:
     ///
     void Save(
         Poco::Data::Session& session,
+        std::string const& tableName,
         Records& records );
 
 protected:

@@ -125,7 +125,7 @@ void Record::CreateTable(
 {
     //
     if( !contains( "id" ) ) CreateId();
-    Poco::Data::Statement statement( session );
+    Statement statement( session );
     statement << "create table if not exists " << m_typename << "(\n";
     for( auto& kv : *this )
     {
@@ -153,7 +153,8 @@ void Record::CreateTable(
         << "  unique(\n"
         << "    id ) );";
 
-    statement.execute();
+    Query query( statement );
+    query.Execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::clear()
@@ -237,16 +238,15 @@ void Record::Load(
         !operator []( "id" ).isEmpty() );
 
     //
-    Statement statement( session );
-    statement
+    Query query = ( session
         << "select\n"
         <<    columns( 2 ) << "\n"
         << "from " << m_typename << "\n"
         << "where\n"
         << "  id = ?",
         into( *this ),
-        useRef( operator []( "id" ) );
-    statement.execute();
+        useRef( operator []( "id" ) ) );
+    query.Execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 std::string Record::ph(
@@ -260,14 +260,13 @@ void Record::Save(
 {
     //
     if( !contains( "id" ) ) CreateId();
-    Statement statement( session );
-    statement
+    Query query = ( session
         << "insert or replace into " << m_typename << "(\n"
         <<    columns( 2 ) << " )\n"
         << "values(\n"
         <<    columns( 2, true ) << " )",
-        useRef( *this );
-    statement.execute();
+        useRef( *this ) );
+    query.Execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 void Record::SetId(

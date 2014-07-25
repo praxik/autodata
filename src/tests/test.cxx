@@ -62,7 +62,7 @@ int main(
         }
 
         Statement statement( GetSession( TEST_DB ) << "select * from table1" );
-        Table< DBPolicy > table;
+        Table< DBPolicy, DbSave > table;
         table.Load( statement );
         for( auto& record : table )
         {
@@ -83,6 +83,8 @@ int main(
             from( doubleCol ).
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var2 << std::endl;
+
+        table.Save( GetSession( TEST_DB ), "table2" );
 
         UnregisterConnectors();
     }

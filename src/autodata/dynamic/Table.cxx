@@ -116,20 +116,30 @@ DbSave::~DbSave()
 ////////////////////////////////////////////////////////////////////////////////
 void DbSave::Save(
     Session& session,
+    std::string const& tableName,
     Records& records )
 {
+    Record& r = records.back();
+    std::string tmp;
+    if( tableName.empty() )
+    {
+        tmp = r.GetTypename();
+    }
+    else
+    {
+        tmp = tableName;
+        r.SetTypename( tmp );
+    }
+    poco_assert( !tmp.empty() );
+    r.CreateTable( session );
+
     //
-    Statement statement( session );
-    statement
-        << "insert or replace into " << records.back().GetTypename() << "(\n"
+    Query query = ( session
+        << "insert into \"" << tmp << "\"(\n"
         <<    records.back().columns( 2 ) << " )\n"
         << "values(\n"
         <<    records.back().columns( 2, true ) << " )",
-        useRef( records );
-    statement.execute();
-
-    //
-    Query query( statement );
+        useRef( records ) );
     query.Execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
