@@ -70,6 +70,16 @@ DefaultPolicy::~DefaultPolicy()
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
+DefaultSave::DefaultSave()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+DefaultSave::~DefaultSave()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
 DBPolicy::DBPolicy()
 {
     ;
@@ -81,7 +91,8 @@ DBPolicy::~DBPolicy()
 }
 ////////////////////////////////////////////////////////////////////////////////
 void DBPolicy::Load(
-    Statement& statement )
+    Statement& statement,
+    Records& records )
 {
     //
     Query query( statement );
@@ -90,7 +101,37 @@ void DBPolicy::Load(
     //
     Table< DBPolicy >& table =
         static_cast< Table< DBPolicy >& >( *this );
-    table.m_records = query.ToRecords();
+    records = query.ToRecords();
+}
+////////////////////////////////////////////////////////////////////////////////
+DbSave::DbSave()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+DbSave::~DbSave()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+void DbSave::Save(
+    Session& session,
+    Records& records )
+{
+    //
+    Statement statement( session );
+    statement
+        << "insert or replace into " << records.back().GetTypename() << "(\n"
+        <<    records.back().columns( 2 ) << " )\n"
+        << "values(\n"
+        <<    records.back().columns( 2, true ) << " )",
+        useRef( records );
+    std::cout << statement.toString() << std::endl;
+    statement.execute();
+
+    //
+    Query query( statement );
+    query.Execute();
 }
 ////////////////////////////////////////////////////////////////////////////////
 FlatFilePolicy::FlatFilePolicy()
@@ -116,14 +157,13 @@ FlatFilePolicy::~FlatFilePolicy()
 }
 ////////////////////////////////////////////////////////////////////////////////
 void FlatFilePolicy::Load(
-    std::ifstream& ifs )
+    std::ifstream& ifs,
+    Records& records )
 {
     auto_cpu_timer timer;
 
     //
-    Table< FlatFilePolicy >& table =
-        static_cast< Table< FlatFilePolicy >& >( *this );
-    table.m_records.clear();
+    records.clear();
 
     //
     poco_assert( ifs.is_open() );
@@ -207,7 +247,7 @@ void FlatFilePolicy::Load(
             record[ m_header.at( idx++ ) ] =
                 ( ConvertType ) ? TryCast( s ) : Var( s );
         }
-        table.m_records.push_back( std::move( record ) );
+        records.push_back( std::move( record ) );
     }
 
     ifs.close();

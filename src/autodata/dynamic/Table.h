@@ -36,10 +36,13 @@ namespace dynamic
 {
 
 class DefaultPolicy;
+class DefaultSave;
 
 ///
-template< typename LoadPolicy = DefaultPolicy >
-class Table : public LoadPolicy
+template<
+    typename LoadPolicy = DefaultPolicy,
+    typename SavePolicy = DefaultSave >
+class Table : public LoadPolicy, SavePolicy
 {
 public:
     ///
@@ -52,6 +55,7 @@ public:
     Table()
         :
         LoadPolicy(),
+        SavePolicy(),
         m_records()
     {
         ;
@@ -62,6 +66,7 @@ public:
         Table const& o )
         :
         LoadPolicy( o ),
+        SavePolicy( o ),
         m_records( o.m_records )
     {
         ;
@@ -72,6 +77,7 @@ public:
         Table&& o )
         :
         LoadPolicy( std::move( o ) ),
+        SavePolicy( std::move( o ) ),
         m_records( std::move( o.m_records ) )
     {
         ;
@@ -177,7 +183,15 @@ public:
     void Load(
         T&& t )
     {
-        LoadPolicy::Load( std::forward< T >( t ) );
+        LoadPolicy::Load( std::forward< T >( t ), m_records );
+    }
+
+    ///
+    template< typename T >
+    void Save(
+        T&& t )
+    {
+        SavePolicy::Save( std::forward< T >( t ), m_records );
     }
 
     ///
@@ -206,6 +220,7 @@ protected:
 private:
     ///
     friend LoadPolicy;
+    friend SavePolicy;
 
     ///
     Records m_records;
@@ -213,33 +228,33 @@ private:
 };
 
 ///For cpplinq use
-template< typename LoadPolicy > inline
+template< typename LoadPolicy, typename SavePolicy > inline
 auto begin(
-    Table< LoadPolicy >& o ) -> decltype( o.begin() )
+    Table< LoadPolicy, SavePolicy >& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
-template< typename LoadPolicy > inline
+template< typename LoadPolicy, typename SavePolicy > inline
 auto begin(
-    Table< LoadPolicy > const& o ) -> decltype( o.begin() )
+    Table< LoadPolicy, SavePolicy > const& o ) -> decltype( o.begin() )
 {
     return o.begin();
 }
 
 ///For cpplinq use
-template< typename LoadPolicy > inline
+template< typename LoadPolicy, typename SavePolicy > inline
 auto end(
-    Table< LoadPolicy >& o ) -> decltype( o.end() )
+    Table< LoadPolicy, SavePolicy >& o ) -> decltype( o.end() )
 {
     return o.end();
 }
 
 ///For cpplinq use
-template< typename LoadPolicy > inline
+template< typename LoadPolicy, typename SavePolicy > inline
 auto end(
-    Table< LoadPolicy > const& o ) -> decltype( o.end() )
+    Table< LoadPolicy, SavePolicy > const& o ) -> decltype( o.end() )
 {
     return o.end();
 }
@@ -260,6 +275,21 @@ private:
 };
 
 ///
+class AUTODATA_EXPORTS DefaultSave
+{
+public:
+    ///
+    DefaultSave();
+
+protected:
+    ///
+    ~DefaultSave();
+
+private:
+
+};
+
+///
 class AUTODATA_EXPORTS DBPolicy
 {
 public:
@@ -268,11 +298,32 @@ public:
 
     ///
     void Load(
-        Poco::Data::Statement& statement );
+        Poco::Data::Statement& statement,
+        Records& records );
 
 protected:
     ///
     ~DBPolicy();
+
+private:
+
+};
+
+///
+class AUTODATA_EXPORTS DbSave
+{
+public:
+    ///
+    DbSave();
+
+    ///
+    void Save(
+        Poco::Data::Session& session,
+        Records& records );
+
+protected:
+    ///
+    ~DbSave();
 
 private:
 
@@ -287,7 +338,8 @@ public:
 
     ///
     void Load(
-        std::ifstream& ifs );
+        std::ifstream& ifs,
+        Records& records );
 
     ///
     std::vector< std::string > const& GetHeader() const;
@@ -349,12 +401,12 @@ namespace Dynamic
 {
 
 ///
-template< typename T >
-class VarHolderImpl< autodata::dynamic::Table< T > > : public VarHolder
+template< typename T, typename U >
+class VarHolderImpl< autodata::dynamic::Table< T, U > > : public VarHolder
 {
 public:
     VarHolderImpl(
-        autodata::dynamic::Table< T > const& val )
+        autodata::dynamic::Table< T, U > const& val )
         :
         _val( val )
     {
@@ -368,7 +420,7 @@ public:
 
     const std::type_info& type() const
     {
-        return typeid( autodata::dynamic::Table< T > );
+        return typeid( autodata::dynamic::Table< T, U > );
     }
 
     void convert( Int8& ) const
@@ -434,8 +486,8 @@ public:
     void convert( std::string& val ) const
     {
         val.append( "[ " );
-        typename autodata::dynamic::Table< T >::const_iterator it = _val.begin();
-        typename autodata::dynamic::Table< T >::const_iterator itEnd = _val.end();
+        typename autodata::dynamic::Table< T, U >::const_iterator it = _val.begin();
+        typename autodata::dynamic::Table< T, U >::const_iterator itEnd = _val.end();
         if( !_val.empty() )
         {
             val.append( it->ToJson() );
@@ -469,7 +521,7 @@ public:
         return cloneHolder( pVarHolder, _val );
     }
 
-    autodata::dynamic::Table< T > const& value() const
+    autodata::dynamic::Table< T, U > const& value() const
     {
         return _val;
     }
@@ -510,7 +562,7 @@ public:
     }
 
     T& operator[](
-        typename autodata::dynamic::Table< T >::size_type n )
+        typename autodata::dynamic::Table< T, U >::size_type n )
     {
         if( n < size() ) return _val.operator []( n );
 
@@ -518,7 +570,7 @@ public:
     }
 
     T const& operator[](
-        typename autodata::dynamic::Table< T >::size_type n ) const
+        typename autodata::dynamic::Table< T, U >::size_type n ) const
     {
         if( n < size() ) return _val.operator []( n );
 
@@ -531,7 +583,7 @@ private:
     VarHolderImpl& operator =( VarHolderImpl const& );
 
     ///
-    autodata::dynamic::Table< T > _val;
+    autodata::dynamic::Table< T, U > _val;
 
 };
 

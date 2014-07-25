@@ -77,7 +77,7 @@ Record::Record(
     Record const& o )
     :
     Struct< std::string >( o ),
-    m_typename()
+    m_typename( o.m_typename )
 {
     ;
 }
@@ -154,6 +154,14 @@ void Record::CreateTable(
         << "    id ) );";
 
     statement.execute();
+}
+////////////////////////////////////////////////////////////////////////////////
+void Record::clear()
+{
+    for( iterator itr = begin(); itr != end(); )
+    {
+        Poco::Dynamic::Struct< std::string >::erase( itr++ );
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 std::string Record::columns(
