@@ -158,9 +158,12 @@ void Record::CreateTable(
 ////////////////////////////////////////////////////////////////////////////////
 void Record::clear()
 {
-    for( iterator itr = begin(); itr != end(); )
+    iterator itr = begin();
+    while( itr != end() )
     {
-        Poco::Dynamic::Struct< std::string >::erase( itr++ );
+        Iterator& tmp = itr;
+        ++itr;
+        Struct< std::string >::erase( tmp );
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +174,7 @@ std::string Record::columns(
     if( empty() ) return std::string( "*" ).insert( 0, n, ' ' );
 
     std::string out;
-    Poco::Dynamic::Struct< std::string >::ConstIterator kv;
+    Struct< std::string >::ConstIterator kv;
     for( kv = begin(); kv != --end(); ++kv )
     {
         out += ( (
