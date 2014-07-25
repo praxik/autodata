@@ -397,10 +397,184 @@ private:
 
 namespace Poco
 {
+namespace Data
+{
+
+template<>
+class Binding< autodata::dynamic::Records > : public AbstractBinding
+{
+public:
+    typedef autodata::dynamic::Records ValType;
+    typedef SharedPtr< ValType > ValPtr;
+    typedef SharedPtr< Binding< ValType > > Ptr;
+    typedef ValType::const_iterator Iterator;
+
+    explicit Binding(
+        ValType const& val,
+        std::string const& name = "",
+        Direction direction = PD_IN )
+        :
+        AbstractBinding( name, direction ),
+        _val( val ),
+        _begin(),
+        _end()
+    {
+        if( PD_IN == direction && numOfRowsHandled() == 0 )
+            throw BindingException(
+                "It is illegal to bind to an empty data collection" );
+        reset();
+    }
+
+    ~Binding()
+    {
+        ;
+    }
+
+    std::size_t numOfColumnsHandled() const
+    {
+        return _val.back().size();
+    }
+
+    std::size_t numOfRowsHandled() const
+    {
+        return static_cast< std::size_t >( _val.size() );
+    }
+
+    bool canBind() const
+    {
+        return _begin != _end;
+    }
+
+    void bind(
+        std::size_t pos )
+    {
+        poco_assert_dbg( !getBinder().isNull() );
+        poco_assert_dbg( canBind() );
+        for( auto const& kv : *_begin )
+        {
+            TypeHandler< Dynamic::Var >::bind(
+                pos++, kv.second, getBinder(), getDirection() );
+        }
+        ++_begin;
+    }
+
+    void reset()
+    {
+        _begin = _val.begin();
+        _end = _val.end();
+    }
+
+private:
+    ValType const& _val;
+    Iterator _begin;
+    Iterator _end;
+};
+
+template<>
+class Extraction< autodata::dynamic::Records > : public AbstractExtraction
+{
+public:
+    typedef autodata::dynamic::Records ValType;
+    typedef SharedPtr< ValType > ValPtr;
+    typedef Extraction< ValType > Type;
+    typedef SharedPtr< Type > Ptr;
+
+    Extraction(
+        ValType& result,
+        Position const& pos = Position( 0 ) )
+        :
+        AbstractExtraction( Limit::LIMIT_UNLIMITED, pos.value() ),
+        _rResult( result ),
+        _default()
+    {
+        _rResult.clear();
+    }
+
+    Extraction(
+        ValType& result,
+        ValType::value_type const& def,
+        Position const& pos = Position( 0 ) )
+        :
+        AbstractExtraction( Limit::LIMIT_UNLIMITED, pos.value() ),
+        _rResult( result ),
+        _default( def )
+    {
+        _rResult.clear();
+    }
+
+    ~Extraction()
+    {
+        ;
+    }
+
+    std::size_t numOfColumnsHandled() const
+    {
+        //This is probably bad - need to fix this
+        return _rResult.back().size();
+    }
+
+    std::size_t numOfRowsHandled() const
+    {
+        return static_cast< std::size_t >( _rResult.size() );
+    }
+
+    std::size_t numOfRowsAllowed() const
+    {
+        return getLimit();
+    }
+
+    bool isNull(
+        std::size_t row ) const
+    {
+        try
+        {
+            return _nulls.at( row );
+        }
+        catch( std::out_of_range& ex )
+        {
+            throw RangeException( ex.what() );
+        }
+    }
+
+    std::size_t extract(
+        std::size_t pos )
+    {
+        AbstractExtractor::Ptr pExt = getExtractor();
+        _rResult.push_back( _default );
+        for( auto& kv : _rResult.back() )
+        {
+            TypeHandler< Dynamic::Var >::extract(
+                pos++, kv.second, _default, pExt );
+        }
+        _nulls.push_back( isValueNull( _rResult.back(), pExt->isNull( pos ) ) );
+        return 1u;
+    }
+
+    AbstractPreparation::Ptr createPreparation(
+        AbstractPreparator::Ptr& pPrep,
+        std::size_t pos )
+    {
+        return new Preparation< ValType::value_type >(
+            pPrep, pos, _default );
+    }
+
+protected:
+    ValType const& result() const
+    {
+        return _rResult;
+    }
+
+private:
+    ValType& _rResult;
+    ValType::value_type _default;
+    std::deque< bool > _nulls;
+};
+
+} //end Data
+
 namespace Dynamic
 {
 
-///
 template< typename T, typename U >
 class VarHolderImpl< autodata::dynamic::Table< T, U > > : public VarHolder
 {

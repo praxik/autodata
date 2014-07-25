@@ -126,7 +126,6 @@ void DbSave::Save(
         << "values(\n"
         <<    records.back().columns( 2, true ) << " )",
         useRef( records );
-    std::cout << statement.toString() << std::endl;
     statement.execute();
 
     //
