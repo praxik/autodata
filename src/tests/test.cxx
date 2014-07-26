@@ -84,7 +84,8 @@ int main(
             aggregate( std::plus< double >() );
         std::cout << "Summation of col 'zero': " << var2 << std::endl;
 
-        table.Save( GetSession( TEST_DB ), "table2" );
+        Session session = GetSession( TEST_DB );
+        table.Save( session, "table2" );
 
         UnregisterConnectors();
     }
