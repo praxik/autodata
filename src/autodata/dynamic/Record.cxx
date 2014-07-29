@@ -261,7 +261,7 @@ void Record::Save(
     //
     if( !contains( "id" ) ) CreateId();
     Query query = ( session
-        << "insert or replace into \"" << m_typename << "\"(\n"
+        << "insert into \"" << m_typename << "\"(\n"
         <<    columns( 2 ) << " )\n"
         << "values(\n"
         <<    columns( 2, true ) << " )",
