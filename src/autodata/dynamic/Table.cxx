@@ -276,13 +276,33 @@ void FlatFilePolicy::SetHeader(
 Var FlatFilePolicy::TryCast(
     std::string const& s )
 {
-    static qi::real_parser< double, qi::strict_real_policies< double > > real_;
-    std::string::const_iterator b = s.begin();
-    std::string::const_iterator e = s.end();
-    double d; if( qi::parse( b, e, real_, d ) && ( b == e ) ) return d;
-    b = s.begin(); //reset
-    int i; if( qi::parse( b, e, qi::int_, i ) && ( b == e ) ) return i;
-    return s;
+    typedef boost::variant< bool, int, double, std::string > A;
+    auto f( std::begin( s ) ), l( std::end( s ) );
+    static auto const qichar = qi::char_( "0-9a-fA-F" );
+
+    static qi::rule< decltype( f ), std::string() > const guid_rule  = qi::raw[
+        qi::repeat( 8 )[ qichar ] > '-' >
+        qi::repeat( 4 )[ qichar ] > '-' >
+        qi::repeat( 4 )[ qichar ] > '-' >
+        qi::repeat( 4 )[ qichar ] > '-' >
+        qi::repeat( 12 )[ qichar ] ];
+    static qi::real_parser< double,
+        qi::strict_real_policies< double > > const double_rule;
+    static auto const int_rule = qi::int_;
+    static auto const bool_rule = qi::bool_;
+    static qi::rule< decltype( f ), A() > const p =
+        guid_rule | double_rule | int_rule | bool_rule;
+
+    A a;
+    if( !qi::parse( f, l, p, a ) ) return s;
+    switch( a.which() )
+    {
+        case 0: return boost::get< bool >( a );
+        case 1: return boost::get< int >( a );
+        case 2: return boost::get< double >( a );
+        case 3: return boost::get< std::string >( a );
+        default: throw std::runtime_error( "" );
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
 
