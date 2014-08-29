@@ -74,7 +74,7 @@ if( POCO_STATIC )
 endif()
 set( POCO_ROOT "Please specify"
     CACHE PATH "Root directory where POCO is installed" )
-find_package( POCO 1.5.2 REQUIRED COMPONENTS
+find_package( POCO 1.5.3 REQUIRED COMPONENTS
     Data DataSQLite Foundation JSON Net Util XML
     OPTIONAL_COMPONENTS DataMySQL DataODBC )
 set( POCO_MYSQL_API_DEFINE "undef" )
