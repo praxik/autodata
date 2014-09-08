@@ -65,8 +65,7 @@ set( BOOST_USE_STATIC_RUNTIME OFF )
 set( BOOST_ROOT "Please specify"
     CACHE PATH "Root directory where Boost is installed" )
 find_package( Boost 1.53.0 REQUIRED COMPONENTS
-    chrono date_time filesystem prg_exec_monitor program_options regex system
-    thread timer )
+    date_time filesystem program_options regex system thread )
 
 #POCO
 if( POCO_STATIC )

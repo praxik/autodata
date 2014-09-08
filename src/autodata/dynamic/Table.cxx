@@ -27,8 +27,6 @@
 
 #include <boost/spirit/include/qi.hpp>
 
-#include <boost/timer/timer.hpp>
-
 // --- AutoData Includes --- //
 #include <autodata/db/Query.h>
 
@@ -46,7 +44,6 @@ using namespace Poco::Dynamic;
 //confused by the _1 in the spirit parser and the _1 in the multi-index headers
 //included through autodata/dynamic/Table.h back to data helper
 using namespace boost::spirit;
-using namespace boost::timer;
 
 // --- Standard Includes --- //
 #include <iomanip>
@@ -169,8 +166,6 @@ void FlatFilePolicy::Load(
     std::ifstream& ifs,
     Records& records )
 {
-    auto_cpu_timer timer;
-
     //
     records.clear();
 
