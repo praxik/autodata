@@ -110,6 +110,21 @@ AUTODATA_EXPORTS
 double round(
     double const v );
 
+///
+template< typename T >
+auto begin(
+    pair< T, T > const& range ) -> T
+{
+    return range.first;
+}
+
+///
+template <typename T>
+auto end(
+    pair< T, T > const& range ) -> T
+{
+    return range.second;
+}
 }
 #endif //SWIG
 #endif
