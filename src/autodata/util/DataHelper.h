@@ -255,14 +255,16 @@ struct less_than
     bool operator ()( Poco::Dynamic::Var const& _Left,
                       Poco::Dynamic::Var const& _Right ) const
     {
-        if( _Left.isEmpty() || _Right.isEmpty() ) return false;
+        if( _Left.isEmpty() ) return false;
+        if( _Right.isEmpty() ) return true;
         return _Left.convert< T >() < _Right.convert< T >();
     }
 
     bool operator ()( Poco::Nullable< Poco::Dynamic::Var > const& _Left,
                       Poco::Nullable< Poco::Dynamic::Var > const& _Right ) const
     {
-        if( _Left.isNull() || _Right.isNull() ) return false;
+        if( _Left.isNull() ) return false;
+        if( _Right.isNull() ) return true;
         return operator ()( _Left.value(), _Right.value() );
     }
 
@@ -293,7 +295,6 @@ struct less_than
         if( _Right.isNull() ) return false;
         return operator ()( _Left, _Right.value() );
     }
-
 };
 
 ///
@@ -303,14 +304,16 @@ struct less_than_or_equal_to
     bool operator ()( Poco::Dynamic::Var const& _Left,
                       Poco::Dynamic::Var const& _Right ) const
     {
-        if( _Left.isEmpty() || _Right.isEmpty() ) return false;
+        if( _Left.isEmpty() ) return false;
+        if( _Right.isEmpty() ) return true;
         return _Left.convert< T >() <= _Right.convert< T >();
     }
 
     bool operator ()( Poco::Nullable< Poco::Dynamic::Var > const& _Left,
                       Poco::Nullable< Poco::Dynamic::Var > const& _Right ) const
     {
-        if( _Left.isNull() || _Right.isNull() ) return false;
+        if( _Left.isNull() ) return false;
+        if( _Right.isNull() ) return true;
         return operator ()( _Left.value(), _Right.value() );
     }
 
@@ -341,7 +344,6 @@ struct less_than_or_equal_to
         if( _Right.isNull() ) return false;
         return operator ()( _Left, _Right.value() );
     }
-
 };
 
 ///
@@ -351,14 +353,16 @@ struct greater_than
     bool operator ()( Poco::Dynamic::Var const& _Left,
                       Poco::Dynamic::Var const& _Right ) const
     {
-        if( _Left.isEmpty() || _Right.isEmpty() ) return false;
+        if( _Left.isEmpty() ) return false;
+        if( _Right.isEmpty() ) return true;
         return _Left.convert< T >() > _Right.convert< T >();
     }
 
     bool operator ()( Poco::Nullable< Poco::Dynamic::Var > const& _Left,
                       Poco::Nullable< Poco::Dynamic::Var > const& _Right ) const
     {
-        if( _Left.isNull() || _Right.isNull() ) return false;
+        if( _Left.isNull() ) return false;
+        if( _Right.isNull() ) return true;
         return operator ()( _Left.value(), _Right.value() );
     }
 
@@ -389,7 +393,6 @@ struct greater_than
         if( _Right.isNull() ) return false;
         return operator ()( _Left, _Right.value() );
     }
-
 };
 
 ///
@@ -399,14 +402,16 @@ struct greater_than_or_equal_to
     bool operator ()( Poco::Dynamic::Var const& _Left,
                       Poco::Dynamic::Var const& _Right ) const
     {
-        if( _Left.isEmpty() || _Right.isEmpty() ) return false;
+        if( _Left.isEmpty() ) return false;
+        if( _Right.isEmpty() ) return true;
         return _Left.convert< T >() >= _Right.convert< T >();
     }
 
     bool operator ()( Poco::Nullable< Poco::Dynamic::Var > const& _Left,
                       Poco::Nullable< Poco::Dynamic::Var > const& _Right ) const
     {
-        if( _Left.isNull() || _Right.isNull() ) return false;
+        if( _Left.isNull() ) return false;
+        if( _Right.isNull() ) return true;
         return operator ()( _Left.value(), _Right.value() );
     }
 
@@ -437,7 +442,6 @@ struct greater_than_or_equal_to
         if( _Right.isNull() ) return false;
         return operator ()( _Left, _Right.value() );
     }
-
 };
 
 } //end util
