@@ -240,11 +240,13 @@ void SetMaxFieldSize(
 {
     Connection const& connection = Connections.at( name );
     ConnectorEnum connector = connection.Connector();
+#ifdef POCO_ODBC_API
     if( connector == CONN_ODBC )
     {
         connection.SessPool()->setProperty(
             "maxFieldSize", Poco::Any( maxFldSize ) );
     }
+#endif //POCO_ODBC_API
 }
 ////////////////////////////////////////////////////////////////////////////////
 void UnregisterConnectors()
