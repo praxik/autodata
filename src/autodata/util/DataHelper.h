@@ -104,12 +104,12 @@ double const NaN = std::numeric_limits< double >::quiet_NaN();
 #ifndef SWIG
 namespace std
 {
-
+#if _MSC_VER < 1800
 ///
 AUTODATA_EXPORTS
 double round(
     double const v );
-
+#endif
 ///
 template< typename T >
 auto begin(

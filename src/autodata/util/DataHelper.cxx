@@ -43,7 +43,7 @@ bool isnan(
 #ifdef _MSC_VER
 namespace std
 {
-
+#if _MSC_VER < 1800
 ////////////////////////////////////////////////////////////////////////////////
 double round(
     double const v )
@@ -51,7 +51,7 @@ double round(
     return v < 0.0 ? ceil( v - 0.5 ) : floor( v + 0.5 );
 }
 ////////////////////////////////////////////////////////////////////////////////
-
+#endif
 } //end std
 #endif
 
