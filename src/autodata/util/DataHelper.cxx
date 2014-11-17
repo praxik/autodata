@@ -31,7 +31,7 @@ using namespace Poco::Data;
 #include <fstream>
 
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef ISNAN_EXISTS
+#if !defined isnan && !defined ISNAN_EXISTS
 bool isnan(
     double v )
 {

@@ -84,24 +84,19 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <iomanip>
 #include <limits>
 #include <cmath>
-#ifdef __linux__
+#if _MSC_VER >= 1800 || defined __linux__
 #define ISNAN_EXISTS 1
 #endif
 
-#ifndef SWIG
-#ifndef isnan
-#ifndef ISNAN_EXISTS
+#if !defined SWIG && !defined isnan && !defined ISNAN_EXISTS
 AUTODATA_EXPORTS
 bool isnan(
     double v );
 #endif
-#endif
-#endif //SWIG
 
 double const NaN = std::numeric_limits< double >::quiet_NaN();
 
-#ifdef _MSC_VER
-#ifndef SWIG
+#if !defined SWIG && defined _MSC_VER
 namespace std
 {
 #if _MSC_VER < 1800
@@ -126,7 +121,6 @@ auto end(
     return range.second;
 }
 }
-#endif //SWIG
 #endif
 
 namespace autodata
