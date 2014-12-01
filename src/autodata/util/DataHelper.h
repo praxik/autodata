@@ -83,6 +83,7 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 // --- Standard Includes --- //
 #include <iomanip>
 #include <limits>
+#include <memory>
 #include <cmath>
 #if _MSC_VER >= 1800 || defined __linux__
 #define ISNAN_EXISTS 1
@@ -448,11 +449,11 @@ namespace Data
 
 ///
 template< typename J >
-class Extraction< boost::shared_ptr< J > > : public AbstractExtraction
+class Extraction< std::shared_ptr< J > > : public AbstractExtraction
 {
 public:
     Extraction(
-        boost::shared_ptr< J >& result,
+        std::shared_ptr< J >& result,
         Position const& pos = Position( 0 ) )
         :
         AbstractExtraction( Limit::LIMIT_UNLIMITED, pos.value() ),
@@ -464,7 +465,7 @@ public:
     }
 
     Extraction(
-        boost::shared_ptr< J >& result,
+        std::shared_ptr< J >& result,
         J const& def,
         Position const& pos = Position( 0 ) )
         :
@@ -508,9 +509,9 @@ public:
         if( _extracted ) throw ExtractException( "value already extracted" );
         _extracted = true;
         AbstractExtractor::Ptr pExt = getExtractor();
-        if( _rResult == boost::shared_ptr< J >() )
+        if( _rResult == std::shared_ptr< J >() )
         {
-            _rResult = boost::make_shared< J >();
+            _rResult = std::make_shared< J >();
         }
         TypeHandler< J >::extract( pos, *_rResult, _default, pExt );
         _null = isValueNull( *_rResult, pExt->isNull( pos ) );
@@ -535,7 +536,7 @@ public:
     }
 
 private:
-    boost::shared_ptr< J >& _rResult;
+    std::shared_ptr< J >& _rResult;
 
     J _default;
 
@@ -546,12 +547,12 @@ private:
 
 ///
 template< typename J >
-class Extraction< std::vector< boost::shared_ptr< J > > > :
+class Extraction< std::vector< std::shared_ptr< J > > > :
     public AbstractExtraction
 {
 public:
     Extraction(
-        std::vector< boost::shared_ptr< J > >& result,
+        std::vector< std::shared_ptr< J > >& result,
         Position const& pos = Position( 0 ) )
         :
         AbstractExtraction( Limit::LIMIT_UNLIMITED, pos.value() ),
@@ -562,7 +563,7 @@ public:
     }
 
     Extraction(
-        std::vector< boost::shared_ptr< J > >& result,
+        std::vector< std::shared_ptr< J > >& result,
         J const& def,
         Position const& pos = Position( 0 ) )
         :
@@ -610,7 +611,7 @@ public:
         std::size_t pos )
     {
         AbstractExtractor::Ptr pExt = getExtractor();
-        boost::shared_ptr< J > tmp = boost::make_shared< J >();
+        std::shared_ptr< J > tmp = std::make_shared< J >();
         TypeHandler< J >::extract( pos, *tmp, _default, pExt );
         _rResult.push_back( tmp );
         _nulls.push_back( isValueNull( *tmp, pExt->isNull( pos ) ) );
@@ -625,13 +626,13 @@ public:
     }
 
 protected:
-    std::vector< boost::shared_ptr< J > > const& result() const
+    std::vector< std::shared_ptr< J > > const& result() const
     {
         return _rResult;
     }
 
 private:
-    std::vector< boost::shared_ptr< J > >&  _rResult;
+    std::vector< std::shared_ptr< J > >&  _rResult;
 
     J _default;
 
@@ -791,12 +792,12 @@ private:
 
 ///
 template< typename J, typename K >
-class Extraction< boost::multi_index_container< boost::shared_ptr< J >, K > > :
+class Extraction< boost::multi_index_container< std::shared_ptr< J >, K > > :
     public AbstractExtraction
 {
 public:
     Extraction(
-        boost::multi_index_container< boost::shared_ptr< J >, K >& result,
+        boost::multi_index_container< std::shared_ptr< J >, K >& result,
         Position const& pos = Position( 0 ) )
         :
         AbstractExtraction( Limit::LIMIT_UNLIMITED, pos.value() ),
@@ -807,7 +808,7 @@ public:
     }
 
     Extraction(
-        boost::multi_index_container< boost::shared_ptr< J >, K >& result,
+        boost::multi_index_container< std::shared_ptr< J >, K >& result,
         J const& def,
         Position const& pos = Position( 0 ) )
         :
@@ -841,7 +842,7 @@ public:
     std::size_t extract(
         std::size_t pos )
     {
-        boost::shared_ptr< J > tmp = boost::make_shared< J >();
+        std::shared_ptr< J > tmp = std::make_shared< J >();
         TypeHandler< J >::extract( pos, *tmp, _default, getExtractor() );
         _rResult.insert( tmp );
 
@@ -857,7 +858,7 @@ public:
 protected:
 
 private:
-    boost::multi_index_container< boost::shared_ptr< J >, K >& _rResult;
+    boost::multi_index_container< std::shared_ptr< J >, K >& _rResult;
 
     ///Copy the default
     J _default;
@@ -967,11 +968,11 @@ std::ostream& operator <<(
 
 ///
 /*template<>
-class VarHolderImpl< boost::shared_ptr< T > > : public VarHolder
+class VarHolderImpl< std::shared_ptr< T > > : public VarHolder
 {
 public:
     VarHolderImpl(
-        boost::shared_ptr< T > const& val )
+        std::shared_ptr< T > const& val )
         :
         _val( val )
     {
@@ -993,7 +994,7 @@ public:
         return new VarHolderImpl( _val );
     }
 
-    boost::shared_ptr< T > const& value() const
+    std::shared_ptr< T > const& value() const
     {
         return _val;
     }
@@ -1007,17 +1008,17 @@ private:
     VarHolderImpl& operator =(
         VarHolderImpl const& );
 
-    boost::shared_ptr< T > _val;
+    std::shared_ptr< T > _val;
 };*/
 
 ///
 template< typename J, typename K >
 class VarHolderImpl< boost::multi_index_container<
-    boost::shared_ptr< J >, K > > : public VarHolder
+    std::shared_ptr< J >, K > > : public VarHolder
 {
 public:
     VarHolderImpl(
-        boost::multi_index_container< boost::shared_ptr< J >, K > const& val )
+        boost::multi_index_container< std::shared_ptr< J >, K > const& val )
         :
         _val( val )
     {
@@ -1032,7 +1033,7 @@ public:
     const std::type_info& type() const
     {
         return typeid(
-            boost::multi_index_container< boost::shared_ptr< J >, K > );
+            boost::multi_index_container< std::shared_ptr< J >, K > );
     }
 
     void convert(
@@ -1065,7 +1066,7 @@ public:
         return new VarHolderImpl( _val );
     }
 
-    boost::multi_index_container< boost::shared_ptr< J >, K > const&
+    boost::multi_index_container< std::shared_ptr< J >, K > const&
     value() const
     {
         return _val;
@@ -1101,17 +1102,17 @@ public:
         return false;
     }
 
-    //boost::shared_ptr< J >& operator[](
+    //std::shared_ptr< J >& operator[](
         //typename std::vector<T>::size_type n )
     //{
         //return _val.operator[]( n );
     //}
 
-    boost::shared_ptr< J > const& operator[](
+    std::shared_ptr< J > const& operator[](
         typename boost::multi_index_container<
-            boost::shared_ptr< J >, K >::size_type n ) const
+            std::shared_ptr< J >, K >::size_type n ) const
     {
-        typename boost::multi_index_container< boost::shared_ptr< J >, K >::
+        typename boost::multi_index_container< std::shared_ptr< J >, K >::
             template nth_index< 0 >::type::const_iterator itr;
         itr = _val.template get< 0 >().begin();
         std::advance( itr, ( n == 0 ) ? 0 : n - 1 );
@@ -1127,7 +1128,7 @@ private:
     VarHolderImpl& operator =(
         VarHolderImpl const& );
 
-    boost::multi_index_container< boost::shared_ptr< J >, K > _val;
+    boost::multi_index_container< std::shared_ptr< J >, K > _val;
 
 };
 #endif //SWIG
