@@ -53,11 +53,6 @@ DIAG_ON( deprecated-declarations )
 #include <Poco/Dynamic/Struct.h>
 
 // --- Boost Includes --- //
-#include <boost/array.hpp>
-#include <boost/function.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/scoped_ptr.hpp>
-
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
@@ -81,10 +76,10 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <cpplinq/linq.hpp>
 
 // --- Standard Includes --- //
+#include <cmath>
 #include <iomanip>
 #include <limits>
 #include <memory>
-#include <cmath>
 
 #ifdef WIN32
 #define MAKE_SHARED_FRIENDS( Class ) \
