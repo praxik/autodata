@@ -85,6 +85,15 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <limits>
 #include <memory>
 #include <cmath>
+
+#ifdef WIN32
+#define MAKE_SHARED_FRIENDS( Class ) \
+    friend class std::_Ref_count_obj< Class >;
+#else
+#define MAKE_SHARED_FRIENDS( Class ) \
+    friend class std::_Ref_count_obj< Class >;
+#endif
+
 #if _MSC_VER >= 1800 || defined __linux__
 #define ISNAN_EXISTS 1
 #endif
