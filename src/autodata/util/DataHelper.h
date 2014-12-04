@@ -83,10 +83,14 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 
 #ifdef WIN32
 #define MAKE_SHARED_FRIENDS( Class ) \
-    friend class std::_Ref_count_obj< Class >;
-#else
+friend class std::_Ref_count_obj< Class >;
+#elif __APPLE__
 #define MAKE_SHARED_FRIENDS( Class ) \
-    friend class __gnu_cxx::new_allocator< Class >;
+template< typename _T1, typename _T2, unsigned > \
+friend class std::__1::__libcpp_compressed_pair_imp;
+#elif __linux__
+#define MAKE_SHARED_FRIENDS( Class ) \
+friend class __gnu_cxx::new_allocator< Class >;
 #endif
 
 #if _MSC_VER >= 1800 || defined __linux__
