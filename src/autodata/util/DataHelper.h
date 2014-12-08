@@ -167,6 +167,38 @@ std::string to_string_p(
 }
 
 ///
+struct AUTODATA_EXPORTS hexchar
+{
+    hexchar();
+    hexchar( unsigned char in );
+    unsigned char c;
+
+#ifndef SWIG
+    ///
+    AUTODATA_EXPORTS
+    friend std::ostream& operator <<(
+        std::ostream& os,
+        hexchar const& c );
+
+    ///
+    AUTODATA_EXPORTS
+    friend std::istream& operator >>(
+        std::istream& is,
+        hexchar& c );
+#endif //SWIG
+};
+
+///
+AUTODATA_EXPORTS
+std::string hex_to_bin(
+    std::string const& s );
+
+///
+AUTODATA_EXPORTS
+std::vector< unsigned char > hex_to_bytes(
+    std::string const& hexstr );
+
+///
 template< typename T >
 bool Convert(
     Poco::Dynamic::Var const& var,

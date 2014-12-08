@@ -121,6 +121,101 @@ std::string escape_json(
     return oss.str();
 }
 ////////////////////////////////////////////////////////////////////////////////
+std::string hex_to_bin(
+    std::string const& s )
+{
+    std::string tmp;
+    if( s.empty() ) return tmp;
+
+    int x = 0;
+    if( s.at( 0 ) == '0' && ( s.at( 1 ) == 'x' || s.at( 1 ) == 'X' ) ) x = 2;
+    tmp.reserve( 4 * ( s.size() - x ) );
+    for( auto itr( s.cbegin() + x ); itr != s.cend(); ++itr )
+    {
+        switch( *itr )
+        {
+            case '0': tmp.append( "0000" ); break;
+            case '1': tmp.append( "0001" ); break;
+            case '2': tmp.append( "0010" ); break;
+            case '3': tmp.append( "0011" ); break;
+            case '4': tmp.append( "0100" ); break;
+            case '5': tmp.append( "0101" ); break;
+            case '6': tmp.append( "0110" ); break;
+            case '7': tmp.append( "0111" ); break;
+            case '8': tmp.append( "1000" ); break;
+            case '9': tmp.append( "1001" ); break;
+            case 'a': tmp.append( "1010" ); break;
+            case 'A': tmp.append( "1010" ); break;
+            case 'b': tmp.append( "1011" ); break;
+            case 'B': tmp.append( "1011" ); break;
+            case 'c': tmp.append( "1100" ); break;
+            case 'C': tmp.append( "1100" ); break;
+            case 'd': tmp.append( "1101" ); break;
+            case 'D': tmp.append( "1101" ); break;
+            case 'e': tmp.append( "1110" ); break;
+            case 'E': tmp.append( "1110" ); break;
+            case 'f': tmp.append( "1111" ); break;
+            case 'F': tmp.append( "1111" ); break;
+            default: throw std::runtime_error( "autodata::util::hex_to_bin: "
+                "input hex string contains invalid characters" ); break;
+        }
+    }
+    return tmp;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::vector< unsigned char > hex_to_bytes(
+    std::string const& hexstr )
+{
+    if( hexstr.size() % 2 != 0 )
+    {
+        throw std::runtime_error( "autodata::util::hex_to_bytes: "
+            "input hex string contains incomplete bytes" );
+    }
+
+    std::vector< unsigned char > bytes;
+    bytes.reserve( hexstr.size() / 2 );
+    for( auto citr = hexstr.cbegin(); citr != hexstr.cend(); citr += 2 )
+    {
+        std::string tmp( citr, citr + 2 );
+        unsigned int n = std::stoul( tmp, nullptr, 16 );
+        bytes.push_back( static_cast< unsigned char >( n ) );
+    }
+    return bytes;
+}
+////////////////////////////////////////////////////////////////////////////////
+hexchar::hexchar()
+    :
+    c()
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+hexchar::hexchar(
+    unsigned char in )
+    :
+    c( in )
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::ostream& operator <<(
+    std::ostream& os,
+    hexchar const& c )
+{
+    return os << std::hex << std::setw( 2 ) << std::setfill( '0' )
+        << static_cast< unsigned int >( c.c );
+}
+////////////////////////////////////////////////////////////////////////////////
+std::istream& operator >>(
+    std::istream& is,
+    hexchar& c )
+{
+    unsigned int n;
+    is >> std::hex >> std::setw( 2 ) >> std::setfill( '0' ) >> n;
+    c.c = static_cast< unsigned char >( n );
+    return is;
+}
+////////////////////////////////////////////////////////////////////////////////
 
 } //end util
 } //end autodata
