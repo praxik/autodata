@@ -211,7 +211,7 @@ std::istream& operator >>(
     hexchar& c )
 {
     unsigned int n;
-    is >> std::hex >> std::setw( 2 ) >> std::setfill( '0' ) >> n;
+    is >> std::hex >> n;
     c.c = static_cast< unsigned char >( n );
     return is;
 }
