@@ -199,6 +199,155 @@ std::vector< unsigned char > hex_to_bytes(
     std::string const& hexstr );
 
 ///
+template< typename A, typename B,
+    typename = typename std::enable_if< std::is_arithmetic< A >::value >::type,
+    typename = typename std::enable_if< std::is_arithmetic< B >::value >::type >
+struct safe_comparison
+{
+public:
+    ///
+    typedef typename std::is_integral< A >::type a_integral;
+    typedef typename std::is_integral< B >::type b_integral;
+    typedef typename std::is_signed< A >::type a_signed;
+    typedef typename std::is_signed< B >::type b_signed;
+
+    ///
+    typedef typename std::integral_constant< bool,
+        a_integral::value && b_integral::value >::type both_integral;
+    typedef typename std::integral_constant< bool,
+        a_signed::value && b_signed::value >::type both_signed;
+    typedef typename std::integral_constant< bool,
+        !a_signed::value && !b_signed::value >::type both_unsigned;
+    typedef typename std::integral_constant< bool,
+        both_integral::value &&
+        !( both_signed::value || both_unsigned::value ) >::type need_check;
+
+    ///
+    static bool gt(
+        A a,
+        B b )
+    {
+        return gt_check( a, b, need_check() );
+    }
+
+    ///
+    static bool lt(
+        A a,
+        B b )
+    {
+        return lt_check( a, b, need_check() );
+    }
+
+private:
+    ///
+    template< typename T > struct to_unsigned;
+    template<> struct to_unsigned< char >{ typedef unsigned char type; };
+    template<> struct to_unsigned< signed char >{ typedef unsigned char type; };
+    template<> struct to_unsigned< short >{ typedef unsigned short type; };
+    template<> struct to_unsigned< int >{ typedef unsigned int type; };
+    template<> struct to_unsigned< long >{ typedef unsigned long type; };
+    template<> struct to_unsigned< long long >{ typedef unsigned long long type; };
+
+    ///
+    static bool gt_check(
+        A a,
+        B b,
+        std::false_type )
+    {
+        return ( a > b );
+    }
+
+    ///
+    static bool gt_check(
+        A a,
+        B b,
+        std::true_type )
+    {
+        return gt_different_signed( a, b, a_signed(), b_signed() );
+    }
+
+    ///
+    static bool gt_different_signed(
+        A a,
+        B b,
+        std::true_type,
+        std::false_type )
+    {
+        return ( a >= 0 ) &&
+            ( static_cast< typename to_unsigned< A >::type >( a ) > b );
+    }
+
+    ///
+    static bool gt_different_signed(
+        A a,
+        B b,
+        std::false_type,
+        std::true_type )
+    {
+        return ( b < 0 ) ||
+            ( a > static_cast< typename to_unsigned< B >::type >( b ) );
+    }
+
+    ///
+    static bool lt_check(
+        A a,
+        B b,
+        std::false_type )
+    {
+        return ( a < b );
+    }
+
+    ///
+    static bool lt_check(
+        A a,
+        B b,
+        std::true_type )
+    {
+        return lt_different_signed( a, b, a_signed(), b_signed() );
+    }
+
+    ///
+    static bool lt_different_signed(
+        A a,
+        B b,
+        std::true_type,
+        std::false_type )
+    {
+        return ( a < 0 ) ||
+            ( static_cast< typename to_unsigned< A >::type >( a ) < b );
+    }
+
+    ///
+    static bool lt_different_signed(
+        A a,
+        B b,
+        std::false_type,
+        std::true_type )
+    {
+        return ( b >= 0 ) &&
+            ( a < static_cast< typename to_unsigned< B >::type >( b ) );
+    }
+};
+
+///
+template< typename A, typename B >
+bool safe_less_than(
+    A a,
+    B b )
+{
+    return safe_comparison< A, B >::lt( a, b );
+}
+
+///
+template< typename A, typename B >
+bool safe_greater_than(
+    A a,
+    B b )
+{
+    return safe_comparison< A, B >::gt( a, b );
+}
+
+///
 template< typename T >
 bool Convert(
     Poco::Dynamic::Var const& var,
