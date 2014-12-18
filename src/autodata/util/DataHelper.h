@@ -199,6 +199,15 @@ std::vector< unsigned char > hex_to_bytes(
     std::string const& hexstr );
 
 ///
+template< typename T > struct to_unsigned;
+template<> struct to_unsigned< char >{ typedef unsigned char type; };
+template<> struct to_unsigned< signed char >{ typedef unsigned char type; };
+template<> struct to_unsigned< short >{ typedef unsigned short type; };
+template<> struct to_unsigned< int >{ typedef unsigned int type; };
+template<> struct to_unsigned< long >{ typedef unsigned long type; };
+template<> struct to_unsigned< long long >{ typedef unsigned long long type; };
+
+///
 template< typename A, typename B,
     typename = typename std::enable_if< std::is_arithmetic< A >::value >::type,
     typename = typename std::enable_if< std::is_arithmetic< B >::value >::type >
@@ -239,15 +248,6 @@ public:
     }
 
 private:
-    ///
-    template< typename T > struct to_unsigned;
-    template<> struct to_unsigned< char >{ typedef unsigned char type; };
-    template<> struct to_unsigned< signed char >{ typedef unsigned char type; };
-    template<> struct to_unsigned< short >{ typedef unsigned short type; };
-    template<> struct to_unsigned< int >{ typedef unsigned int type; };
-    template<> struct to_unsigned< long >{ typedef unsigned long type; };
-    template<> struct to_unsigned< long long >{ typedef unsigned long long type; };
-
     ///
     static bool gt_check(
         A a,
