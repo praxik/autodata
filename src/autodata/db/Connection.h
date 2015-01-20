@@ -27,7 +27,9 @@
 #include <autodata/util/DataHelper.h>
 
 // --- Poco Includes --- //
+#ifndef SWIG
 #include <Poco/Data/SessionPool.h>
+#endif //SWIG
 
 namespace autodata
 {

@@ -26,30 +26,26 @@
 #include <autodata/CompilerGuards.h>
 
 // --- POCO Includes --- //
+#include <Poco/Nullable.h>
 #include <Poco/SharedPtr.h>
-
+#ifndef SWIG
 #include <Poco/Data/Binding.h>
 #include <Poco/Data/Extraction.h>
 #include <Poco/Data/Limit.h>
 #include <Poco/Data/RecordSet.h>
-
 #ifdef POCO_MYSQL_API
 #include <Poco/Data/MySQL/Connector.h>
 #include <Poco/Data/MySQL/MySQLException.h>
 #endif //MySQL_API
 #ifdef POCO_ODBC_API
-#ifndef SWIG
 DIAG_OFF( deprecated-declarations )
-#endif
 #include <Poco/Data/ODBC/Connector.h>
-#ifndef SWIG
 DIAG_ON( deprecated-declarations )
-#endif
 #include <Poco/Data/ODBC/ODBCException.h>
 #endif //POCO_ODBC_API
 #include <Poco/Data/SQLite/Connector.h>
 #include <Poco/Data/SQLite/SQLiteException.h>
-
+#endif
 #include <Poco/Dynamic/Struct.h>
 
 // --- Boost Includes --- //
