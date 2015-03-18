@@ -150,10 +150,18 @@ std::string escape_json(
     std::string const& json );
 
 ///
-AUTODATA_EXPORTS
-bool icompare(
-    std::string const& s1,
-    std::string const& s2 );
+struct AUTODATA_EXPORTS icase
+{
+    ///
+    bool operator ()(
+        std::string const& s1,
+        std::string const& s2 ) const;
+
+    ///
+    static bool compare(
+        std::string const& s1,
+        std::string const& s2 );
+};
 
 ///
 template< typename T >

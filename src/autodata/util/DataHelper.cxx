@@ -122,7 +122,19 @@ std::string escape_json(
     return oss.str();
 }
 ////////////////////////////////////////////////////////////////////////////////
-bool icompare(
+bool icase::operator ()(
+    std::string const& s1,
+    std::string const& s2 ) const
+{
+    return std::lexicographical_compare(
+        s1.begin(), s1.end(), s2.begin(), s2.end(),
+        []( char c1, char c2 ) -> bool
+        {
+            return std::tolower( c1 ) < std::tolower( c2 );
+        } );
+}
+////////////////////////////////////////////////////////////////////////////////
+bool icase::compare(
     std::string const& s1,
     std::string const& s2 )
 {
