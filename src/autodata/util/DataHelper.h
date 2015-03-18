@@ -150,6 +150,12 @@ std::string escape_json(
     std::string const& json );
 
 ///
+AUTODATA_EXPORTS
+bool icompare(
+    std::string const& s1,
+    std::string const& s2 );
+
+///
 template< typename T >
 std::string to_string_p(
     T const t,

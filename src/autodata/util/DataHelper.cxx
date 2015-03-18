@@ -27,7 +27,8 @@ using namespace autodata::util;
 // --- POCO Includes --- //
 using namespace Poco::Data;
 
-// --- Standard Includes --- //
+// --- Stl Includes --- //
+#include <cctype>
 #include <fstream>
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -119,6 +120,18 @@ std::string escape_json(
         }
     }
     return oss.str();
+}
+////////////////////////////////////////////////////////////////////////////////
+bool icompare(
+    std::string const& s1,
+    std::string const& s2 )
+{
+    return ( ( s1.size() == s2.size() ) &&
+        std::equal( s1.begin(), s1.end(), s2.begin(),
+        []( char c1, char c2 ) -> bool
+        {
+            return std::tolower( c1 ) == std::tolower( c2 );
+        } ) );
 }
 ////////////////////////////////////////////////////////////////////////////////
 std::string hex_to_bin(
