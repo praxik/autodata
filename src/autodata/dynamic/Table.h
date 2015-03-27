@@ -61,6 +61,18 @@ public:
         ;
     }
 
+    ///
+    Table(
+        Records::size_type cnt,
+        Records::value_type const& val )
+        :
+        LoadPolicy(),
+        SavePolicy(),
+        m_records( cnt, val )
+    {
+        ;
+    }
+
     ///copy constructor
     Table(
         Table const& o )
