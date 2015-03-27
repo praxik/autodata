@@ -62,7 +62,7 @@ int main(
         }
 
         Statement statement( GetSession( TEST_DB ) << "select * from table1" );
-        Table< DBPolicy, DbSave > table;
+        Table< DbLoad, DbSave > table;
         table.Load( statement );
         for( auto& record : table )
         {

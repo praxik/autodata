@@ -35,12 +35,13 @@ namespace autodata
 namespace dynamic
 {
 
-class DefaultPolicy;
+class DefaultLoad;
+typedef DefaultLoad DefaultPolicy;
 class DefaultSave;
 
 ///
 template<
-    typename LoadPolicy = DefaultPolicy,
+    typename LoadPolicy = DefaultLoad,
     typename SavePolicy = DefaultSave >
 class Table : public LoadPolicy, SavePolicy
 {
@@ -62,6 +63,8 @@ public:
     }
 
     ///
+    template< typename T = LoadPolicy, typename =
+        std::enable_if_t< std::is_same< T, DefaultLoad >::value > >
     Table(
         Records::size_type cnt,
         Records::value_type const& val )
@@ -69,6 +72,19 @@ public:
         LoadPolicy(),
         SavePolicy(),
         m_records( cnt, val )
+    {
+        ;
+    }
+
+    ///
+    template< typename T = LoadPolicy, typename =
+        std::enable_if_t< std::is_same< T, DefaultLoad >::value > >
+    Table(
+        Records records )
+        :
+        LoadPolicy(),
+        SavePolicy(),
+        m_records( std::move( records ) )
     {
         ;
     }
@@ -273,15 +289,20 @@ auto end(
 }
 
 ///
-class AUTODATA_EXPORTS DefaultPolicy
+class AUTODATA_EXPORTS DefaultLoad
 {
 public:
     ///
-    DefaultPolicy();
+    DefaultLoad();
+
+    ///
+    void Load(
+        Records from,
+        Records& to );
 
 protected:
     ///
-    ~DefaultPolicy();
+    ~DefaultLoad();
 
 private:
 
@@ -303,11 +324,11 @@ private:
 };
 
 ///
-class AUTODATA_EXPORTS DBPolicy
+class AUTODATA_EXPORTS DbLoad
 {
 public:
     ///
-    DBPolicy();
+    DbLoad();
 
     ///
     void Load(
@@ -316,11 +337,12 @@ public:
 
 protected:
     ///
-    ~DBPolicy();
+    ~DbLoad();
 
 private:
 
 };
+typedef DbLoad DBPolicy;
 
 ///
 class AUTODATA_EXPORTS DbSave
