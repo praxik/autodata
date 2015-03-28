@@ -64,7 +64,7 @@ public:
 
     ///
     template< typename T = LoadPolicy, typename =
-        std::enable_if< std::is_same< T, DefaultLoad >::value > >
+        std::enable_if< std::is_same< T, DefaultLoad >::value > >::type
     Table(
         Records::size_type cnt,
         Records::value_type const& val )
@@ -78,7 +78,7 @@ public:
 
     ///
     template< typename T = LoadPolicy, typename =
-        std::enable_if< std::is_same< T, DefaultLoad >::value > >
+        std::enable_if< std::is_same< T, DefaultLoad >::value > >::type
     Table(
         Records records )
         :
