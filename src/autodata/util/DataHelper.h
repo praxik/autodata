@@ -219,8 +219,8 @@ template<> struct to_unsigned< long long >{ typedef unsigned long long type; };
 
 ///
 template< typename A, typename B,
-    typename = std::enable_if< std::is_arithmetic< A >::value >::type,
-    typename = std::enable_if< std::is_arithmetic< B >::value > >::type
+    typename = typename std::enable_if< std::is_arithmetic< A >::value >::type,
+    typename = typename std::enable_if< std::is_arithmetic< B >::value >::type >
 struct safe_comparison
 {
 public:
