@@ -284,7 +284,7 @@ Var FlatFilePolicy::TryCast(
     static auto const qichar = qi::char_( "0-9a-fA-F" );
 
     static qi::rule< decltype( f ), std::string() > const guid_rule  = qi::raw[
-        qi::repeat( 8 )[ qichar ] >> '-' >
+        ( qi::repeat( 8 )[ qichar ] >> '-' ) >
         qi::repeat( 4 )[ qichar ] > '-' >
         qi::repeat( 4 )[ qichar ] > '-' >
         qi::repeat( 4 )[ qichar ] > '-' >
