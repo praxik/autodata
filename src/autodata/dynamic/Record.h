@@ -398,9 +398,29 @@ namespace Dynamic
 {
 
 ///Assignment operator for assigning autodata::dynamic::Record to Var
-template<>
+template<> AUTODATA_EXPORTS
 Var& Var::operator =(
     autodata::dynamic::Record const& o );
+
+///
+template<>
+class AUTODATA_EXPORTS VarHolderImpl< autodata::dynamic::Record > :
+    public VarHolderImpl< Struct< std::string > >
+{
+public:
+    VarHolderImpl(
+        autodata::dynamic::Record const& val )
+        :
+        VarHolderImpl< Struct< std::string > >( val )
+    {
+        ;
+    }
+
+    ~VarHolderImpl()
+    {
+        ;
+    }
+};
 
 } //end Dynamic
 } //end Poco
