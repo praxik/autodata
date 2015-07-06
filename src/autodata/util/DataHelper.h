@@ -415,6 +415,17 @@ T Convert(
 ///
 template< typename T >
 T Convert(
+    Poco::Dynamic::Var const& var,
+    std::initializer_list< T > checks,
+    T const& defVal = T() )
+{
+    for( auto check : checks ) if( var == check ) return defVal;
+    return Convert< T >( var, defVal );
+}
+
+///
+template< typename T >
+T Convert(
     Poco::Nullable< T > const& nullable,
     T const& defVal = T() )
 {
