@@ -25,7 +25,6 @@
 #include <autodata/dynamic/Record.h>
 
 using namespace autodata::db;
-using namespace autodata::dynamic;
 using namespace autodata::util;
 
 // --- Poco Includes --- //
@@ -289,35 +288,3 @@ std::string Record::ToJson() const
 
 } //end dynamic
 } //end autodata
-
-////////////////////////////////////////////////////////////////////////////////
-std::ostream& operator <<(
-    std::ostream &os,
-    Row const& record )
-{
-    return os;
-}
-////////////////////////////////////////////////////////////////////////////////
-
-namespace Poco
-{
-namespace Dynamic
-{
-
-///////////////////////////////////////////////////////////////////////////////////
-template<>
-Var& Var::operator =(
-    autodata::dynamic::Record const& o )
-{
-#ifdef POCO_NO_SOO
-    Var tmp( o );
-    swap( tmp );
-#else
-    construct( o );
-#endif
-    return *this;
-}
-////////////////////////////////////////////////////////////////////////////////
-
-} //end Dynamic
-} //end Poco

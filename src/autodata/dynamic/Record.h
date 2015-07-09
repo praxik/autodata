@@ -397,11 +397,6 @@ private:
 namespace Dynamic
 {
 
-///Assignment operator for assigning autodata::dynamic::Record to Var
-template<> AUTODATA_EXPORTS
-Var& Var::operator =(
-    autodata::dynamic::Record const& o );
-
 ///
 template<>
 class AUTODATA_EXPORTS VarHolderImpl< autodata::dynamic::Record > :

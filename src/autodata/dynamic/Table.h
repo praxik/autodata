@@ -741,6 +741,11 @@ public:
         return true;
     }
 
+    bool isVector() const
+    {
+        return true;
+    }
+
     bool isStruct() const
     {
         return false;
@@ -771,7 +776,7 @@ public:
         return _val.size();
     }
 
-    T& operator[](
+    typename autodata::dynamic::Table< T, U >::value_type& operator[](
         typename autodata::dynamic::Table< T, U >::size_type n )
     {
         if( n < size() ) return _val.operator []( n );
@@ -779,7 +784,7 @@ public:
         throw RangeException( "Vector index out of range" );
     }
 
-    T const& operator[](
+    typename autodata::dynamic::Table< T, U >::value_type const& operator[](
         typename autodata::dynamic::Table< T, U >::size_type n ) const
     {
         if( n < size() ) return _val.operator []( n );
