@@ -51,6 +51,7 @@ void Main()
     }
     std::cout << std::endl;
 
+    //
     std::cout << "Testing vector w/ default key function" << std::endl;
     for( auto const& group : iter::collapse( vec ) )
     {
@@ -67,6 +68,7 @@ void Main()
     }
     std::cout << std::endl;
 
+    //
     std::cout << "Testing rvalue vector w/ default key function" << std::endl;
     for( auto const& group : iter::collapse( std::move( vec ) ) )
     {

@@ -21,18 +21,28 @@ class Collapse
 public:
     ///
     using iterator_type =
-        typename decltype( std::begin( std::declval< Container >() ) );
+        decltype( std::begin( std::declval< Container >() ) );
     using iterator_ref =
         typename std::iterator_traits< iterator_type >::reference;
-    using keyfunc_return_type = typename decltype(
-        std::declval< KeyFunc >()( std::declval< iterator_ref >() ) );
+    using keyfunc_return_type =
+        decltype( std::declval< KeyFunc >()( std::declval< iterator_ref >() ) );
 
     ///
     Collapse() = delete;
     Collapse( Collapse const& ) = delete;
     Collapse& operator=( Collapse const& ) = delete;
     Collapse& operator=( Collapse&& ) = delete;
-    Collapse( Collapse&& o ) = delete;
+
+    //Not supported in VS 2013
+    //Collapse( Collapse&& ) = default;
+    Collapse(
+        Collapse&& o )
+        :
+        m_container( std::forward< Container >( o.m_container ) ),
+        m_keyfunc( std::move( o.m_keyfunc ) )
+    {
+        ;
+    }
 
 private:
     ///
@@ -239,7 +249,7 @@ private:
             reverse_iterator_type ritr( m_end );
             reverse_iterator_type rend( m_beg );
             if( ritr == rend ) return;
-            typename keyfunc_return_type value = m_keyfunc( *ritr++ );
+            keyfunc_return_type value = m_keyfunc( *ritr++ );
             while( ritr != rend && m_keyfunc( *ritr ) == value )
             {
                 ++ritr;
@@ -254,7 +264,7 @@ private:
         void advance_range_end()
         {
             if( m_rngend == m_rotend ) return;
-            typename keyfunc_return_type value = m_keyfunc( *m_rngend++ );
+            keyfunc_return_type value = m_keyfunc( *m_rngend++ );
             while( m_rngend != m_rotend && m_keyfunc( *m_rngend ) == value )
             {
                 ++m_rngend;
@@ -275,9 +285,11 @@ public:
     GroupIterator begin()
     {
         iterator_type beg = std::begin( m_container );
-        bool wrap =
-            ( m_keyfunc( *beg ) == m_keyfunc( *std::rbegin( m_container ) ) );
-        return { std::move( beg ), std::end( m_container ), m_keyfunc, wrap };
+        iterator_type end = std::end( m_container );
+        bool wrap = ( m_keyfunc( *beg ) == m_keyfunc( *std::prev( end ) ) );
+            //No std::rbegin for gcc 4.9.2
+            //( m_keyfunc( *beg ) == m_keyfunc( *std::rbegin( m_container ) ) );
+        return { std::move( beg ), std::move( end ), m_keyfunc, wrap };
     }
 
     ///
@@ -293,9 +305,11 @@ class DefKeyFunc
 {
 public:
     using iterator_type =
-        typename decltype( std::begin( std::declval< Container >() ) );
+        decltype( std::begin( std::declval< Container >() ) );
     using iterator_ref =
-        typename std::iterator_traits< iterator_type >::reference;
+        decltype( *std::declval< iterator_type >() );
+        //Doesn't work with gcc 4.9.2
+        //typename std::iterator_traits< iterator_type >::reference;
 
     iterator_ref operator ()(
         iterator_ref val ) const
