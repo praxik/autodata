@@ -22,6 +22,8 @@ public:
     ///
     using iterator_type =
         decltype( std::begin( std::declval< Container >() ) );
+    using iterator_diff =
+        typename std::iterator_traits< iterator_type >::difference_type;
     using iterator_ref =
         typename std::iterator_traits< iterator_type >::reference;
     using keyfunc_return_type =
@@ -70,13 +72,15 @@ private:
             iterator_type end,
             iterator_type rngbeg,
             iterator_type rngend,
-            bool wrap )
+            bool wrap,
+            iterator_diff size )
             :
             m_beg( std::move( beg ) ),
             m_end( std::move( end ) ),
             m_rngbeg( std::move( rngbeg ) ),
             m_rngend( std::move( rngend ) ),
-            m_wrap( wrap )
+            m_wrap( wrap ),
+            m_size( size )
         {
             ;
         }
@@ -87,6 +91,7 @@ private:
         iterator_type const m_rngbeg;
         iterator_type const m_rngend;
         bool const m_wrap;
+        iterator_diff const m_size;
 
         ///
         class RangeIterator : public std::iterator< std::input_iterator_tag,
@@ -157,6 +162,11 @@ private:
         {
             return { m_beg, m_end, m_rngend, m_rngend, m_wrap };
         }
+
+        iterator_diff size() const
+        {
+            return m_size;
+        }
     };
 
     ///
@@ -204,7 +214,8 @@ private:
             m_rngend( m_beg ),
             m_rotend( m_end ),
             m_keyfunc( keyfunc ),
-            m_wrap( wrap )
+            m_wrap( wrap ),
+            m_size( 0 )
         {
             if( m_wrap ) advance_range_begin();
             advance_range_end();
@@ -225,9 +236,13 @@ private:
         ///prefix
         GroupIterator& operator ++()
         {
+            //Reset the size
+            m_size = 0;
+
             //If we have a rotated/wrapped grouping, and have hit the rotation end
             if( m_wrap && ( m_rngend == m_rotend ) ) m_rngbeg = m_end; //finished
             else m_rngbeg = m_rngend;
+
             advance_range_end();
             return *this;
         }
@@ -237,7 +252,7 @@ private:
             return
             {
                 m_keyfunc( *m_rngbeg ),
-                Range( m_beg, m_end, m_rngbeg, m_rngend, m_wrap )
+                Range( m_beg, m_end, m_rngbeg, m_rngend, m_wrap, m_size )
             };
         }
 
@@ -249,11 +264,9 @@ private:
             reverse_iterator_type ritr( m_end );
             reverse_iterator_type rend( m_beg );
             if( ritr == rend ) return;
-            keyfunc_return_type value = m_keyfunc( *ritr++ );
-            while( ritr != rend && m_keyfunc( *ritr ) == value )
-            {
-                ++ritr;
-            }
+            keyfunc_return_type value = m_keyfunc( *ritr );
+            do{ ++m_size; }
+            while( ++ritr != rend && m_keyfunc( *ritr ) == value );
             m_rngbeg = ritr.base();
             //If we iterated all the way through the container,
             //all the items are the same and no wrapping is needed
@@ -264,11 +277,9 @@ private:
         void advance_range_end()
         {
             if( m_rngend == m_rotend ) return;
-            keyfunc_return_type value = m_keyfunc( *m_rngend++ );
-            while( m_rngend != m_rotend && m_keyfunc( *m_rngend ) == value )
-            {
-                ++m_rngend;
-            }
+            keyfunc_return_type value = m_keyfunc( *m_rngend );
+            do{ ++m_size; }
+            while( ++m_rngend != m_rotend && m_keyfunc( *m_rngend ) == value );
         }
 
         iterator_type const m_beg;
@@ -278,6 +289,7 @@ private:
         iterator_type m_rotend;
         KeyFunc const& m_keyfunc;
         bool m_wrap;
+        iterator_diff m_size;
     };
 
 public:

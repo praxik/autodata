@@ -39,10 +39,12 @@ void Main()
         } ) )
     {
         std::cout << "key: ";
-        std::cout << group.value() << "  ";
+        std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
-        std::cout << "content: ";
-        for( auto const& item : group.range() )
+
+        auto const& range = group.range();
+        std::cout << "  items(" << range.size() << "): ";
+        for( auto const& item : range )
         {
             std::cout << item.first << "  ";
             //std::cout << &item.second << "  ";
@@ -56,10 +58,12 @@ void Main()
     for( auto const& group : iter::collapse( vec ) )
     {
         std::cout << "key: ";
-        std::cout << group.value() << "  ";
+        std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
-        std::cout << "content: ";
-        for( auto const& item : group.range() )
+
+        auto const& range = group.range();
+        std::cout << "  items(" << range.size() << "): ";
+        for( auto const& item : range )
         {
             std::cout << item << "  ";
             //std::cout << &item << "  ";
@@ -73,10 +77,12 @@ void Main()
     for( auto const& group : iter::collapse( std::move( vec ) ) )
     {
         std::cout << "key: ";
-        std::cout << group.value() << "  ";
+        std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
-        std::cout << "content: ";
-        for( auto const& item : group.range() )
+
+        auto const& range = group.range();
+        std::cout << "  items(" << range.size() << "): ";
+        for( auto const& item : range )
         {
             std::cout << item << "  ";
             //std::cout << &item << "  ";
