@@ -31,11 +31,16 @@ void Main()
         } );
 
     //Test a map
-    std::cout << "Testing map with custom key function" << std::endl;
+    std::cout << "Testing map w/ custom key function and "
+        "custom binary predicate" << std::endl;
     for( auto const& group : iter::collapse( map,
         []( maptype::value_type const& kv ) -> std::string const&
         {
             return kv.second;
+        },
+        []( std::string const& lhs, std::string const& rhs ) -> bool
+        {
+            return ( lhs == rhs ) && ( lhs[ 0 ] == 'S' );
         } ) )
     {
         std::cout << "key: ";

@@ -2,6 +2,7 @@
 #pragma once
 
 #include <iterator>
+#include <functional>
 #include <type_traits>
 #include <utility>
 
@@ -9,13 +10,14 @@ namespace iter
 {
 
 ///Forward declaration for friendship
-template< typename Container, typename KeyFunc >
+template< typename Container, typename KeyFunc, typename BinPred >
 class Collapse;
-template< typename Container, typename KeyFunc >
-Collapse< Container, KeyFunc > collapse( Container&&, KeyFunc );
+template< typename Container, typename KeyFunc, typename BinPred >
+Collapse< Container, KeyFunc, BinPred > collapse(
+    Container&&, KeyFunc, BinPred );
 
 ///
-template< typename Container, typename KeyFunc >
+template< typename Container, typename KeyFunc, typename BinPred >
 class Collapse
 {
 public:
@@ -41,7 +43,8 @@ public:
         Collapse&& o )
         :
         m_container( std::forward< Container >( o.m_container ) ),
-        m_keyfunc( std::move( o.m_keyfunc ) )
+        m_keyfunc( o.m_keyfunc ),
+        m_binpred( o.m_binpred )
     {
         ;
     }
@@ -50,18 +53,22 @@ private:
     ///
     Collapse(
         Container&& container,
-        KeyFunc keyfunc )
+        KeyFunc keyfunc,
+        BinPred binpred )
         :
         m_container( std::forward< Container >( container ) ),
-        m_keyfunc( std::move( keyfunc ) )
+        m_keyfunc( keyfunc ),
+        m_binpred( binpred )
     {
         ;
     }
-    friend Collapse collapse< Container, KeyFunc >( Container&&, KeyFunc );
+    friend Collapse collapse< Container, KeyFunc, BinPred >(
+        Container&&, KeyFunc, BinPred );
 
     ///Container is lvalue or rvalue
     Container m_container;
     KeyFunc m_keyfunc;
+    BinPred m_binpred;
 
     ///
     class Range
@@ -205,7 +212,8 @@ private:
         GroupIterator(
             iterator_type&& beg,
             iterator_type&& end,
-            KeyFunc const& keyfunc,
+            KeyFunc keyfunc,
+            BinPred binpred,
             bool wrap = false )
             :
             m_beg( std::move( beg ) ),
@@ -214,6 +222,7 @@ private:
             m_rngend( m_beg ),
             m_rotend( m_end ),
             m_keyfunc( keyfunc ),
+            m_binpred( binpred ),
             m_wrap( wrap ),
             m_size( 0 )
         {
@@ -266,7 +275,8 @@ private:
             if( ritr == rend ) return;
             keyfunc_return_type value = m_keyfunc( *ritr );
             do{ ++m_size; }
-            while( ++ritr != rend && m_keyfunc( *ritr ) == value );
+            while( ( ++ritr != rend ) &&
+                m_binpred( m_keyfunc( *ritr ), value ) );
             m_rngbeg = ritr.base();
             //If we iterated all the way through the container,
             //all the items are the same and no wrapping is needed
@@ -279,7 +289,8 @@ private:
             if( m_rngend == m_rotend ) return;
             keyfunc_return_type value = m_keyfunc( *m_rngend );
             do{ ++m_size; }
-            while( ++m_rngend != m_rotend && m_keyfunc( *m_rngend ) == value );
+            while( ( ++m_rngend != m_rotend ) &&
+                m_binpred( m_keyfunc( *m_rngend ), value ) );
         }
 
         iterator_type const m_beg;
@@ -287,7 +298,8 @@ private:
         iterator_type m_rngbeg;
         iterator_type m_rngend;
         iterator_type m_rotend;
-        KeyFunc const& m_keyfunc;
+        KeyFunc m_keyfunc;
+        BinPred m_binpred;
         bool m_wrap;
         iterator_diff m_size;
     };
@@ -298,16 +310,25 @@ public:
     {
         iterator_type beg = std::begin( m_container );
         iterator_type end = std::end( m_container );
-        bool wrap = ( m_keyfunc( *beg ) == m_keyfunc( *std::prev( end ) ) );
+        bool wrap = m_binpred(
+            m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
             //No std::rbegin for gcc 4.9.2
             //( m_keyfunc( *beg ) == m_keyfunc( *std::rbegin( m_container ) ) );
-        return { std::move( beg ), std::move( end ), m_keyfunc, wrap };
+        return
+        {
+            std::move( beg ), std::move( end ),
+            m_keyfunc, m_binpred, wrap
+        };
     }
 
     ///
     GroupIterator end()
     {
-        return { std::end( m_container ), std::end( m_container ), m_keyfunc };
+        return
+        {
+            std::end( m_container ), std::end( m_container ),
+            m_keyfunc, m_binpred
+        };
     }
 };
 
@@ -316,10 +337,8 @@ template< typename Container >
 class DefKeyFunc
 {
 public:
-    using iterator_type =
-        decltype( std::begin( std::declval< Container >() ) );
-    using iterator_ref =
-        decltype( *std::declval< iterator_type >() );
+    using iterator_ref = decltype( *std::declval<
+        decltype( std::begin( std::declval< Container >() ) ) >() );
         //Doesn't work with gcc 4.9.2
         //typename std::iterator_traits< iterator_type >::reference;
 
@@ -331,24 +350,40 @@ public:
 };
 
 ///
-template< typename Container, typename KeyFunc >
-Collapse< Container, KeyFunc > collapse(
+template< typename Container, typename KeyFunc, typename BinPred >
+Collapse< Container, KeyFunc, BinPred > collapse(
     Container&& container,
-    KeyFunc keyfunc )
+    KeyFunc keyfunc,
+    BinPred binpred )
 {
-    return { std::forward< Container >( container ), keyfunc };
+    return { std::forward< Container >( container ), keyfunc, binpred };
+}
+
+///
+template< typename Container, typename KeyFunc >
+auto collapse(
+    Container&& container,
+    KeyFunc keyfunc ) -> decltype(
+        collapse( std::forward< Container >( container ),
+            keyfunc, std::equal_to<>() ) )
+{
+    return collapse(
+        std::forward< Container >( container ),
+        keyfunc,
+        std::equal_to<>() );
 }
 
 ///
 template< typename Container >
 auto collapse(
-    Container&& container ) -> decltype( collapse(
-        std::forward< Container >( container ),
-        DefKeyFunc< Container >() ) )
+    Container&& container ) -> decltype(
+        collapse( std::forward< Container >( container ),
+            DefKeyFunc< Container >(), std::equal_to<>() ) )
 {
     return collapse(
         std::forward< Container >( container ),
-        DefKeyFunc< Container >() );
+        DefKeyFunc< Container >(),
+        std::equal_to<>() );
 }
 
 } //iter
