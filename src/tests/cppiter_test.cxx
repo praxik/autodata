@@ -40,7 +40,7 @@ void Main()
         },
         []( std::string const& lhs, std::string const& rhs ) -> bool
         {
-            return ( lhs == rhs ) && ( lhs[ 0 ] == 'S' );
+            return ( lhs == rhs ) && ( lhs == "SWG" );
         } ) )
     {
         std::cout << "key: ";

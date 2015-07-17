@@ -312,8 +312,6 @@ public:
         iterator_type end = std::end( m_container );
         bool wrap = m_binpred(
             m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
-            //No std::rbegin for gcc 4.9.2
-            //( m_keyfunc( *beg ) == m_keyfunc( *std::rbegin( m_container ) ) );
         return
         {
             std::move( beg ), std::move( end ),
@@ -333,19 +331,28 @@ public:
 };
 
 ///
-template< typename Container >
 class DefKeyFunc
 {
 public:
-    using iterator_ref = decltype( *std::declval<
-        decltype( std::begin( std::declval< Container >() ) ) >() );
-        //Doesn't work with gcc 4.9.2
-        //typename std::iterator_traits< iterator_type >::reference;
-
-    iterator_ref operator ()(
-        iterator_ref val ) const
+    template< class T >
+    auto operator ()(
+        T&& val ) const -> decltype( std::forward< T >( val ) )
     {
-        return val;
+        return std::forward< T >( val );
+    }
+};
+
+///std::equal_to<> in c++14
+class DefBinPred
+{
+public:
+    template< class T >
+    auto operator ()(
+        T&& lhs,
+        T&& rhs ) const -> decltype(
+            std::forward< T >( lhs ) == std::forward< T >( rhs ) )
+    {
+        return ( std::forward< T >( lhs ) == std::forward< T >( rhs ) );
     }
 };
 
@@ -364,26 +371,26 @@ template< typename Container, typename KeyFunc >
 auto collapse(
     Container&& container,
     KeyFunc keyfunc ) -> decltype(
-        collapse( std::forward< Container >( container ),
-            keyfunc, std::equal_to<>() ) )
+        collapse(
+            std::forward< Container >( container ),
+            keyfunc, DefBinPred() ) )
 {
     return collapse(
         std::forward< Container >( container ),
-        keyfunc,
-        std::equal_to<>() );
+        keyfunc, DefBinPred() );
 }
 
 ///
 template< typename Container >
 auto collapse(
     Container&& container ) -> decltype(
-        collapse( std::forward< Container >( container ),
-            DefKeyFunc< Container >(), std::equal_to<>() ) )
+        collapse(
+            std::forward< Container >( container ),
+            DefKeyFunc(), DefBinPred() ) )
 {
     return collapse(
         std::forward< Container >( container ),
-        DefKeyFunc< Container >(),
-        std::equal_to<>() );
+        DefKeyFunc(), DefBinPred() );
 }
 
 } //iter
