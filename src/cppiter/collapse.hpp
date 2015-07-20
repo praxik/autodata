@@ -5,6 +5,7 @@
 #include <functional>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 namespace iter
 {
@@ -21,6 +22,10 @@ template< typename Container, typename KeyFunc, typename BinPred >
 class Collapse
 {
 public:
+    ///Forward declarations
+    class iterator;
+    class Group;
+
     ///
     using iterator_type =
         decltype( std::begin( std::declval< Container >() ) );
@@ -31,13 +36,7 @@ public:
     using keyfunc_return_type =
         decltype( std::declval< KeyFunc >()( std::declval< iterator_ref >() ) );
 
-    ///
-    Collapse() = delete;
-    Collapse( Collapse const& ) = delete;
-    Collapse& operator=( Collapse const& ) = delete;
-    Collapse& operator=( Collapse&& ) = delete;
-
-    //Not supported in VS 2013
+    ///Not supported in VS 2013
     //Collapse( Collapse&& ) = default;
     Collapse(
         Collapse&& o )
@@ -47,6 +46,36 @@ public:
         m_binpred( o.m_binpred )
     {
         ;
+    }
+
+    ///
+    Collapse() = delete;
+    Collapse( Collapse const& ) = delete;
+    Collapse& operator =( Collapse const& ) = delete;
+    Collapse& operator =( Collapse&& ) = delete;
+
+    ///
+    iterator begin()
+    {
+        iterator_type beg = std::begin( m_container );
+        iterator_type end = std::end( m_container );
+        bool wrap = m_binpred(
+            m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
+        return
+        {
+            std::move( beg ), std::move( end ),
+            m_keyfunc, m_binpred, wrap
+        };
+    }
+
+    ///
+    iterator end()
+    {
+        return
+        {
+            std::end( m_container ), std::end( m_container ),
+            m_keyfunc, m_binpred
+        };
     }
 
 private:
@@ -71,145 +100,10 @@ private:
     BinPred m_binpred;
 
     ///
-    class Range
+    class iterator : public std::iterator< std::input_iterator_tag, Group >
     {
     public:
-        Range(
-            iterator_type beg,
-            iterator_type end,
-            iterator_type rngbeg,
-            iterator_type rngend,
-            bool wrap,
-            iterator_diff size )
-            :
-            m_beg( std::move( beg ) ),
-            m_end( std::move( end ) ),
-            m_rngbeg( std::move( rngbeg ) ),
-            m_rngend( std::move( rngend ) ),
-            m_wrap( wrap ),
-            m_size( size )
-        {
-            ;
-        }
-
-    private:
-        iterator_type const m_beg;
-        iterator_type const m_end;
-        iterator_type const m_rngbeg;
-        iterator_type const m_rngend;
-        bool const m_wrap;
-        iterator_diff const m_size;
-
-        ///
-        class RangeIterator : public std::iterator< std::input_iterator_tag,
-            std::remove_reference< iterator_ref > >
-        {
-        public:
-            RangeIterator(
-                iterator_type beg,
-                iterator_type end,
-                iterator_type rngbeg,
-                iterator_type rngend,
-                bool wrap )
-                :
-                m_beg( std::move( beg ) ),
-                m_end( std::move( end ) ),
-                m_itr( std::move( rngbeg ) ),
-                m_rngend( std::move( rngend ) ),
-                m_wrap( wrap )
-            {
-                ;
-            }
-
-            bool operator ==(
-                RangeIterator const& rhs ) const
-            {
-                return ( m_itr == rhs.m_itr );
-            }
-
-            bool operator !=(
-                RangeIterator const& rhs ) const
-            {
-                return !( *this == rhs );
-            }
-
-            ///prefix
-            RangeIterator& operator ++()
-            {
-                advance();
-                return *this;
-            }
-
-            iterator_ref operator *() const
-            {
-                return *m_itr;
-            }
-
-        private:
-            void advance()
-            {
-                ++m_itr;
-                if( m_wrap && m_itr == m_end ) m_itr = m_beg;
-            }
-
-            iterator_type const m_beg;
-            iterator_type const m_end;
-            iterator_type m_itr;
-            iterator_type const m_rngend;
-            bool const m_wrap;
-        };
-
-    public:
-        RangeIterator begin() const
-        {
-            return { m_beg, m_end, m_rngbeg, m_rngend, m_wrap };
-        }
-
-        RangeIterator end() const
-        {
-            return { m_beg, m_end, m_rngend, m_rngend, m_wrap };
-        }
-
-        iterator_diff size() const
-        {
-            return m_size;
-        }
-    };
-
-    ///
-    class Group
-    {
-    public:
-        Group(
-            keyfunc_return_type&& value,
-            Range&& range )
-            :
-            m_value( std::forward< keyfunc_return_type >( value ) ),
-            m_range( std::move( range ) )
-        {
-            ;//std::cout << &m_value << std::endl;
-        }
-
-        keyfunc_return_type value() const
-        {
-            return m_value;
-        }
-
-        Range const& range() const
-        {
-            return m_range;
-        }
-
-    private:
-        keyfunc_return_type m_value;
-        Range m_range;
-    };
-
-    ///
-    class GroupIterator : public std::iterator< std::input_iterator_tag, Group >
-    {
-    public:
-        GroupIterator(
+        iterator(
             iterator_type&& beg,
             iterator_type&& end,
             KeyFunc keyfunc,
@@ -231,19 +125,19 @@ private:
         }
 
         bool operator ==(
-            GroupIterator const& rhs ) const
+            iterator const& rhs ) const
         {
             return ( m_rngbeg == rhs.m_rngbeg );
         }
 
         bool operator !=(
-            GroupIterator const& rhs ) const
+            iterator const& rhs ) const
         {
             return !( *this == rhs );
         }
 
         ///prefix
-        GroupIterator& operator ++()
+        iterator& operator ++()
         {
             //Reset the size
             m_size = 0;
@@ -258,14 +152,12 @@ private:
 
         Group operator *() const
         {
-            return
-            {
-                m_keyfunc( *m_rngbeg ),
-                Range( m_beg, m_end, m_rngbeg, m_rngend, m_wrap, m_size )
-            };
+            return { *this, m_keyfunc( *m_rngbeg ) };
         }
 
     private:
+        friend class Group;
+
         void advance_range_begin()
         {
             using reverse_iterator_type =
@@ -304,30 +196,125 @@ private:
         iterator_diff m_size;
     };
 
-public:
     ///
-    GroupIterator begin()
+    class Group
     {
-        iterator_type beg = std::begin( m_container );
-        iterator_type end = std::end( m_container );
-        bool wrap = m_binpred(
-            m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
-        return
-        {
-            std::move( beg ), std::move( end ),
-            m_keyfunc, m_binpred, wrap
-        };
-    }
+    public:
+        ///Forward declarations
+        class iterator;
 
-    ///
-    GroupIterator end()
-    {
-        return
+        ///
+        Group(
+            typename Collapse::iterator const& owner,
+            keyfunc_return_type&& value )
+            :
+            m_owner( owner ),
+            m_value( std::forward< keyfunc_return_type >( value ) )
         {
-            std::end( m_container ), std::end( m_container ),
-            m_keyfunc, m_binpred
+            ;//std::cout << &m_value << std::endl;
+        }
+
+        ///
+        Group() = delete;
+        Group( Group const& ) = delete;
+        Group& operator =( Group const& ) = delete;
+        Group& operator =( Group&& ) = delete;
+
+        ///
+        iterator begin() const
+        {
+            return { *this, m_owner.m_rngbeg };
+        }
+
+        ///
+        iterator end() const
+        {
+            return { *this, m_owner.m_rngend };
+        }
+
+        ///
+        iterator_diff size() const
+        {
+            return m_owner.m_size;
+        }
+
+        ///
+        keyfunc_return_type value() const
+        {
+            return m_value;
+        }
+
+        ///Haven't figured out how to recursively group groups yet...
+        std::vector< typename std::decay< iterator_ref >::type > to_vector() const
+        {
+            return std::vector< typename std::decay< iterator_ref >::type >( begin(), end() );
+        }
+
+    private:
+        Group(
+            Group&& obj )
+            :
+            m_owner( obj.m_owner ),
+            m_value( std::forward< keyfunc_return_type >( obj.m_value ) )
+        {
+            ;
+        }
+
+        typename Collapse::iterator const& m_owner;
+        keyfunc_return_type m_value;
+
+        class iterator : public std::iterator< std::input_iterator_tag,
+            typename std::decay< iterator_ref >::type >
+        {
+        public:
+            iterator(
+                Group const& group,
+                iterator_type beg )
+                :
+                m_group( group ),
+                m_itr( std::move( beg ) )
+            {
+                ;
+            }
+
+            bool operator ==(
+                iterator const& rhs ) const
+            {
+                return ( m_itr == rhs.m_itr );
+            }
+
+            bool operator !=(
+                iterator const& rhs ) const
+            {
+                return !( *this == rhs );
+            }
+
+            ///prefix
+            iterator& operator ++()
+            {
+                advance();
+                return *this;
+            }
+
+            iterator_ref operator *() const
+            {
+                return *m_itr;
+            }
+
+        private:
+            void advance()
+            {
+                ++m_itr;
+                if( m_group.m_owner.m_wrap && m_itr == m_group.m_owner.m_end )
+                {
+                    m_itr = m_group.m_owner.m_beg;
+                }
+            }
+
+            Group const& m_group;
+            iterator_type m_itr;
         };
-    }
+    };
 };
 
 ///

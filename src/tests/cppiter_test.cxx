@@ -47,9 +47,8 @@ void Main()
         std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
 
-        auto const& range = group.range();
-        std::cout << "  items(" << range.size() << "): ";
-        for( auto const& item : range )
+        std::cout << "  items(" << group.size() << "): ";
+        for( auto const& item : group )
         {
             std::cout << item.first << "  ";
             //std::cout << &item.second << "  ";
@@ -66,9 +65,8 @@ void Main()
         std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
 
-        auto const& range = group.range();
-        std::cout << "  items(" << range.size() << "): ";
-        for( auto const& item : range )
+        std::cout << "  items(" << group.size() << "): ";
+        for( auto const& item : group )
         {
             std::cout << item << "  ";
             //std::cout << &item << "  ";
@@ -85,9 +83,8 @@ void Main()
         std::cout << group.value() << std::endl;
         //std::cout << &group.value() << std::endl;
 
-        auto const& range = group.range();
-        std::cout << "  items(" << range.size() << "): ";
-        for( auto const& item : range )
+        std::cout << "  items(" << group.size() << "): ";
+        for( auto const& item : group )
         {
             std::cout << item << "  ";
             //std::cout << &item << "  ";
