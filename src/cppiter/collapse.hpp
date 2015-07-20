@@ -22,10 +22,6 @@ template< typename Container, typename KeyFunc, typename BinPred >
 class Collapse
 {
 public:
-    ///Forward declarations
-    class iterator;
-    class Group;
-
     ///
     using iterator_type =
         decltype( std::begin( std::declval< Container >() ) );
@@ -54,31 +50,14 @@ public:
     Collapse& operator =( Collapse const& ) = delete;
     Collapse& operator =( Collapse&& ) = delete;
 
-    ///
-    iterator begin()
-    {
-        iterator_type beg = std::begin( m_container );
-        iterator_type end = std::end( m_container );
-        bool wrap = m_binpred(
-            m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
-        return
-        {
-            std::move( beg ), std::move( end ),
-            m_keyfunc, m_binpred, wrap
-        };
-    }
-
-    ///
-    iterator end()
-    {
-        return
-        {
-            std::end( m_container ), std::end( m_container ),
-            m_keyfunc, m_binpred
-        };
-    }
-
 private:
+    ///Forward declarations
+    class Group;
+
+    ///
+    friend Collapse collapse< Container, KeyFunc, BinPred >(
+        Container&&, KeyFunc, BinPred );
+
     ///
     Collapse(
         Container&& container,
@@ -91,8 +70,6 @@ private:
     {
         ;
     }
-    friend Collapse collapse< Container, KeyFunc, BinPred >(
-        Container&&, KeyFunc, BinPred );
 
     ///Container is lvalue or rvalue
     Container m_container;
@@ -200,9 +177,6 @@ private:
     class Group
     {
     public:
-        ///Forward declarations
-        class iterator;
-
         ///
         Group(
             typename Collapse::iterator const& owner,
@@ -220,37 +194,8 @@ private:
         Group& operator =( Group const& ) = delete;
         Group& operator =( Group&& ) = delete;
 
-        ///
-        iterator begin() const
-        {
-            return { *this, m_owner.m_rngbeg };
-        }
-
-        ///
-        iterator end() const
-        {
-            return { *this, m_owner.m_rngend };
-        }
-
-        ///
-        iterator_diff size() const
-        {
-            return m_owner.m_size;
-        }
-
-        ///
-        keyfunc_return_type value() const
-        {
-            return m_value;
-        }
-
-        ///Haven't figured out how to recursively group groups yet...
-        std::vector< typename std::decay< iterator_ref >::type > to_vector() const
-        {
-            return std::vector< typename std::decay< iterator_ref >::type >( begin(), end() );
-        }
-
     private:
+        ///
         Group(
             Group&& obj )
             :
@@ -314,7 +259,63 @@ private:
             Group const& m_group;
             iterator_type m_itr;
         };
+
+    public:
+        ///
+        iterator begin() const
+        {
+            return { *this, m_owner.m_rngbeg };
+        }
+
+        ///
+        iterator end() const
+        {
+            return { *this, m_owner.m_rngend };
+        }
+
+        ///
+        iterator_diff size() const
+        {
+            return m_owner.m_size;
+        }
+
+        ///
+        keyfunc_return_type value() const
+        {
+            return m_value;
+        }
+
+        ///Haven't figured out how to recursively group groups yet...
+        std::vector< typename std::decay< iterator_ref >::type > to_vector() const
+        {
+            return std::vector< typename std::decay< iterator_ref >::type >( begin(), end() );
+        }
     };
+
+public:
+    ///
+    iterator begin()
+    {
+        iterator_type beg = std::begin( m_container );
+        iterator_type end = std::end( m_container );
+        bool wrap = m_binpred(
+            m_keyfunc( *beg ), m_keyfunc( *std::prev( end ) ) );
+        return
+        {
+            std::move( beg ), std::move( end ),
+            m_keyfunc, m_binpred, wrap
+        };
+    }
+
+    ///
+    iterator end()
+    {
+        return
+        {
+            std::end( m_container ), std::end( m_container ),
+            m_keyfunc, m_binpred
+        };
+    }
 };
 
 ///
