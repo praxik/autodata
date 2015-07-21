@@ -90,6 +90,28 @@ void Main()
             //std::cout << &item << "  ";
         }
         std::cout << std::endl;
+
+        auto&& subcollapse = iter::collapse( group,
+            iter::DefKeyFunc(),
+            []( std::string const& lhs, std::string const& rhs )
+            {
+                return ( lhs == rhs ) && lhs[ 0 ] == 'S';
+            } );
+        for( auto const& subgrp : subcollapse )
+        {
+            std::cout << "  key: ";
+            std::cout << subgrp.value() << std::endl;
+            //std::cout << &subgrp.value() << std::endl;
+
+            std::cout << "    items(" << subgrp.size() << "): ";
+            for( auto const& item : subgrp )
+            {
+                std::cout << item << "  ";
+                //std::cout << &item << "  ";
+            }
+            std::cout << std::endl;
+        }
+        std::cout << std::endl;
     }
     std::cout << std::endl;
 }

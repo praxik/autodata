@@ -25,6 +25,8 @@ public:
     ///
     using iterator_type =
         decltype( std::begin( std::declval< Container >() ) );
+    using reverse_iterator_type =
+        typename std::reverse_iterator< iterator_type >;
     using iterator_diff =
         typename std::iterator_traits< iterator_type >::difference_type;
     using iterator_ref =
@@ -113,7 +115,7 @@ private:
             return !( *this == rhs );
         }
 
-        ///prefix
+        ///preincrement
         iterator& operator ++()
         {
             //Reset the size
@@ -137,8 +139,6 @@ private:
 
         void advance_range_begin()
         {
-            using reverse_iterator_type =
-                typename std::reverse_iterator< iterator_type >;
             reverse_iterator_type ritr( m_end );
             reverse_iterator_type rend( m_beg );
             if( ritr == rend ) return;
@@ -182,19 +182,12 @@ private:
             typename Collapse::iterator const& owner,
             keyfunc_return_type&& value )
             :
-            m_owner( owner ),
+            m_owner( &owner ),
             m_value( std::forward< keyfunc_return_type >( value ) )
         {
             ;//std::cout << &m_value << std::endl;
         }
 
-        ///
-        Group() = delete;
-        Group( Group const& ) = delete;
-        Group& operator =( Group const& ) = delete;
-        Group& operator =( Group&& ) = delete;
-
-    private:
         ///
         Group(
             Group&& obj )
@@ -205,18 +198,25 @@ private:
             ;
         }
 
-        typename Collapse::iterator const& m_owner;
-        keyfunc_return_type m_value;
+        ///
+        Group() = delete;
+        Group( Group const& ) = delete;
+        Group& operator =( Group const& ) = delete;
+        Group& operator =( Group&& ) = delete;
 
-        class iterator : public std::iterator< std::input_iterator_tag,
-            typename std::decay< iterator_ref >::type >
+    private:
+        typename Collapse::iterator const* m_owner;
+        const keyfunc_return_type m_value;
+
+        class iterator : public std::iterator< std::bidirectional_iterator_tag,
+            typename std::remove_reference< iterator_ref >::type >
         {
         public:
             iterator(
                 Group const& group,
                 iterator_type beg )
                 :
-                m_group( group ),
+                m_group( &group ),
                 m_itr( std::move( beg ) )
             {
                 ;
@@ -234,10 +234,28 @@ private:
                 return !( *this == rhs );
             }
 
-            ///prefix
+            ///predecrement
+            iterator& operator --()
+            {
+                --m_itr;
+                if( m_group->m_owner->m_wrap &&
+                    reverse_iterator_type( m_itr ) ==
+                    reverse_iterator_type( m_group->m_owner->m_beg ) )
+                {
+                    m_itr = std::prev( m_group->m_owner->m_end );
+                }
+                return *this;
+            }
+
+            ///preincrement
             iterator& operator ++()
             {
-                advance();
+                ++m_itr;
+                if( m_group->m_owner->m_wrap &&
+                    m_itr == m_group->m_owner->m_end )
+                {
+                    m_itr = m_group->m_owner->m_beg;
+                }
                 return *this;
             }
 
@@ -247,16 +265,7 @@ private:
             }
 
         private:
-            void advance()
-            {
-                ++m_itr;
-                if( m_group.m_owner.m_wrap && m_itr == m_group.m_owner.m_end )
-                {
-                    m_itr = m_group.m_owner.m_beg;
-                }
-            }
-
-            Group const& m_group;
+            Group const* m_group;
             iterator_type m_itr;
         };
 
@@ -264,19 +273,32 @@ private:
         ///
         iterator begin() const
         {
-            return { *this, m_owner.m_rngbeg };
+            return { *this, m_owner->m_rngbeg };
         }
 
         ///
         iterator end() const
         {
-            return { *this, m_owner.m_rngend };
+            return { *this, m_owner->m_rngend };
+        }
+
+        ///
+        using reverse_iterator = std::reverse_iterator< iterator >;
+        reverse_iterator rbegin() const
+        {
+            return reverse_iterator( end() );
+        }
+
+        ///
+        reverse_iterator rend() const
+        {
+            return reverse_iterator( begin() );
         }
 
         ///
         iterator_diff size() const
         {
-            return m_owner.m_size;
+            return m_owner->m_size;
         }
 
         ///
@@ -285,16 +307,16 @@ private:
             return m_value;
         }
 
-        ///Haven't figured out how to recursively group groups yet...
-        std::vector< typename std::decay< iterator_ref >::type > to_vector() const
+        ///
+        std::vector< typename std::remove_reference< iterator_ref >::type > to_vector() const
         {
-            return std::vector< typename std::decay< iterator_ref >::type >( begin(), end() );
+            return std::vector< typename std::remove_reference< iterator_ref >::type >( begin(), end() );
         }
     };
 
 public:
     ///
-    iterator begin()
+    iterator begin() const
     {
         iterator_type beg = std::begin( m_container );
         iterator_type end = std::end( m_container );
@@ -308,7 +330,7 @@ public:
     }
 
     ///
-    iterator end()
+    iterator end() const
     {
         return
         {
