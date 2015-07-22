@@ -72,7 +72,7 @@ public:
         Record&& o );
 
     ///assignment operator
-    //Record& operator =( Record ) = default;
+    Record& operator =( Record const& ) = default;
 
     ///
     virtual ~Record();
