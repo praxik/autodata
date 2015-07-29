@@ -20,9 +20,12 @@
 
 #pragma once
 
-// --- AutoData Includes --- //
+// --- Autodata Includes --- //
 #include <autodata/AutoDataConfig.h>
 #include <autodata/CompilerGuards.h>
+
+// --- Standard Includes --- //
+#include <utility>
 
 namespace autodata
 {
@@ -54,9 +57,9 @@ T vsum(
 ///
 template< typename T, typename... Ts, typename =
     typename std::enable_if< std::is_arithmetic< T >::value >::type >
-auto vsum(
+typename std::common_type< T, Ts... >::type vsum(
     T v,
-    Ts... vs ) -> decltype( v + vsum( vs... ) )
+    Ts... vs )
 {
     return v + vsum( vs... );
 }
@@ -88,19 +91,17 @@ T&& vmin(
     return std::forward< T >( v );
 }
 
-template< typename T0, typename T1, typename... Ts >
+///c++14
+/*template< typename T0, typename T1, typename... Ts >
 auto vmin(
     T0&& v0,
     T1&& v1,
-    Ts&&... vs ) -> decltype(
-        ( v0 < v1 ) ?
-            vmin( v0, std::forward< Ts >( vs )... ) :
-            vmin( v1, std::forward< Ts >( vs )... ) )
+    Ts&&... vs )
 {
     return ( v0 < v1 ) ?
-      vmin( v0, std::forward< Ts >( vs )... ) :
-      vmin( v1, std::forward< Ts >( vs )... );
-}
+        vmin( v0, std::forward< Ts >( vs )... ) :
+        vmin( v1, std::forward< Ts >( vs )... );
+}*/
 
 ///
 template< typename T >
@@ -110,19 +111,17 @@ T&& vmax(
     return std::forward< T >( v );
 }
 
-template< typename T0, typename T1, typename... Ts >
+///c++14
+/*template< typename T0, typename T1, typename... Ts >
 auto vmax(
     T0&& v0,
     T1&& v1,
-    Ts&&... vs ) -> decltype(
-        ( v0 > v1 ) ?
-            vmax( v0, std::forward< Ts >( vs )... ) :
-            vmax( v1, std::forward< Ts >( vs )... ) )
+    Ts&&... vs )
 {
     return ( v0 > v1 ) ?
-      vmax( v0, std::forward< Ts >( vs )... ) :
-      vmax( v1, std::forward< Ts >( vs )... );
-}
+        vmax( v0, std::forward< Ts >( vs )... ) :
+        vmax( v1, std::forward< Ts >( vs )... );
+}*/
 
 } // end agg
 } // end autodata
