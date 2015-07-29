@@ -30,10 +30,8 @@ namespace agg
 {
 
 ///
-int vcount()
-{
-    return 0;
-}
+AUTODATA_EXPORTS
+int vcount();
 
 ///
 template< typename T, typename... Ts >
