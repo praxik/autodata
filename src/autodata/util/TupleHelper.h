@@ -78,13 +78,13 @@ auto apply_tuple(
     Tuple&& tup ) -> decltype(
         Unpacker::apply(
             std::forward< Callable >( fn ),
-            std::forward< Tuple >( tuple ),
+            std::forward< Tuple >( tup ),
             typename gens< std::tuple_size<
                 typename std::remove_reference< Tuple >::type >::value >::type() ) )
 {
     return Unpacker::apply(
         std::forward< Callable >( fn ),
-        std::forward< Tuple >( tuple ),
+        std::forward< Tuple >( tup ),
         typename gens< std::tuple_size<
             typename std::remove_reference< Tuple >::type >::value >::type() );
 }
