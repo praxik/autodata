@@ -60,32 +60,28 @@ template< std::size_t... Ns >
 struct rgens< 0, Ns... > : seq< Ns... >{};
 
 ///
-struct tuple_unpacker
+template< typename Callable, typename Tuple, std::size_t... Ns >
+auto CallWithTuple(
+    Callable&& fn,
+    Tuple&& tup,
+    seq< Ns... > ) -> decltype(
+        fn( std::get< Ns >( std::forward< Tuple >( tup ) )... ) )
 {
-    ///Value returning function
-    template< typename Callable, typename Tuple, std::size_t... Ns >
-    static auto apply(
-        Callable&& fn,
-        Tuple&& tup,
-        seq< Ns... > ) -> decltype(
-            fn( std::get< Ns >( std::forward< Tuple >( tup ) )... ) )
-    {
-        return fn( std::get< Ns >( std::forward< Tuple >( tup ) )... );
-    }
-};
+    return fn( std::get< Ns >( std::forward< Tuple >( tup ) )... );
+}
 
 ///
-template< typename Unpacker, typename Callable, typename Tuple >
-auto apply_tuple(
+template< typename Callable, typename Tuple >
+auto Invoke(
     Callable&& fn,
     Tuple&& tup ) -> decltype(
-        Unpacker::apply(
+        CallWithTuple(
             std::forward< Callable >( fn ),
             std::forward< Tuple >( tup ),
             typename gens< std::tuple_size<
                 typename std::remove_reference< Tuple >::type >::value >::type() ) )
 {
-    return Unpacker::apply(
+    return CallWithTuple(
         std::forward< Callable >( fn ),
         std::forward< Tuple >( tup ),
         typename gens< std::tuple_size<
@@ -96,9 +92,12 @@ auto apply_tuple(
 template< typename PocoTuple, std::size_t... Ns >
 auto Convert(
     PocoTuple&& pocotuple,
-    seq< Ns... > ) -> decltype( std::make_tuple( pocotuple.get< Ns >()... ) )
+    seq< Ns... > ) -> decltype(
+        std::make_tuple(
+            std::forward< PocoTuple >( pocotuple ).get< Ns >()... ) )
 {
-    return std::make_tuple( pocotuple.get< Ns >()... );
+    return std::make_tuple(
+        std::forward< PocoTuple >( pocotuple ).get< Ns >()... );
 }
 
 ///Must manually specify template params
