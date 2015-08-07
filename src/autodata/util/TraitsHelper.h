@@ -34,6 +34,16 @@ namespace autodata
 namespace util
 {
 
+///
+template< typename T, typename... Ts >
+struct are_arithmetic : std::conditional<
+    std::is_arithmetic< T >::value,
+    are_arithmetic< Ts... >, std::false_type >::type{};
+
+///
+template< typename T >
+struct are_arithmetic< T > : std::is_arithmetic< T >{};
+
 ///Check if type U is a specialization of the incomplete type T
 template< template< typename... > class T, typename U >
 struct is_specialization_of : std::false_type{};

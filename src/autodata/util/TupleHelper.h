@@ -24,6 +24,9 @@
 #include <autodata/AutoDataConfig.h>
 #include <autodata/CompilerGuards.h>
 
+// --- Poco Includes --- //
+#include <Poco/Tuple.h>
+
 // --- Standard Includes --- //
 #include <functional>
 #include <tuple>
@@ -87,6 +90,24 @@ auto apply_tuple(
         std::forward< Tuple >( tup ),
         typename gens< std::tuple_size<
             typename std::remove_reference< Tuple >::type >::value >::type() );
+}
+
+///Helper function
+template< typename PocoTuple, std::size_t... Ns >
+auto Convert(
+    PocoTuple&& pocotuple,
+    seq< Ns... > ) -> decltype( std::make_tuple( pocotuple.get< Ns >()... ) )
+{
+    return std::make_tuple( pocotuple.get< Ns >()... );
+}
+
+///Must manually specify template params
+///Poco::Tuple is not a true tuple w/ NullTypeList template params
+template< typename... Ts >
+std::tuple< Ts... > Convert(
+    Poco::Tuple< Ts... > const& pocotuple )
+{
+    return Convert( pocotuple, typename gens< sizeof...( Ts ) >::type() );
 }
 
 } //end util
