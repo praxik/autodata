@@ -94,10 +94,10 @@ auto Convert(
     PocoTuple&& pocotuple,
     seq< Ns... > ) -> decltype(
         std::make_tuple(
-            std::forward< PocoTuple >( pocotuple ).get< Ns >()... ) )
+            std::forward< PocoTuple >( pocotuple ).template get< Ns >()... ) )
 {
     return std::make_tuple(
-        std::forward< PocoTuple >( pocotuple ).get< Ns >()... );
+        std::forward< PocoTuple >( pocotuple ).template get< Ns >()... );
 }
 
 ///Must manually specify template params
