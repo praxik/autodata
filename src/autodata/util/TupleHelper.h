@@ -44,20 +44,37 @@ template< std::size_t... >
 struct seq{ using type = seq; };
 
 ///
-template< std::size_t N, std::size_t... Ns >
-struct gens : gens< N - 1, N - 1, Ns... >{};
+template< typename S0, typename S1 >
+struct concat{};
+
+template< std::size_t... I0, std::size_t... I1 >
+struct concat< seq< I0... >, seq< I1... > > :
+    seq< I0..., ( sizeof...( I0 ) + I1 )... >{};
 
 ///
-template< std::size_t... Ns >
-struct gens< 0, Ns... > : seq< Ns... >{};
+template< std::size_t N >
+struct gens;
 
-///Reversed
-template< std::size_t N, std::size_t... Ns >
-struct rgens : rgens< N - 1, Ns..., N - 1 >{};
+template<>
+struct gens< 0 > : seq<>{};
 
-///Reversed
-template< std::size_t... Ns >
-struct rgens< 0, Ns... > : seq< Ns... >{};
+template<>
+struct gens< 1 > : seq< 0 >{};
+
+template< std::size_t N >
+struct gens : concat<
+    typename gens< N / 2 >::type,
+    typename gens< N - N / 2 >::type >::type{};
+
+///Closed interval sequence
+template< std::size_t C, std::size_t P, std::size_t... Ns >
+struct cintvl_helper : cintvl_helper< C - 1, P + 1, Ns..., P >{};
+
+template< std::size_t P, std::size_t... Ns >
+struct cintvl_helper< 0, P, Ns... > : seq< Ns... >{};
+
+template< std::size_t S, std::size_t E >
+struct cigens : cintvl_helper< E - S + 1, S >{};
 
 ///
 template< typename Callable, typename Tuple, std::size_t... Ns >
