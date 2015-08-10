@@ -62,6 +62,9 @@ enum ConnectorEnum
 class AUTODATA_EXPORTS ConnectionTuple
 {
 public:
+    ///default constructor...
+    ConnectionTuple() = default;
+
     ///constructor
     ConnectionTuple(
         std::string const& name,
