@@ -412,6 +412,7 @@ T Convert(
     }
 }
 
+#ifndef SWIG
 ///
 template< typename T >
 T Convert(
@@ -422,6 +423,7 @@ T Convert(
     for( auto check : checks ) if( var == check ) return defVal;
     return Convert< T >( var, defVal );
 }
+#endif //SWIG
 
 ///
 template< typename T >

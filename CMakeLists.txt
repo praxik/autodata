@@ -1,5 +1,9 @@
 
-cmake_minimum_required( VERSION 2.8.8 )
+if( WIN32 )
+    cmake_minimum_required( VERSION 3.0.0 )
+else()
+    cmake_minimum_required( VERSION 2.8.8 )
+endif()
 
 project( AUTODATA )
 
@@ -67,6 +71,13 @@ set( BOOST_ROOT "Please specify"
 find_package( Boost 1.53.0 REQUIRED COMPONENTS
     date_time filesystem program_options regex system thread )
 
+#CSharp
+if( WIN32 )
+    set( CSHARP_DOTNET_VERSION v4.0.30319 )
+    set( CSHARP_DOTNET_VERSION ${CSHARP_DOTNET_VERSION} CACHE STRING "" FORCE )
+    find_package( CSharp 4.0 )
+endif()
+
 #POCO
 if( POCO_STATIC )
     add_definitions( -DPOCO_STATIC )
@@ -78,6 +89,12 @@ find_package( POCO 1.5.3 REQUIRED COMPONENTS
     OPTIONAL_COMPONENTS DataMySQL DataODBC )
 set( POCO_MYSQL_API_DEFINE "undef" )
 set( POCO_ODBC_API_DEFINE "undef" )
+
+#Ruby
+find_package( Ruby )
+
+#Swig
+find_package( SWIG )
 
 foreach( config IN LISTS CMAKE_CONFIGURATION_TYPES ITEMS ${CMAKE_BUILD_TYPE} )
     string( TOUPPER ${config} config )

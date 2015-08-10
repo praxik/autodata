@@ -36,7 +36,6 @@ namespace autodata
 namespace db
 {
 
-#ifndef SWIG
 ///
 enum ConnectorEnum
 {
@@ -60,8 +59,41 @@ enum ConnectorEnum
 };
 
 ///
-typedef std::tuple<
-    std::string, ConnectorEnum, std::string > ConnectionTuple;
+class AUTODATA_EXPORTS ConnectionTuple
+{
+public:
+    ///constructor
+    ConnectionTuple(
+        std::string const& name,
+        ConnectorEnum connector,
+        std::string const& value );
+
+    ///copy constructor
+    ConnectionTuple(
+        ConnectionTuple const& ) = default;
+
+#ifndef SWIG
+    ///move constructor
+    ConnectionTuple(
+        ConnectionTuple&& rhs );
+#endif
+
+    ///assignment operator
+    ConnectionTuple& operator =(
+        ConnectionTuple rhs );
+
+    ///destructor
+    ~ConnectionTuple() = default;
+
+    std::string const& Name() const;
+    ConnectorEnum Connector() const;
+    std::string const& Value() const;
+
+private:
+    std::string m_name;
+    ConnectorEnum m_connector;
+    std::string m_value;
+};
 typedef std::vector< ConnectionTuple > ConnectionVector;
 
 ///
@@ -84,12 +116,15 @@ AUTODATA_EXPORTS
 ConnectorEnum GetConnector(
     std::string const& name );
 
+#ifndef SWIG
 ///
 AUTODATA_EXPORTS
 Poco::Data::Session GetSession(
     std::string const& name,
     unsigned int maxRetryAttempts = 100,
     unsigned int retrySleep = 100 );
+
+#endif //SWIG
 
 ///
 AUTODATA_EXPORTS
@@ -107,6 +142,7 @@ void SetMaxFieldSize(
 AUTODATA_EXPORTS
 void UnregisterConnectors();
 
+#ifndef SWIG
 ///For internal use only
 class Connection
 {

@@ -75,6 +75,52 @@ ConnectorStringMap ConnectorStrings = boost::assign::map_list_of
 #endif //POCO_ODBC_API
     ( CONN_SQLITE, SQLite::Connector::KEY );
 ////////////////////////////////////////////////////////////////////////////////
+ConnectionTuple::ConnectionTuple(
+    std::string const& name,
+    ConnectorEnum connector,
+    std::string const& value )
+    :
+    m_name( name ),
+    m_connector( connector ),
+    m_value( value )
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+ConnectionTuple::ConnectionTuple(
+    ConnectionTuple&& rhs )
+    :
+    m_name( std::move( rhs.m_name ) ),
+    m_connector( rhs.m_connector ),
+    m_value( std::move( rhs.m_value ) )
+{
+    ;
+}
+////////////////////////////////////////////////////////////////////////////////
+ConnectionTuple& ConnectionTuple::operator =(
+    ConnectionTuple rhs )
+{
+    m_name = std::move( rhs.m_name );
+    m_connector = rhs.m_connector;
+    m_value = std::move( rhs.m_value );
+    return *this;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::string const& ConnectionTuple::Name() const
+{
+    return m_name;
+}
+////////////////////////////////////////////////////////////////////////////////
+ConnectorEnum ConnectionTuple::Connector() const
+{
+    return m_connector;
+}
+////////////////////////////////////////////////////////////////////////////////
+std::string const& ConnectionTuple::Value() const
+{
+    return m_value;
+}
+////////////////////////////////////////////////////////////////////////////////
 Connection::Connection(
     ConnectorEnum connector,
     std::string value,
@@ -198,9 +244,9 @@ void RegisterConnectors(
 {
     for( auto const& c : connections )
     {
-        std::string const& name = std::get< 0 >( c );
-        ConnectorEnum connector = std::get< 1 >( c );
-        std::string const& value = std::get< 2 >( c );
+        std::string const& name = c.Name();
+        ConnectorEnum connector = c.Connector();
+        std::string const& value = c.Value();
 
         Registers[ connector ]();
         Connections.emplace( name, Connection(
