@@ -117,13 +117,19 @@ auto Convert(
         std::forward< PocoTuple >( pocotuple ).template get< Ns >()... );
 }
 
-///Must manually specify template params
 ///Poco::Tuple is not a true tuple w/ NullTypeList template params
-template< typename... Ts >
-std::tuple< Ts... > Convert(
-    Poco::Tuple< Ts... > const& pocotuple )
+template< typename PocoTuple >
+auto Convert(
+    PocoTuple&& pocotuple ) -> decltype(
+        Convert(
+            std::forward< PocoTuple >( pocotuple ),
+            typename gens<
+                std::remove_reference< PocoTuple >::type::length >::type() ) )
 {
-    return Convert( pocotuple, typename gens< sizeof...( Ts ) >::type() );
+    return Convert(
+        std::forward< PocoTuple >( pocotuple ),
+        typename gens<
+            std::remove_reference< PocoTuple >::type::length >::type() );
 }
 
 } //end util
