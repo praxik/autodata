@@ -136,6 +136,10 @@ void RegisterConnectors(
 
 ///
 ///\param maxFldSize set the maximum field size in bytes
+/*\note
+ * When connecting via the psqlodbc driver on *nix os,
+ * make sure to specify the connection option "MaxLongVarcharSize=maxFldSize;"
+ */
 AUTODATA_EXPORTS
 void SetMaxFieldSize(
     std::string const& name,
