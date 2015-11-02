@@ -53,6 +53,7 @@ public:
 
 %template( VectorInt ) std::vector< int >;
 %template( VectorUInt ) std::vector< unsigned int >;
+%template( VectorSizeT ) std::vector< std::size_t >;
 %template( VectorDouble ) std::vector< double >;
 %template( VectorString ) std::vector< std::string >;
 %template( VectorPairString ) std::vector< std::pair< std::string, std::string > >;
