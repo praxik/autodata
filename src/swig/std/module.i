@@ -26,7 +26,7 @@ std_ruby
 std
 #endif
 %{
-    #include <stdint.h>
+    ;
 %}
 
 %import <common.i>

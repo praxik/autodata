@@ -20,7 +20,7 @@ if( RUBY_FOUND )
     set( TARGET_NAME std_ruby )
     set( SWIG_LANGUAGE RUBY )
 
-    set( CMAKE_SWIG_FLAGS -c++ )
+    set( CMAKE_SWIG_FLAGS "${CMAKE_SWIG_GLOBAL_FLAGS} -c++" )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/ruby )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
