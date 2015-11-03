@@ -26,7 +26,7 @@ std_ruby
 std
 #endif
 %{
-    ;
+    #include <stdint.h>
 %}
 
 %import <common.i>
@@ -53,7 +53,8 @@ public:
 
 %template( VectorInt ) std::vector< int >;
 %template( VectorUInt ) std::vector< unsigned int >;
-%template( VectorSizeT ) std::vector< size_t >;
+%template( VectorInt64 ) std::vector< int64_t >;
+%template( VectorUInt64 ) std::vector< uint64_t >;
 %template( VectorDouble ) std::vector< double >;
 %template( VectorString ) std::vector< std::string >;
 %template( VectorPairString ) std::vector< std::pair< std::string, std::string > >;
