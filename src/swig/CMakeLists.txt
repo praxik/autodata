@@ -11,8 +11,6 @@ try_compile( UINT64T_SAME_AS_ULONG
 #When "-DSWIGWORDSIZE64" is defined SWIG uses unsigned long for uint64_t types
 if( ${UINT64T_SAME_AS_ULONG} )
     set( CMAKE_SWIG_GLOBAL_FLAGS "-DSWIGWORDSIZE64" )
-else()
-    set( CMAKE_SWIG_GLOBAL_FLAGS "-DSWIGWORDSIZE32" )
 endif()
 
 set( SWIG_DIR ${CMAKE_SOURCE_DIR}/src/swig )
