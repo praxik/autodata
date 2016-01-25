@@ -253,7 +253,6 @@ private:
 
     ///
     Records m_records;
-
 };
 
 ///For cpplinq use
@@ -357,12 +356,19 @@ public:
         std::string const& tableName,
         Records& records );
 
+    ///Specify the number of row samples to use for determining column types
+    std::size_t SampleSize;
+
 protected:
     ///
     ~DbSave();
 
 private:
-
+    ///
+    void CreateTable(
+        Poco::Data::Session& session,
+        std::string const& tableName,
+        Records& records );
 };
 
 ///

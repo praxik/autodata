@@ -110,6 +110,8 @@ void DbLoad::Load(
 }
 ////////////////////////////////////////////////////////////////////////////////
 DbSave::DbSave()
+    :
+    SampleSize( 50 )
 {
     ;
 }
@@ -119,26 +121,65 @@ DbSave::~DbSave()
     ;
 }
 ////////////////////////////////////////////////////////////////////////////////
+void DbSave::CreateTable(
+    Session& session,
+    std::string const& tableName,
+    Records& records )
+{
+    std::size_t size = std::min( SampleSize, records.size() );
+    Statement statement( session );
+    statement << "create table if not exists \"" << tableName << "\"(\n";
+    auto const& firstrow = records.front();
+    for( auto const& kv : firstrow )
+    {
+        std::string const& col = kv.first;
+        statement << "  \"" << col << "\" ";
+        std::string type = "integer"; //most restrictive type
+        for( std::size_t row = 0; row < size; ++row )
+        {
+            auto const& record = records.at( row );
+            Var const& var = record[ col ];
+
+            //If any value in the samples is text, break
+            if( var.isString() )
+            {
+                type = "text";
+                break;
+            }
+
+            //Unhandled type
+            if( !var.isNumeric() ) throw std::runtime_error(
+                "autodata::dynamic::DbSave::CreateTable: unhandled type" );
+
+            //Type is integer or floating point
+            if( type == "real" ) continue;
+
+            //Type is integer, can we remain an integer?
+            if( !var.isInteger() ) type = "real";
+        }
+        statement << type << ",\n";
+    }
+    statement
+        << "constraint \"" << tableName << "_ukey_1\"\n"
+        << "  unique(\n"
+        << "    id ) );";
+
+    Query query( statement );
+    query.Execute();
+}
+////////////////////////////////////////////////////////////////////////////////
 void DbSave::Save(
     Session& session,
     std::string const& tableName,
     Records& records )
 {
+    //Fix up records if necessary
     Record& r = records.back();
-    std::string tmp;
-    if( tableName.empty() )
-    {
-        tmp = r.GetTypename();
-    }
-    else
-    {
-        tmp = tableName;
-        r.SetTypename( tmp );
-    }
-    poco_assert( !tmp.empty() );
-    r.CreateTable( session );
-
-    //
+    std::string tmp = ( tableName.empty() ) ? r.GetTypename() : tableName;
+    if( tmp.empty() ) throw std::runtime_error(
+        "autodata::dynamic::DbSave::Save: table name cannot be empty" );
+    if( !r.contains( "id" ) ) for( auto& rec : records ) rec.CreateId();
+    CreateTable( session, tmp, records );
     Query query = ( session
         << "insert into \"" << tmp << "\"(\n"
         <<    r.columns( 2 ) << " )\n"
