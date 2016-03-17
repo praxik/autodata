@@ -79,10 +79,12 @@ elseif( ${TARGET_CATEGORY} STREQUAL "Swig" )
         ARCHIVE DESTINATION ${INSTALL_LIBDIR} )
 
     if( INCDIR_NAME )
-        get_filename_component( PATH ${INTERFACE_FILE} PATH )
-        install(
-            FILES ${INTERFACE_FILE}
-            DESTINATION ${INSTALL_INCDIR}/${INCDIR_NAME}/${PATH} )
+        foreach( INTF ${INTERFACE_FILES} )
+            get_filename_component( PATH ${INTF} PATH )
+            install(
+                FILES ${INTF}
+                DESTINATION ${INSTALL_INCDIR}/${INCDIR_NAME}/${PATH} )
+        endforeach()
     endif()
 
     if( ${SWIG_LANGUAGE} STREQUAL "CSHARP" )

@@ -22,7 +22,7 @@ set( PRIVATE_HEADERS "" )
 set( PUBLIC_HEADERS "" )
 set( PRIVATE_SOURCES "" )
 
-set( INTERFACE_FILE module.i )
+set( MODULE_FILE module.i )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
 include_directories( ${SWIG_DIR} )

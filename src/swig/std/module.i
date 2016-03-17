@@ -33,6 +33,7 @@ std
 
 %include <stl.i>
 %include <stdint.i>
+%include <std/std_reference_wrapper.i>
 #ifdef SWIGRUBY
 namespace std
 {

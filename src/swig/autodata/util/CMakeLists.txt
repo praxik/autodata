@@ -1,6 +1,8 @@
 
+file( GLOB INTERFACE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.i" )
+
 set( INCDIR_NAME "swig/autodata/util" )
-set_source_files_properties( ${INTERFACE_FILE} PROPERTIES CPLUSPLUS ON )
+set_source_files_properties( ${MODULE_FILE} PROPERTIES CPLUSPLUS ON )
 
 if( CSHARP_FOUND )
     set( TARGET_NAME autodata_util_csharp )
@@ -13,7 +15,7 @@ if( CSHARP_FOUND )
         Poco_csharp
         Poco_Data_csharp
         Poco_Dynamic_csharp )
-    swig_add_module( ${TARGET_NAME} csharp ${INTERFACE_FILE} )
+    swig_add_module( ${TARGET_NAME} csharp ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         autodata
         ${Boost_LIBRARIES}
@@ -33,7 +35,7 @@ if( RUBY_FOUND )
         Poco_ruby
         Poco_Data_ruby
         Poco_Dynamic_ruby )
-    swig_add_module( ${TARGET_NAME} ruby ${INTERFACE_FILE} )
+    swig_add_module( ${TARGET_NAME} ruby ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         autodata
         ${Boost_LIBRARIES}
