@@ -58,4 +58,5 @@ public:
 %template( VectorUInt64 ) std::vector< uint64_t >;
 %template( VectorDouble ) std::vector< double >;
 %template( VectorString ) std::vector< std::string >;
+%template( VectorPairDouble ) std::vector< std::pair< double, double > >;
 %template( VectorPairString ) std::vector< std::pair< std::string, std::string > >;
