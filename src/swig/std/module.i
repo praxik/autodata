@@ -52,10 +52,19 @@ public:
 %template( PairDouble ) std::pair< double, double >;
 %template( PairString ) std::pair< std::string, std::string >;
 
+#ifdef SWIGRUBY
+%include <std_set.i>
+
+%template( SetInt ) std::set< int >;
+%template( SetFloat ) std::set< float >;
+%template( SetDouble ) std::set< double >;
+#endif
+
 %template( VectorInt ) std::vector< int >;
 %template( VectorUInt ) std::vector< unsigned int >;
 %template( VectorInt64 ) std::vector< int64_t >;
 %template( VectorUInt64 ) std::vector< uint64_t >;
+%template( VectorFloat ) std::vector< float >;
 %template( VectorDouble ) std::vector< double >;
 %template( VectorString ) std::vector< std::string >;
 %template( VectorPairDouble ) std::vector< std::pair< double, double > >;
