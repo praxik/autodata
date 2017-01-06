@@ -50,6 +50,8 @@ public:
 #endif
 
 %template( PairDouble ) std::pair< double, double >;
+%template( PairDblStr ) std::pair< double, std::string >;
+%template( PairStrDbl ) std::pair< std::string, double >;
 %template( PairString ) std::pair< std::string, std::string >;
 
 #ifdef SWIGRUBY
