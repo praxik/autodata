@@ -329,10 +329,12 @@ public:
     ///
     DbLoad();
 
+#ifndef SWIG
     ///
     void Load(
         Poco::Data::Statement& statement,
         Records& records );
+#endif //SWIG
 
 protected:
     ///
@@ -350,11 +352,13 @@ public:
     ///
     DbSave();
 
+#ifndef SWIG
     ///
     void Save(
         Poco::Data::Session& session,
         std::string const& tableName,
         Records& records );
+#endif //SWIG
 
     ///Specify the number of row samples to use for determining column types
     std::size_t SampleSize;
@@ -364,11 +368,13 @@ protected:
     ~DbSave();
 
 private:
+#ifndef SWIG
     ///
     void CreateTable(
         Poco::Data::Session& session,
         std::string const& tableName,
         Records& records );
+#endif //SWIG
 };
 
 ///
@@ -437,6 +443,7 @@ private:
 } //end dynamic
 } //end autodata
 
+#ifndef SWIG
 namespace Poco
 {
 namespace Data
@@ -810,3 +817,4 @@ private:
 
 } // end Dynamic
 } // end Poco
+#endif //SWIG

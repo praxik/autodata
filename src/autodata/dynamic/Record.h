@@ -27,8 +27,9 @@
 #include <autodata/util/DataHelper.h>
 
 // --- POCO Includes --- //
+#ifndef SWIG
 #include <Poco/Data/Session.h>
-
+#endif //SWIG
 #include <Poco/Dynamic/Struct.h>
 
 namespace autodata
@@ -40,12 +41,14 @@ namespace dynamic
 class Record;
 typedef std::vector< Record > Records;
 
+#ifndef SWIG
 ///
 AUTODATA_EXPORTS
 Record load(
     std::string const& typeName,
     Poco::Dynamic::Var const& id,
     Poco::Data::Session& session );
+#endif //SWIG
 
 ///
 class AUTODATA_EXPORTS Record : public Poco::Dynamic::Struct< std::string >
@@ -94,9 +97,11 @@ public:
     ///
     void CreateId();
 
+#ifndef SWIG
     ///
     void CreateTable(
         Poco::Data::Session& session );
+#endif //SWIG
 
     ///
     iterator end();
@@ -114,6 +119,7 @@ public:
     ///
     std::string const& GetTypename() const;
 
+#ifndef SWIG
     ///
     void Load(
         Poco::Data::Session& session );
@@ -121,6 +127,7 @@ public:
     ///
     void Save(
         Poco::Data::Session& session );
+#endif //SWIG
 
     ///
     void SetId(
@@ -186,6 +193,7 @@ auto end(
 } //end dynamic
 } //end autodata
 
+#ifndef SWIG
 namespace Poco
 {
 namespace Data
@@ -419,3 +427,4 @@ public:
 
 } //end Dynamic
 } //end Poco
+#endif //SWIG
