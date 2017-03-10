@@ -71,8 +71,21 @@ bool only_1_bit(
 std::string get_file_contents(
     std::string const& filename )
 {
-    std::ifstream ifs( filename, std::ios::in | std::ios::binary );
-    if( !ifs ) throw( errno );
+    std::ifstream ifs;
+    //Prepare to throw if failbit gets set
+    ifs.exceptions( ifs.exceptions() | std::ios::failbit );
+    try
+    {
+        ifs.open( filename, std::ios::in | std::ios::binary );
+    }
+    catch( std::ios_base::failure const& e )
+    {
+        std::ostringstream oss;
+        oss << "autodata::util::get_file_contents: " << std::endl
+            << "  " << std::strerror( errno ) << std::endl
+            << "  " << e.what();
+        throw std::runtime_error( oss.str() );
+    }
 
     std::string contents;
     ifs.seekg( 0, std::ios::end );
