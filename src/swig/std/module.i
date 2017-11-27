@@ -69,6 +69,7 @@ public:
 %template( VectorFloat ) std::vector< float >;
 %template( VectorDouble ) std::vector< double >;
 %template( VectorString ) std::vector< std::string >;
+%template( VectorPairInt ) std::vector< std::pair< int, int > >;
 %template( VectorPairDouble ) std::vector< std::pair< double, double > >;
 %template( VectorPairDblStr ) std::vector< std::pair< double, std::string > >;
 %template( VectorPairStrDbl ) std::vector< std::pair< std::string, double > >;
