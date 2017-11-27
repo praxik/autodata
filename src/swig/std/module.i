@@ -49,6 +49,7 @@ public:
 %include <std_shared_ptr.i>
 #endif
 
+%template( PairInt ) std::pair< int, int >;
 %template( PairDouble ) std::pair< double, double >;
 %template( PairDblStr ) std::pair< double, std::string >;
 %template( PairStrDbl ) std::pair< std::string, double >;
