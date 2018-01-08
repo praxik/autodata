@@ -55,7 +55,7 @@ public:
 %template( PairStrDbl ) std::pair< std::string, double >;
 %template( PairString ) std::pair< std::string, std::string >;
 
-#ifdef SWIGRUBY
+#ifndef SWIGCSHARP
 %include <std_set.i>
 
 %template( SetInt ) std::set< int >;

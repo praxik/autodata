@@ -15,8 +15,13 @@ if( NOT TARGET_LANGUAGE )
 endif()
 
 #
-set_target_properties( ${TARGET_NAME}
-    PROPERTIES PROJECT_LABEL "${TARGET_CATEGORY} ${TARGET_NAME}" )
+if( ${TARGET_CATEGORY} STREQUAL "Swig" )
+    set_target_properties( ${SWIG_MODULE_${TARGET_NAME}_REAL_NAME}
+        PROPERTIES PROJECT_LABEL "${TARGET_CATEGORY} ${TARGET_NAME}" )
+else()
+    set_target_properties( ${TARGET_NAME}
+        PROPERTIES PROJECT_LABEL "${TARGET_CATEGORY} ${TARGET_NAME}" )
+endif()
 
 #
 if( WIN32 )

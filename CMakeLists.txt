@@ -90,6 +90,9 @@ find_package( POCO 1.5.3 REQUIRED COMPONENTS
 set( POCO_MYSQL_API_DEFINE "undef" )
 set( POCO_ODBC_API_DEFINE "undef" )
 
+#Python
+find_package( PythonLibs )
+
 #Ruby
 find_package( Ruby )
 
