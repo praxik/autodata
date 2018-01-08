@@ -26,8 +26,7 @@ if( PYTHONLIBS_FOUND )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
     swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
-    swig_link_libraries(
-        ${TARGET_NAME}
+    swig_link_libraries( ${TARGET_NAME}
         ${PYTHON_LIBRARIES} )
 
     include( ModuleInstall )
@@ -37,13 +36,12 @@ if( RUBY_FOUND )
     set( TARGET_NAME std_ruby )
     set( SWIG_LANGUAGE RUBY )
 
-    list( APPEND CMAKE_SWIG_FLAGS "-c++" )
+    list( APPEND CMAKE_SWIG_FLAGS -c++ )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/ruby )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
     swig_add_module( ${TARGET_NAME} ruby ${MODULE_FILE} )
-    swig_link_libraries(
-        ${TARGET_NAME}
+    swig_link_libraries( ${TARGET_NAME}
         ${RUBY_LIBRARY} )
 
     include( ModuleInstall )

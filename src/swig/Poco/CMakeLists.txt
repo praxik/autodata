@@ -10,7 +10,7 @@ if( CSHARP_FOUND )
     set( TARGET_NAME Poco_csharp )
     set( SWIG_LANGUAGE CSHARP )
 
-    set( CMAKE_SWIG_FLAGS -namespace Poco -dllimport ${TARGET_NAME} )
+    list( APPEND CMAKE_SWIG_FLAGS -namespace Poco -dllimport ${TARGET_NAME} )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/csharp )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         std_csharp )
@@ -21,11 +21,26 @@ if( CSHARP_FOUND )
     include( ModuleInstall )
 endif()
 
+if( PYTHONLIBS_FOUND )
+    set( TARGET_NAME Poco_python )
+    set( SWIG_LANGUAGE PYTHON )
+
+    set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python )
+    set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
+        _std_python )
+    swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
+    swig_link_libraries( ${TARGET_NAME}
+        ${POCO_LIBRARIES}
+        ${PYTHON_LIBRARIES} )
+
+    include( ModuleInstall )
+endif()
+
 if( RUBY_FOUND )
     set( TARGET_NAME Poco_ruby )
     set( SWIG_LANGUAGE RUBY )
 
-    set( CMAKE_SWIG_FLAGS -c++ )
+    list( APPEND CMAKE_SWIG_FLAGS -c++ )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/ruby )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         std_ruby )
