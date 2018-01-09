@@ -44,6 +44,6 @@ SWIG_CSBODY_TYPEWRAPPER( public, protected, public, SWIGTYPE )
 #else
 #define SWIGPY_SLICE_ARG( obj ) ( (PySliceObject*) (obj) )
 #endif
-#endif SWIGPYTHON
+#endif //SWIGPYTHON
 
 %import <operator_overload.i>
