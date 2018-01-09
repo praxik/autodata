@@ -8,7 +8,7 @@ if( CSHARP_FOUND )
     set( TARGET_NAME std_csharp )
     set( SWIG_LANGUAGE CSHARP )
 
-    list( APPEND CMAKE_SWIG_FLAGS -namespace std -dllimport ${TARGET_NAME} )
+    set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -namespace std -dllimport ${TARGET_NAME} )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/csharp )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
@@ -22,6 +22,7 @@ if( PYTHONLIBS_FOUND )
     set( TARGET_NAME std_python )
     set( SWIG_LANGUAGE PYTHON )
 
+    set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
@@ -36,7 +37,7 @@ if( RUBY_FOUND )
     set( TARGET_NAME std_ruby )
     set( SWIG_LANGUAGE RUBY )
 
-    list( APPEND CMAKE_SWIG_FLAGS -c++ )
+    set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -c++ )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/ruby )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         ${SWIG_DIR}/common.i )
