@@ -33,6 +33,17 @@ SWIG_CSBODY_TYPEWRAPPER( public, protected, public, SWIGTYPE )
 
 %include <enums.swg>
 %csconst( 1 );
+#endif //SWIGCSHARP
+
+#ifdef SWIGPYTHON
+//Workaround for undefined SWIGPY_SLICE_ARG with swig 2.0.3 and 2.0.4
+//If removed, fails also with swig 3.0, so this has not been fixed?
+//Needs to be investigated
+#if( PY_VERSION_HEX >= 0x03020000 )
+#define SWIGPY_SLICE_ARG( obj ) ( (PyObject*) (obj) )
+#else
+#define SWIGPY_SLICE_ARG( obj ) ( (PySliceObject*) (obj) )
 #endif
+#endif SWIGPYTHON
 
 %import <operator_overload.i>

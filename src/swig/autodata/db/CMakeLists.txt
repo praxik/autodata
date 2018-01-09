@@ -36,14 +36,14 @@ if( PYTHONLIBS_FOUND )
         _Poco_Data_python
         _Poco_Dynamic_python
         _autodata_util_python )
-    #swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
-    #swig_link_libraries( ${TARGET_NAME}
-        #autodata
-        #${Boost_LIBRARIES}
-        #${POCO_LIBRARIES}
-        #${PYTHON_LIBRARIES} )
+    swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
+    swig_link_libraries( ${TARGET_NAME}
+        autodata
+        ${Boost_LIBRARIES}
+        ${POCO_LIBRARIES}
+        ${PYTHON_LIBRARIES} )
 
-    #include( ModuleInstall )
+    include( ModuleInstall )
 endif()
 
 if( RUBY_FOUND )
