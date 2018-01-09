@@ -158,6 +158,12 @@ elseif( ${TARGET_CATEGORY} STREQUAL "Swig" )
             FILES ${CSHARP_DLL}
             DESTINATION ${INSTALL_BINDIR} )
 
+    elseif(  ${SWIG_LANGUAGE} STREQUAL "PYTHON" )
+        install(
+            DIRECTORY ${CMAKE_SWIG_OUTDIR}/
+            DESTINATION ${MODULE_OUTPUT_DIRECTORY}
+            FILES_MATCHING PATTERN "*.py" )
+
     elseif(  ${SWIG_LANGUAGE} STREQUAL "RUBY" )
         set_target_properties( ${SWIG_MODULE_${TARGET_NAME}_REAL_NAME}
             PROPERTIES PREFIX "" )

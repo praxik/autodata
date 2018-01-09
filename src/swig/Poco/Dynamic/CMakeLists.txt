@@ -24,7 +24,7 @@ if( PYTHONLIBS_FOUND )
     set( TARGET_NAME Poco_Dynamic_python )
     set( SWIG_LANGUAGE PYTHON )
 
-    set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -interface ${TARGET_NAME} )
+    set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -interface _${TARGET_NAME} )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         _std_python
