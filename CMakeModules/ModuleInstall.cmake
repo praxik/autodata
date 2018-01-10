@@ -83,14 +83,14 @@ elseif( ${TARGET_CATEGORY} STREQUAL "Swig" )
         LIBRARY DESTINATION ${MODULE_OUTPUT_DIRECTORY}
         ARCHIVE DESTINATION ${INSTALL_LIBDIR} )
 
-    if( INCDIR_NAME )
-        foreach( INTF ${INTERFACE_FILES} )
-            get_filename_component( PATH ${INTF} PATH )
-            install(
-                FILES ${INTF}
-                DESTINATION ${INSTALL_INCDIR}/${INCDIR_NAME}/${PATH} )
-        endforeach()
-    endif()
+    #Install interface files
+    file( RELATIVE_PATH RELTOSRC "${CMAKE_SOURCE_DIR}/src" ${CMAKE_CURRENT_SOURCE_DIR} )
+    file( GLOB INTERFACE_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "*.i" )
+    foreach( INTF ${INTERFACE_FILES} )
+        install(
+            FILES ${INTF}
+            DESTINATION ${INSTALL_INCDIR}/${RELTOSRC} )
+    endforeach()
 
     if( ${SWIG_LANGUAGE} STREQUAL "CSHARP" )
         set( CSHARP_SFX _dotnet )

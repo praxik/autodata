@@ -1,7 +1,4 @@
 
-file( GLOB INTERFACE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.i" )
-
-set( INCDIR_NAME "swig/std" )
 set_source_files_properties( ${MODULE_FILE} PROPERTIES CPLUSPLUS ON )
 
 if( CSHARP_FOUND )

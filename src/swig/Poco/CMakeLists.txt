@@ -1,9 +1,6 @@
 
-file( GLOB INTERFACE_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.i" )
-
 include_directories( ${POCO_INCLUDE_DIR} )
 
-set( INCDIR_NAME "swig/Poco" )
 set_source_files_properties( ${MODULE_FILE} PROPERTIES CPLUSPLUS ON )
 
 if( CSHARP_FOUND )
