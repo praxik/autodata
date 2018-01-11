@@ -2,7 +2,8 @@
 set_source_files_properties( ${MODULE_FILE} PROPERTIES CPLUSPLUS ON )
 
 if( CSHARP_FOUND )
-    set( TARGET_NAME Poco_Dynamic_csharp )
+    set( MODULE_NAME Poco_Dynamic )
+    set( TARGET_NAME ${MODULE_NAME}_csharp )
     set( SWIG_LANGUAGE CSHARP )
 
     set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -namespace Poco.Dynamic -dllimport ${TARGET_NAME} )
@@ -18,9 +19,12 @@ if( CSHARP_FOUND )
 endif()
 
 if( PYTHONLIBS_FOUND )
-    set( TARGET_NAME Poco_Dynamic_python )
+    set( MODULE_NAME Poco_Dynamic )
+    set( TARGET_NAME ${MODULE_NAME}_python )
     set( SWIG_LANGUAGE PYTHON )
 
+    #Prevent UseSWIG from rebuilding source...
+    set_property( SOURCE ${MODULE_FILE} PROPERTY SWIG_MODULE_NAME ${MODULE_NAME} )
     set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -interface _${TARGET_NAME} )
     set( CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/python )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
@@ -35,7 +39,8 @@ if( PYTHONLIBS_FOUND )
 endif()
 
 if( RUBY_FOUND )
-    set( TARGET_NAME Poco_Dynamic_ruby )
+    set( MODULE_NAME Poco_Dynamic_ruby )
+    set( TARGET_NAME ${MODULE_NAME} )
     set( SWIG_LANGUAGE RUBY )
 
     set( CMAKE_SWIG_FLAGS ${CMAKE_SWIG_GLOBAL_FLAGS} -c++ )
