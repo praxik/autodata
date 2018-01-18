@@ -12,7 +12,7 @@ if( CSHARP_FOUND )
         std_csharp
         Poco_csharp
         Poco_Dynamic_csharp )
-    swig_add_module( ${TARGET_NAME} csharp ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE csharp SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES} )
 
@@ -32,7 +32,7 @@ if( PYTHONLIBS_FOUND )
         _std_python
         _Poco_python
         _Poco_Dynamic_python )
-    swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE python SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES}
         ${PYTHON_LIBRARIES} )
@@ -51,7 +51,7 @@ if( RUBY_FOUND )
         std_ruby
         Poco_ruby
         Poco_Dynamic_ruby )
-    swig_add_module( ${TARGET_NAME} ruby ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE ruby SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES}
         ${RUBY_LIBRARY} )

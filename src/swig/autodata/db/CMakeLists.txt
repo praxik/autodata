@@ -14,7 +14,7 @@ if( CSHARP_FOUND )
         Poco_Data_csharp
         Poco_Dynamic_csharp
         autodata_util_csharp )
-    swig_add_module( ${TARGET_NAME} csharp ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE csharp SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         autodata
         ${Boost_LIBRARIES}
@@ -38,7 +38,7 @@ if( PYTHONLIBS_FOUND )
         _Poco_Data_python
         _Poco_Dynamic_python
         _autodata_util_python )
-    swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE python SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         autodata
         ${Boost_LIBRARIES}
@@ -61,7 +61,7 @@ if( RUBY_FOUND )
         Poco_Data_ruby
         Poco_Dynamic_ruby
         autodata_util_ruby )
-    swig_add_module( ${TARGET_NAME} ruby ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE ruby SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         autodata
         ${Boost_LIBRARIES}

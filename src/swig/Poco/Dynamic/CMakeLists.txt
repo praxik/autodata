@@ -11,7 +11,7 @@ if( CSHARP_FOUND )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         std_csharp
         Poco_csharp )
-    swig_add_module( ${TARGET_NAME} csharp ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE csharp SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES} )
 
@@ -30,7 +30,7 @@ if( PYTHONLIBS_FOUND )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         _std_python
         _Poco_python )
-    swig_add_module( ${TARGET_NAME} python ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE python SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES}
         ${PYTHON_LIBRARIES} )
@@ -48,7 +48,7 @@ if( RUBY_FOUND )
     set( SWIG_MODULE_${TARGET_NAME}_EXTRA_DEPS
         std_ruby
         Poco_ruby )
-    swig_add_module( ${TARGET_NAME} ruby ${MODULE_FILE} )
+    swig_add_library( ${TARGET_NAME} LANGUAGE ruby SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES}
         ${RUBY_LIBRARY} )
