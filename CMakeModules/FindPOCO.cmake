@@ -61,7 +61,7 @@ endfunction()
 # Find the main Poco header.
 set( POCO_INCLUDE_DIR )
 find_path( POCO_INCLUDE_DIR Poco/Poco.h
-    PATHS ${POCO_ROOT}
+    HINTS ${POCO_ROOT}
         ENV POCO_ROOT
     PATH_SUFFIXES include
 )
@@ -140,7 +140,7 @@ foreach( lib ${_requestedComponents} )
     find_library( POCO_${lib}_LIBRARY
         NAMES ${lib}${_crtSuffix}
             Poco${lib}${_crtSuffix}
-        PATHS ${POCO_ROOT}
+        HINTS ${POCO_ROOT}
             ENV POCO_ROOT
         PATH_SUFFIXES lib
     )
@@ -155,7 +155,7 @@ foreach( lib ${_requestedComponents} )
     find_library( POCO_${lib}_LIBRARY_DEBUG
         NAMES ${lib}${_crtDebugSuffix}
             Poco${lib}${_crtDebugSuffix}
-        PATHS ${POCO_ROOT}
+        HINTS ${POCO_ROOT}
             ENV POCO_ROOT
         PATH_SUFFIXES lib
     )
