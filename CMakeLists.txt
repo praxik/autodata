@@ -37,15 +37,9 @@ if( WIN32 )
         message( STATUS "VC++ Platform: ${VC_PLATFORM}\n" )
 
         if( MSVC11 )
-            set( VC_VERSION 11 )
             #https://connect.microsoft.com/VisualStudio/feedback/details/737019
             add_definitions( -D_VARIADIC_MAX=10 )
-        elseif( MSVC12 )
-            set( VC_VERSION 12 )
-        else()
-            message( FATAL_ERROR "VC++ version not supported" )
         endif()
-        message( STATUS "VC++ Version: ${VC_VERSION}\n" )
     endif()
 endif()
 
