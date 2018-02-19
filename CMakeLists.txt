@@ -88,7 +88,7 @@ set( POCO_ODBC_API_DEFINE "undef" )
 find_package( PythonLibs )
 
 #Ruby
-find_package( Ruby )
+find_package( Ruby 2.4 )
 
 #Swig
 find_package( SWIG )
