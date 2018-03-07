@@ -85,6 +85,7 @@ set( POCO_MYSQL_API_DEFINE "undef" )
 set( POCO_ODBC_API_DEFINE "undef" )
 
 #Python
+find_package( PythonInterp )
 find_package( PythonLibs )
 
 #Ruby
