@@ -29,6 +29,8 @@ autodata_db
     #include <autodata/db/Connection.h>
 %}
 
+%include <std_vector.i>
+
 %import <autodata/util/module.i>
 
 #ifdef SWIGCSHARP
