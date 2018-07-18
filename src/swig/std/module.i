@@ -34,7 +34,7 @@ std
 %include <stl.i>
 %include <stdint.i>
 %include <std/std_reference_wrapper.i>
-#ifdef SWIGRUBY
+#if defined( SWIGRUBY ) || defined( SWIGPYTHON )
 namespace std
 {
 template< typename T >
