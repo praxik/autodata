@@ -133,12 +133,6 @@ namespace autodata
 namespace util
 {
 
-#ifndef SWIG
-///
-AUTODATA_EXPORTS
-bool only_1_bit(
-    int x );
-
 ///
 AUTODATA_EXPORTS
 std::string get_file_contents(
@@ -148,6 +142,12 @@ std::string get_file_contents(
 AUTODATA_EXPORTS
 std::string escape_json(
     std::string const& json );
+
+#ifndef SWIG
+///
+AUTODATA_EXPORTS
+bool only_1_bit(
+    int x );
 
 ///
 struct AUTODATA_EXPORTS icase
