@@ -13,7 +13,7 @@ if( ${UINT64T_SAME_AS_ULONG} )
     set( CMAKE_SWIG_GLOBAL_FLAGS -DSWIGWORDSIZE64 )
 endif()
 
-set( SWIG_DIR ${CMAKE_SOURCE_DIR}/src/swig )
+set( SWIG_SRC_DIR ${CMAKE_SOURCE_DIR}/src/swig )
 
 #set( TARGET_VERSION ${LEAF_VERSION} )
 set( TARGET_EXPORT ${CMAKE_PROJECT_NAME}Targets )
@@ -25,7 +25,7 @@ set( PRIVATE_SOURCES "" )
 set( MODULE_FILE module.i )
 
 include_directories( ${CMAKE_SOURCE_DIR}/src )
-include_directories( ${SWIG_DIR} )
+include_directories( ${SWIG_SRC_DIR} )
 if( PYTHONLIBS_FOUND )
     include_directories( ${PYTHON_INCLUDE_DIRS} )
 endif()

@@ -130,7 +130,7 @@ elseif( ${TARGET_CATEGORY} STREQUAL "Swig" )
                 ${CMAKE_COMMAND}
                     -Dswig_generated_file_fullname=${swig_generated_file_fullname}
                     -DCMAKE_SWIG_OUTDIR=${CMAKE_SWIG_OUTDIR}
-                    -P ${SWIG_DIR}/prebuild.cmake )
+                    -P ${SWIG_SRC_DIR}/prebuild.cmake )
 
         add_custom_command(
             TARGET ${TARGET_NAME}
@@ -146,7 +146,7 @@ elseif( ${TARGET_CATEGORY} STREQUAL "Swig" )
                     -DCSHARP_REF="${CSHARP_REF}"
                     -DCSHARP_DLL=${CSHARP_DLL}
                     -DCSHARP_SRC=${CSHARP_SRC}
-                    -P ${SWIG_DIR}/postbuild.cmake )
+                    -P ${SWIG_SRC_DIR}/postbuild.cmake )
         add_custom_target(
             ${CSHARP_NAME} ALL
             DEPENDS ${CSHARP_DLL} )
