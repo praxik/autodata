@@ -1,9 +1,19 @@
-
-if( WIN32 )
-    cmake_minimum_required( VERSION 3.0.0 )
-else()
-    cmake_minimum_required( VERSION 2.8.8 )
-endif()
+cmake_minimum_required( VERSION 3.0.0 )
+foreach( policy
+    )
+  if( POLICY ${policy} )
+    cmake_policy( SET ${policy} NEW )
+  endif()
+endforeach()
+foreach( policy
+    CMP0074 # CMake 3.12
+    CMP0078 # CMake 3.13
+    CMP0086 # CMake 3.14
+    )
+  if( POLICY ${policy} )
+    cmake_policy( SET ${policy} OLD )
+  endif()
+endforeach()
 
 project( AUTODATA )
 
