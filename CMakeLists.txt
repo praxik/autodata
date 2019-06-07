@@ -94,12 +94,17 @@ find_package( POCO 1.5.3 REQUIRED COMPONENTS
 set( POCO_MYSQL_API_DEFINE "undef" )
 set( POCO_ODBC_API_DEFINE "undef" )
 
+#Only 64-bit...
+if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
+
 #Python
 find_package( PythonInterp )
 find_package( PythonLibs )
 
 #Ruby
 find_package( Ruby 2.2 )
+
+endif()
 
 #Swig
 find_package( SWIG )
