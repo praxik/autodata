@@ -98,8 +98,8 @@ set( POCO_ODBC_API_DEFINE "undef" )
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 #Python
-find_package( PythonInterp )
-find_package( PythonLibs )
+find_package( PythonInterp 3 )
+find_package( PythonLibs 3 )
 
 #Ruby
 find_package( Ruby 2.2 )
