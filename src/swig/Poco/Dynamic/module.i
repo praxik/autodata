@@ -79,6 +79,6 @@ Poco_Dynamic
 %ignore Poco::Dynamic::Struct< std::string >::end() const;
 %ignore Poco::Dynamic::Struct< std::string >::begin() const;
 %include <Poco/Dynamic/Struct.h>
-%template( DynamicStruct ) Poco::Dynamic::Struct< std::string >;
+%template( DynamicStruct ) Poco::Dynamic::Struct< std::string, std::map< std::string, Poco::Dynamic::Var >, std::set< std::string > >;
 %template( StructData ) std::map< std::string, Poco::Dynamic::Var >;
-//%template( StructNameSet ) std::set< std::string >;
+%template( StructNameSet ) std::set< std::string >;
