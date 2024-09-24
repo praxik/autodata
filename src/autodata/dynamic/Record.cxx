@@ -37,6 +37,7 @@ using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
 using namespace Poco::Dynamic;
 using namespace Poco::JSON;
+namespace PJ = Poco::JSON;
 
 namespace autodata
 {
@@ -201,7 +202,7 @@ void Record::FromJson(
 {
     try
     {
-        Parser parser;
+        PJ::Parser parser;
         Var result = parser.parse( json );
         poco_assert( result.type() == typeid( Object::Ptr ) );
         Struct< std::string >::operator =( *result.extract< Object::Ptr >() );

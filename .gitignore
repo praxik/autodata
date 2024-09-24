@@ -1,4 +1,5 @@
 .DS_Store
+*.swp
 build-64-bit
 install-64-bit
 build-32-bit

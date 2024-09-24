@@ -44,6 +44,7 @@ public:
     T* operator ->();
     T* get();
 };
+namespace literals{}
 }
 #else
 %include <std_shared_ptr.i>

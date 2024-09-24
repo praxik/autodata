@@ -22,7 +22,7 @@ if( CSHARP_FOUND )
     include( ModuleInstall )
 endif()
 
-if( PYTHONLIBS_FOUND )
+if( Python3_FOUND )
     set( MODULE_NAME autodata_util )
     set( TARGET_NAME ${MODULE_NAME}_python )
     set( SWIG_LANGUAGE PYTHON )
@@ -41,7 +41,7 @@ if( PYTHONLIBS_FOUND )
         autodata
         ${Boost_LIBRARIES}
         ${POCO_LIBRARIES}
-        ${PYTHON_LIBRARIES} )
+        ${Python3_LIBRARIES} )
 
     include( ModuleInstall )
 endif()

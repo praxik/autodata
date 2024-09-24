@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0.0 )
+cmake_minimum_required( VERSION 3.30.0 )
 foreach( policy
     )
   if( POLICY ${policy} )
@@ -72,7 +72,7 @@ set( BOOST_USE_MULTITHREADED ON )
 set( BOOST_USE_STATIC_RUNTIME OFF )
 set( BOOST_ROOT "Please specify"
     CACHE PATH "Root directory where Boost is installed" )
-find_package( Boost 1.53.0 REQUIRED COMPONENTS
+find_package( Boost 1.53.0 CONFIG REQUIRED COMPONENTS
     date_time filesystem program_options regex system thread )
 
 #CSharp
@@ -98,8 +98,7 @@ set( POCO_ODBC_API_DEFINE "undef" )
 if( CMAKE_SIZEOF_VOID_P EQUAL 8 )
 
 #Python
-find_package( PythonInterp 3 )
-find_package( PythonLibs 3 )
+find_package( Python3 COMPONENTS Interpreter Development )
 
 #Ruby
 find_package( Ruby 2.2 )
@@ -107,7 +106,7 @@ find_package( Ruby 2.2 )
 endif()
 
 #Swig
-find_package( SWIG )
+find_package( SWIG 4.0 )
 
 foreach( config IN LISTS CMAKE_CONFIGURATION_TYPES ITEMS ${CMAKE_BUILD_TYPE} )
     string( TOUPPER ${config} config )

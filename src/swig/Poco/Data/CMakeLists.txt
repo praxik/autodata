@@ -19,7 +19,7 @@ if( CSHARP_FOUND )
     include( ModuleInstall )
 endif()
 
-if( PYTHONLIBS_FOUND )
+if( Python3_FOUND )
     set( MODULE_NAME Poco_Data )
     set( TARGET_NAME ${MODULE_NAME}_python )
     set( SWIG_LANGUAGE PYTHON )
@@ -35,7 +35,7 @@ if( PYTHONLIBS_FOUND )
     swig_add_library( ${TARGET_NAME} LANGUAGE python SOURCES ${MODULE_FILE} )
     swig_link_libraries( ${TARGET_NAME}
         ${POCO_LIBRARIES}
-        ${PYTHON_LIBRARIES} )
+        ${Python3_LIBRARIES} )
 
     include( ModuleInstall )
 endif()
