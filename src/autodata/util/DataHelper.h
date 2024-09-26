@@ -77,17 +77,10 @@ boost::once_flag const BOOST_ONCE_INIT_CONST = BOOST_ONCE_INIT;
 #include <limits>
 #include <memory>
 
-#ifdef WIN32
 #define MAKE_SHARED_FRIENDS( Class ) \
-friend class std::_Ref_count_obj< Class >;
-#elif __APPLE__
-#define MAKE_SHARED_FRIENDS( Class ) \
-template< typename _T1, typename _T2, unsigned > \
-friend class std::__1::__libcpp_compressed_pair_imp;
-#elif __linux__
-#define MAKE_SHARED_FRIENDS( Class ) \
-friend class __gnu_cxx::new_allocator< Class >;
-#endif
+friend class autodata::util::Factory; \
+friend class Poco::Data::TypeHandler< Class >; \
+template< typename T > friend class Poco::Data::Extraction;
 
 #if _MSC_VER >= 1800 || defined __linux__
 #define ISNAN_EXISTS 1
@@ -652,6 +645,41 @@ struct greater_than_or_equal_to
     }
 };
 
+///
+class Factory final
+{
+public:
+    ///
+    template< typename T, typename... Args >
+    static std::shared_ptr< T > make_shared( Args&&... args )
+    {
+        return std::allocate_shared< T >(
+            Alloc< T >(), std::forward< Args >( args )... );
+    }
+private:
+    ///
+    template< typename T >
+    struct Alloc : std::allocator< T >
+    {
+        using std::allocator< T >::allocator;
+
+        ///
+        template< typename U >
+        struct rebind{ using other = Alloc< U >; };
+
+        ///
+        template< typename U, typename... Args >
+        void construct( U* ptr, Args&&... args )
+        {
+            new( ptr ) U( std::forward< Args >( args )... );
+        }
+
+        ///
+        template< typename U >
+        void destroy( U* ptr ){ ptr->~U(); }
+    };
+};
+
 } //end util
 } //end autodata
 
@@ -719,12 +747,13 @@ public:
     std::size_t extract(
         std::size_t pos )
     {
+        using namespace autodata::util;
         if( _extracted ) throw ExtractException( "value already extracted" );
         _extracted = true;
         AbstractExtractor::Ptr pExt = getExtractor();
         if( _rResult == std::shared_ptr< J >() )
         {
-            _rResult = std::make_shared< J >();
+            _rResult = Factory::make_shared< J >();
         }
         TypeHandler< J >::extract( pos, *_rResult, _default, pExt );
         _null = isValueNull( *_rResult, pExt->isNull( pos ) );
@@ -823,8 +852,9 @@ public:
     std::size_t extract(
         std::size_t pos )
     {
+        using namespace autodata::util;
         AbstractExtractor::Ptr pExt = getExtractor();
-        std::shared_ptr< J > tmp = std::make_shared< J >();
+        std::shared_ptr< J > tmp = Factory::make_shared< J >();
         TypeHandler< J >::extract( pos, *tmp, _default, pExt );
         _rResult.push_back( tmp );
         _nulls.push_back( isValueNull( *tmp, pExt->isNull( pos ) ) );
@@ -1055,7 +1085,8 @@ public:
     std::size_t extract(
         std::size_t pos )
     {
-        std::shared_ptr< J > tmp = std::make_shared< J >();
+        using namespace autodata::util;
+        std::shared_ptr< J > tmp = Factory::make_shared< J >();
         TypeHandler< J >::extract( pos, *tmp, _default, getExtractor() );
         _rResult.insert( tmp );
 
